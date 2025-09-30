@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.logistica.controller.CrearEnvioController"
+            prefWidth="400" prefHeight="300">
+
+    <children>
+        <VBox alignment="CENTER" spacing="10" prefWidth="400" prefHeight="300">
+            <Label text="Crear Envío" style="-fx-font-size: 18px;"/>
+
+            <TextField fx:id="origenField" promptText="Dirección Origen"/>
+            <TextField fx:id="destinoField" promptText="Dirección Destino"/>
+            <TextField fx:id="pesoField" promptText="Peso en Kg"/>
+
+            <Button text="Crear Envío" onAction="#handleCrearEnvio"/>
+            <Label fx:id="mensajeLabel"/>
+        </VBox>
+    </children>
+</AnchorPane>
+
