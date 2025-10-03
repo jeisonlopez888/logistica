@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.logistica.ui.AdminController"
+            prefWidth="800" prefHeight="500">
+
+    <top>
+        <Label text="Panel de Administración - Usuarios"
+               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10;"/>
+    </top>
+
+    <center>
+        <TableView fx:id="usuariosTable" prefHeight="400" prefWidth="780">
+            <columns>
+                <TableColumn fx:id="idCol" text="Cédula" prefWidth="100"/>
+                <TableColumn fx:id="nombreCol" text="Nombre" prefWidth="150"/>
+                <TableColumn fx:id="emailCol" text="Email" prefWidth="180"/>
+                <TableColumn fx:id="telefonoCol" text="Teléfono" prefWidth="120"/>
+                <TableColumn fx:id="passwordCol" text="Password" prefWidth="120"/>
+                <TableColumn fx:id="adminCol" text="Admin" prefWidth="80"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 10;">
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Eliminar Usuario" onAction="#handleEliminarUsuario"/>
+                <Button text="Editar Usuario" onAction="#handleEditarUsuario"/>
+            </HBox>
+            <Label fx:id="mensajeLabel" text="" style="-fx-text-fill: red;"/>
+        </VBox>
+    </bottom>
+</BorderPane>
+
+
+

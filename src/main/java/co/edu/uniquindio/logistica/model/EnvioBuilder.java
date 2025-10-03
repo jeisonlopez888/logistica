@@ -7,7 +7,7 @@ public class EnvioBuilder {
 
     public EnvioBuilder() {
         envio = new Envio();
-        envio.setId(DataStore.getInstance().nextId());
+
     }
 
     public EnvioBuilder usuario(Usuario usuario) {
@@ -34,4 +34,3 @@ public class EnvioBuilder {
         return envio;
     }
 }
-

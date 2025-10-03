@@ -6,6 +6,7 @@ public class Envio {
     private Direccion destino;
     private double peso;
     private Usuario usuario;
+    private String estado = "SOLICITADO";
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -21,5 +22,17 @@ public class Envio {
 
     public Usuario getUsuario() { return usuario; }
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+
+    // Métodos para TableView (evitan bindings complejos)
+    public String getOrigenDireccion() {
+        return origen == null ? "" : origen.getCalle();
+    }
+    public String getDestinoDireccion() {
+        return destino == null ? "" : destino.getCalle();
+    }
 }
+
 

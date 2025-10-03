@@ -11,16 +11,16 @@ module co.edu.uniquindio.logistica {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
 
-    // Paquetes abiertos a JavaFX
+    // abrir paquetes para reflexión / FXML
     opens co.edu.uniquindio.logistica to javafx.fxml;
-    opens co.edu.uniquindio.logistica.controller to javafx.fxml;
-    opens co.edu.uniquindio.logistica.model to javafx.base; // 👈 ESTA LÍNEA ES LA CLAVE
+    opens co.edu.uniquindio.logistica.ui to javafx.fxml;
+    opens co.edu.uniquindio.logistica.model to javafx.base, javafx.fxml;
 
-    // Paquetes exportados
     exports co.edu.uniquindio.logistica;
-    exports co.edu.uniquindio.logistica.controller;
-    exports co.edu.uniquindio.logistica.model; // opcional, si usas fuera del módulo
+    exports co.edu.uniquindio.logistica.ui;
+    exports co.edu.uniquindio.logistica.model;
 }
+
 
 
 

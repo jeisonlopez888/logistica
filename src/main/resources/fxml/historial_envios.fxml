@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="co.edu.uniquindio.logistica.controller.HistorialEnviosController"
+            fx:controller="co.edu.uniquindio.logistica.ui.HistorialEnviosController"
             prefWidth="600" prefHeight="400">
 
     <children>
-        <VBox spacing="10" alignment="CENTER" prefWidth="600" prefHeight="400">
+        <VBox spacing="10" alignment="CENTER" layoutX="10" layoutY="10" prefWidth="580" prefHeight="380">
             <Label text="Historial de Envíos" style="-fx-font-size: 18px;"/>
-
-            <TableView fx:id="tablaEnvios" prefWidth="580" prefHeight="300">
+            <TableView fx:id="tablaEnvios" prefWidth="560" prefHeight="300">
                 <columns>
-                    <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="70"/>
                     <TableColumn fx:id="colOrigen" text="Origen" prefWidth="150"/>
                     <TableColumn fx:id="colDestino" text="Destino" prefWidth="150"/>
-                    <TableColumn fx:id="colPeso" text="Peso (Kg)" prefWidth="100"/>
+                    <TableColumn fx:id="colPeso" text="Peso (Kg)" prefWidth="90"/>
                 </columns>
             </TableView>
-
-            <Button text="Cerrar" onAction="#cerrar"/>
+            <HBox spacing="15">
+                <Button text="Editar" onAction="#editarEnvio"/>
+                <Button text="Eliminar" onAction="#eliminarEnvio"/>
+                <Button text="Volver" onAction="#volverMenu"/>
+            </HBox>
         </VBox>
     </children>
 </AnchorPane>
+
 

@@ -20,5 +20,10 @@ public class Direccion {
     public String getCalle() { return calle; }
     public String getCiudad() { return ciudad; }
     public String getCoordenadas() { return coordenadas; }
+
+    @Override
+    public String toString() {
+        return (alias != null && !alias.isEmpty() ? alias + " - " : "") + calle + ", " + ciudad;
+    }
 }
 
