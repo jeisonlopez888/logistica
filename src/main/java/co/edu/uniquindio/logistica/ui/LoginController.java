@@ -2,6 +2,7 @@ package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.Usuario;
+import co.edu.uniquindio.logistica.util.Sesion;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -28,6 +29,7 @@ public class LoginController {
         Usuario user = facade.login(email, password);
 
         if (user != null) {
+            Sesion.setUsuarioActual(user);
             mensajeLabel.setText("Bienvenido, " + user.getNombre() + "!");
             mensajeLabel.setStyle("-fx-text-fill: green;");
 

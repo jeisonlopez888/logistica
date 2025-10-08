@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class EnvioService {
+
     private final DataStore store = DataStore.getInstance();
 
     // CREAR
     public void registrarEnvio(Envio envio) {
+        if (envio.getEstado() == null) {
+            envio.setEstado(Envio.EstadoEnvio.PENDIENTE);
+        }
         store.addEnvio(envio);
     }
 
@@ -40,11 +44,19 @@ public class EnvioService {
                 .orElse(null);
     }
 
-    // EDITAR (actualizar datos de un envío existente)
+    // ACTUALIZAR ENVÍO COMPLETO
     public void actualizarEnvio(Envio envio, Envio actualizado) {
         envio.setOrigen(actualizado.getOrigen());
         envio.setDestino(actualizado.getDestino());
         envio.setPeso(actualizado.getPeso());
-        // Puedes extender aquí con más atributos
+        envio.setEstado(actualizado.getEstado());
+    }
+
+    // ACTUALIZAR SOLO EL ESTADO
+    public void actualizarEstado(Long idEnvio, Envio.EstadoEnvio nuevoEstado) {
+        Envio envio = buscarPorId(idEnvio);
+        if (envio != null) {
+            envio.setEstado(nuevoEstado);
+        }
     }
 }

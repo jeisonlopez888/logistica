@@ -10,6 +10,8 @@ module co.edu.uniquindio.logistica {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires org.apache.poi.ooxml;
+    requires org.apache.pdfbox;
 
     // abrir paquetes para reflexión / FXML
     opens co.edu.uniquindio.logistica to javafx.fxml;

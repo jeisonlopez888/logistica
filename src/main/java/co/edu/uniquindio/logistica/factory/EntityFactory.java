@@ -9,14 +9,12 @@ import co.edu.uniquindio.logistica.store.DataStore;
 
 public class EntityFactory {
 
-    // 🔹 Crear un usuario
+    // ✅ Crear un usuario (solo crea el objeto, NO lo guarda todavía)
     public static Usuario createUsuario(Long id, String nombre, String email, String telefono, String password, boolean admin) {
-        Usuario u = new Usuario(id, nombre, email, telefono, password, admin);
-        DataStore.getInstance().addUsuario(u); // opcional: registrar automáticamente en el DataStore
-        return u;
+        return new Usuario(id, nombre, email, telefono, password, admin);
     }
 
-    // 🔹 Crear un envío (usando Builder + Factory)
+    // 🔹 Crear un envío (este sí puede registrar directamente porque tiene builder)
     public static Envio createEnvio(Usuario usuario, Direccion origen, Direccion destino, double peso) {
         Envio envio = new EnvioBuilder()
                 .usuario(usuario)
@@ -25,7 +23,7 @@ public class EntityFactory {
                 .peso(peso)
                 .build();
 
-        DataStore.getInstance().addEnvio(envio); // registrar automáticamente
+        DataStore.getInstance().addEnvio(envio); // mantenerlo aquí está bien
         return envio;
     }
 }

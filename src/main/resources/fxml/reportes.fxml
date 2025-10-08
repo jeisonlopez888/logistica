@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.logistica.ui.ReportesController"
+            prefWidth="600" prefHeight="400"
+            style="-fx-background-color: linear-gradient(to bottom right, #f9f9f9, #e3f2fd);">
+
+    <top>
+        <HBox alignment="CENTER" style="-fx-background-color: #1976D2; -fx-padding: 15;">
+            <Label text="📊 Generar Reportes"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="20" alignment="CENTER" style="-fx-padding: 30;">
+            <Label text="Seleccione el tipo de reporte:"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0D47A1;"/>
+
+            <ComboBox fx:id="tipoReporteCombo" prefWidth="250"/>
+
+            <Label text="Seleccione el formato de salida:"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0D47A1;"/>
+
+            <HBox spacing="20" alignment="CENTER">
+                <RadioButton fx:id="excelRadio" text="Excel (.xlsx)" selected="true"/>
+                <RadioButton fx:id="pdfRadio" text="PDF (.pdf)"/>
+            </HBox>
+
+            <Button text="📁 Generar Reporte" onAction="#handleGenerarReporte"
+                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+            <Label fx:id="mensajeLabel" text="" style="-fx-font-size: 14px; -fx-text-fill: #1976D2;"/>
+        </VBox>
+    </center>
+
+</BorderPane>
+

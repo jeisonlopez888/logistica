@@ -2,6 +2,7 @@ package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.Usuario;
+import co.edu.uniquindio.logistica.util.Sesion;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,7 +22,6 @@ public class UserController {
     private Usuario usuario;
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
 
-    // Este método lo invoca LoginController al iniciar sesión
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
@@ -34,7 +34,11 @@ public class UserController {
 
             CrearEnvioController ctrl = loader.getController();
             ctrl.setUsuario(usuario);
-            ctrl.setOnEnvioCreado(() -> {}); // Puedes actualizar la lista si lo necesitas
+
+            // ✅ Refrescar historial automáticamente al crear envío
+            ctrl.setOnEnvioCreado(() -> {
+                mostrarAlerta("Éxito", "El envío se registró correctamente.");
+            });
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -53,7 +57,7 @@ public class UserController {
             Parent root = loader.load();
 
             HistorialEnviosController ctrl = loader.getController();
-            ctrl.setUsuario(usuario); // Pasar el usuario actual a la ventana de historial
+            ctrl.setUsuario(usuario);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -65,10 +69,11 @@ public class UserController {
         }
     }
 
-
     @FXML
     private void handleVolverLogin(ActionEvent event) {
         try {
+            Sesion.cerrarSesion();
+
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -79,7 +84,6 @@ public class UserController {
         }
     }
 
-
     private void mostrarAlerta(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
@@ -87,6 +91,4 @@ public class UserController {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
-
-
 }

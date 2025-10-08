@@ -4,7 +4,11 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<VBox alignment="CENTER" spacing="10" xmlns:fx="">
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="co.edu.uniquindio.logistica.ui.CrearUsuarioController"
+      alignment="CENTER" spacing="10" prefWidth="400" prefHeight="400">
+
     <Label text="Registrar Usuario" style="-fx-font-size: 18px;"/>
     <TextField fx:id="idField" promptText="Número de identificación"/>
     <TextField fx:id="nombreField" promptText="Nombre completo"/>
@@ -15,5 +19,6 @@
     <Button text="Registrar" onAction="#handleRegistrar"/>
     <Label fx:id="mensajeLabel"/>
 </VBox>
+
 
 

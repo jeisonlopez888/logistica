@@ -1,13 +1,13 @@
 package co.edu.uniquindio.logistica.model;
 
-import co.edu.uniquindio.logistica.store.DataStore;
+import java.time.LocalDateTime;
 
 public class EnvioBuilder {
-    private Envio envio;
+    private final Envio envio;
 
     public EnvioBuilder() {
         envio = new Envio();
-
+        envio.setEstado(Envio.EstadoEnvio.PENDIENTE); // Estado inicial por defecto
     }
 
     public EnvioBuilder usuario(Usuario usuario) {
@@ -27,6 +27,17 @@ public class EnvioBuilder {
 
     public EnvioBuilder peso(double peso) {
         envio.setPeso(peso);
+        return this;
+    }
+
+    public EnvioBuilder estado(Envio.EstadoEnvio estado) {
+        envio.setEstado(estado);
+        return this;
+    }
+
+    public EnvioBuilder fechaCreacion(LocalDateTime fecha) {
+        // Permite sobreescribir manualmente si se necesita
+        // (por defecto Envio ya pone LocalDateTime.now())
         return this;
     }
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.logistica.ui.TarifasController"
+            prefWidth="600" prefHeight="400">
+    <children>
+        <VBox alignment="CENTER" spacing="10" layoutX="50" layoutY="30" prefWidth="500">
+            <Label text="Gestión de Tarifas" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+            <TableView fx:id="tarifasTable" prefHeight="250">
+                <columns>
+                    <TableColumn fx:id="idCol" text="ID" prefWidth="80"/>
+                    <TableColumn fx:id="descripcionCol" text="Descripción" prefWidth="200"/>
+                    <TableColumn fx:id="baseCol" text="Base ($)" prefWidth="100"/>
+                    <TableColumn fx:id="porKiloCol" text="Por Kg ($)" prefWidth="100"/>
+                </columns>
+            </TableView>
+
+            <HBox spacing="10">
+                <Button text="Agregar Tarifa" onAction="#handleAgregar"/>
+                <Button text="Eliminar Tarifa" onAction="#handleEliminar"/>
+                <Button text="Cerrar" onAction="#handleCerrar"/>
+            </HBox>
+
+            <Label fx:id="mensajeLabel" textFill="green"/>
+        </VBox>
+    </children>
+</AnchorPane>
+

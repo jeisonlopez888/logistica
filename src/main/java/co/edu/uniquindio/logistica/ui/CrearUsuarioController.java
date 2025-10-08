@@ -7,7 +7,7 @@ import javafx.scene.control.*;
 
 public class CrearUsuarioController {
 
-    @FXML private TextField idField;        // 🔹 cédula
+    @FXML private TextField idField;
     @FXML private TextField nombreField;
     @FXML private TextField emailField;
     @FXML private TextField telefonoField;
@@ -15,12 +15,21 @@ public class CrearUsuarioController {
     @FXML private CheckBox adminCheck;
     @FXML private Label mensajeLabel;
 
-    private final LogisticaFacade facade = LogisticaFacade.getInstance();
+    private LogisticaFacade facade;
+    private Runnable onUsuarioCreado; // 🔹 callback para refrescar la tabla en AdminController
+
+    public void setFacade(LogisticaFacade facade) {
+        this.facade = facade;
+    }
+
+    public void setOnUsuarioCreado(Runnable onUsuarioCreado) {
+        this.onUsuarioCreado = onUsuarioCreado;
+    }
 
     @FXML
     private void handleRegistrar() {
         try {
-            Long id = Long.parseLong(idField.getText()); // 🔹 leer cédula
+            Long id = Long.parseLong(idField.getText());
             String nombre = nombreField.getText();
             String email = emailField.getText();
             String telefono = telefonoField.getText();
@@ -28,26 +37,39 @@ public class CrearUsuarioController {
             boolean admin = adminCheck.isSelected();
 
             if (nombre.isEmpty() || email.isEmpty() || telefono.isEmpty() || password.isEmpty()) {
-                mensajeLabel.setText("❌ Todos los campos son obligatorios");
-                mensajeLabel.setStyle("-fx-text-fill: red;");
+                mostrarMensaje("❌ Todos los campos son obligatorios", "red");
                 return;
             }
 
             Usuario nuevo = facade.crearUsuario(id, nombre, email, telefono, password, admin);
-            mensajeLabel.setText("✅ Usuario creado: " + nuevo.getNombre());
-            mensajeLabel.setStyle("-fx-text-fill: green;");
+            mostrarMensaje("✅ Usuario creado: " + nuevo.getNombre(), "green");
 
-            // limpiar campos
-            idField.clear();
-            nombreField.clear();
-            emailField.clear();
-            telefonoField.clear();
-            passwordField.clear();
-            adminCheck.setSelected(false);
+            limpiarCampos();
+
+            // 🔹 Notificar al AdminController que se creó un nuevo usuario
+            if (onUsuarioCreado != null) {
+                onUsuarioCreado.run();
+            }
 
         } catch (NumberFormatException e) {
-            mensajeLabel.setText("❌ El ID debe ser un número válido");
-            mensajeLabel.setStyle("-fx-text-fill: red;");
+            mostrarMensaje("❌ El ID debe ser un número válido", "red");
+        } catch (Exception e) {
+            mostrarMensaje("⚠️ Error al crear el usuario", "red");
+            e.printStackTrace();
         }
+    }
+
+    private void mostrarMensaje(String texto, String color) {
+        mensajeLabel.setText(texto);
+        mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
+    }
+
+    private void limpiarCampos() {
+        idField.clear();
+        nombreField.clear();
+        emailField.clear();
+        telefonoField.clear();
+        passwordField.clear();
+        adminCheck.setSelected(false);
     }
 }
