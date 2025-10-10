@@ -53,6 +53,15 @@ public class LogisticaFacade {
         return usuario;
     }
 
+    // ---------------- 📍 DIRECCIONES ----------------
+    public Direccion crearDireccion(Usuario usuario, String alias, String calle, String ciudad, String coordenadas) {
+        return usuarioService.crearDireccionParaUsuario(usuario, alias, calle, ciudad, coordenadas);
+    }
+
+    public void actualizarDireccion(Usuario usuario, Direccion direccion, String alias, String calle, String ciudad, String coordenadas) {
+        usuarioService.actualizarDireccionUsuario(usuario, direccion, alias, calle, ciudad, coordenadas);
+    }
+
     // ---------------- 📦 ENVIOS ----------------
     public Long generarId() {
         return store.nextId();

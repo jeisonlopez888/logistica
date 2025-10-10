@@ -1,5 +1,6 @@
 package co.edu.uniquindio.logistica.service;
 
+import co.edu.uniquindio.logistica.model.Direccion;
 import co.edu.uniquindio.logistica.model.Usuario;
 import co.edu.uniquindio.logistica.store.DataStore;
 
@@ -30,6 +31,21 @@ public class UsuarioService {
     // ELIMINAR
     public void eliminarUsuario(Usuario usuario) {
         store.getUsuarios().remove(usuario);
+    }
+
+    // ---------------- DIRECCIONES ----------------
+    public Direccion crearDireccionParaUsuario(Usuario usuario, String alias, String calle, String ciudad, String coordenadas) {
+        Direccion direccion = new Direccion(store.nextId(), alias, calle, ciudad, coordenadas);
+        usuario.getDirecciones().add(direccion);
+        return direccion;
+    }
+
+    public void actualizarDireccionUsuario(Usuario usuario, Direccion direccion, String alias, String calle, String ciudad, String coordenadas) {
+        if (direccion == null) return;
+        direccion.setAlias(alias);
+        direccion.setCalle(calle);
+        direccion.setCiudad(ciudad);
+        direccion.setCoordenadas(coordenadas);
     }
 }
 

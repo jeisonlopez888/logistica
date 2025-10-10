@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="co.edu.uniquindio.logistica.ui.DireccionesController"
+      spacing="10" prefWidth="600" prefHeight="400">
+
+    <padding>
+        <Insets top="16" right="16" bottom="16" left="16"/>
+    </padding>
+
+    <Label text="📍 Mis Direcciones" style="-fx-font-size: 18px;"/>
+
+    <TableView fx:id="direccionesTable" prefHeight="300">
+        <columns>
+            <TableColumn fx:id="aliasColumn" text="Alias" prefWidth="150"/>
+            <TableColumn fx:id="calleColumn" text="Calle" prefWidth="280"/>
+            <TableColumn fx:id="ciudadColumn" text="Ciudad" prefWidth="150"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10">
+        <Button text="Nueva" onAction="#handleNuevaDireccion"/>
+        <Button text="Editar" onAction="#handleEditarDireccion"/>
+        <Button text="Cerrar" onAction="#handleCerrar"/>
+    </HBox>
+
+    <Label fx:id="mensajeLabel"/>
+</VBox>

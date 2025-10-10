@@ -80,6 +80,10 @@ public class DataStore {
         // --- Direcciones ---
         Direccion d1 = new Direccion(nextId(), "Casa", "Calle 10 # 5-20", "Armenia", "4.53,-75.68");
         Direccion d2 = new Direccion(nextId(), "Trabajo", "Cra 14 # 2-30", "Armenia", "4.54,-75.68");
+        // asociar a usuarios como direcciones frecuentes
+        u1.getDirecciones().add(d1);
+        u1.getDirecciones().add(d2);
+        u2.getDirecciones().add(new Direccion(nextId(), "Bodega", "Av 30 # 15-80", "Pereira", "4.81,-75.69"));
 
 // --- Envíos ---
         Envio e1 = new EnvioBuilder()
