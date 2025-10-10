@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="co.edu.uniquindio.logistica.ui.DireccionFormController"
+      spacing="10" prefWidth="420" prefHeight="320">
+
+    <padding>
+        <Insets top="16" right="16" bottom="16" left="16"/>
+    </padding>
+
+    <Label text="Dirección" style="-fx-font-size: 18px;"/>
+
+    <Label text="Alias (opcional)"/>
+    <TextField fx:id="aliasField" promptText="Casa, Trabajo..."/>
+
+    <Label text="Calle"/>
+    <TextField fx:id="calleField" promptText="Calle 10 # 5-20"/>
+
+    <Label text="Ciudad"/>
+    <TextField fx:id="ciudadField" promptText="Armenia"/>
+
+    <Label text="Coordenadas (opcional)"/>
+    <TextField fx:id="coordenadasField" promptText="4.53,-75.68"/>
+
+    <HBox spacing="10">
+        <Button fx:id="guardarBtn" text="Guardar" onAction="#handleGuardar"/>
+        <Button text="Cancelar" onAction="#handleCancelar"/>
+    </HBox>
+
+    <Label fx:id="mensajeLabel"/>
+</VBox>

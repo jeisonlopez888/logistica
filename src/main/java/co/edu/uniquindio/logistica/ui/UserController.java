@@ -70,6 +70,25 @@ public class UserController {
     }
 
     @FXML
+    private void handleGestionarDirecciones() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/direcciones.fxml"));
+            Parent root = loader.load();
+
+            DireccionesController ctrl = loader.getController();
+            ctrl.setUsuario(usuario);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Mis Direcciones");
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     private void handleVolverLogin(ActionEvent event) {
         try {
             Sesion.cerrarSesion();

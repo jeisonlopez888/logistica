@@ -13,6 +13,7 @@
 
     <Button onAction="#handleCrearEnvio" text="Crear Envío" />
     <Button onAction="#handleVerHistorial" text="Ver Historial de Envíos" />
+    <Button onAction="#handleGestionarDirecciones" text="Mis Direcciones" />
     <Button text="Volver al Login" onAction="#handleVolverLogin"/>
 
 

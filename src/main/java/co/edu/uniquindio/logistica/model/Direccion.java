@@ -21,6 +21,13 @@ public class Direccion {
     public String getCiudad() { return ciudad; }
     public String getCoordenadas() { return coordenadas; }
 
+    // Setters
+    public void setId(Long id) { this.id = id; }
+    public void setAlias(String alias) { this.alias = alias; }
+    public void setCalle(String calle) { this.calle = calle; }
+    public void setCiudad(String ciudad) { this.ciudad = ciudad; }
+    public void setCoordenadas(String coordenadas) { this.coordenadas = coordenadas; }
+
     @Override
     public String toString() {
         return (alias != null && !alias.isEmpty() ? alias + " - " : "") + calle + ", " + ciudad;
