@@ -2,8 +2,14 @@ package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.Tarifa;
+import co.edu.uniquindio.logistica.store.DataStore;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
@@ -41,7 +47,8 @@ public class TarifasController {
             double base = pedirNumero("Costo base:");
             double porKilo = pedirNumero("Costo por kilo:");
 
-            Tarifa nueva = new Tarifa(facade.generarId(), desc, base, porKilo);
+            Tarifa nueva = new Tarifa(DataStore.getInstance().nextId()
+                    , desc, base, porKilo);
             facade.addTarifa(nueva);
             cargarTarifas();
             mensajeLabel.setText("✅ Tarifa agregada correctamente");
@@ -68,9 +75,24 @@ public class TarifasController {
     }
 
     @FXML
-    private void handleCerrar() {
-        Stage stage = (Stage) tarifasTable.getScene().getWindow();
-        stage.close();
+    private void handleVolverAdmin(ActionEvent event) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/admin.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo volver al login.");
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }
 

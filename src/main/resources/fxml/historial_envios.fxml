@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1"
             xmlns="http://javafx.com/javafx/17.0.12"
             fx:controller="co.edu.uniquindio.logistica.ui.HistorialEnviosController"
-            prefHeight="550" prefWidth="1100"
+            prefHeight="600" prefWidth="1200"
             style="-fx-background-color: linear-gradient(to bottom right, #f7f9fc, #e6ebf3);">
 
     <children>
@@ -19,7 +18,7 @@
             <Label text="📦 Historial de Envíos"
                    style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2b2b2b;" />
 
-            <TableView fx:id="tablaEnvios" editable="true" prefHeight="380" style="-fx-background-radius: 10; -fx-border-radius: 10;">
+            <TableView fx:id="tablaEnvios" editable="true" prefHeight="420" style="-fx-background-radius: 10; -fx-border-radius: 10;">
                 <columns>
                     <TableColumn fx:id="colId" text="ID" prefWidth="60" />
                     <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="140" />
@@ -29,7 +28,9 @@
                     <TableColumn fx:id="colDestinoCiudad" text="Ciudad Destino" prefWidth="110" />
                     <TableColumn fx:id="colPeso" text="Peso (Kg)" prefWidth="80" />
                     <TableColumn fx:id="colEstado" text="Estado" prefWidth="120" />
+                    <TableColumn fx:id="colRepartidor" text="Repartidor Asignado" prefWidth="150" />
                     <TableColumn fx:id="colFechaCreacion" text="Fecha Creación" prefWidth="130" />
+                    <TableColumn fx:id="colFechaConfirmacion" text="Fecha Confirmación" prefWidth="130" />
                     <TableColumn fx:id="colFechaEntrega" text="Fecha Entrega" prefWidth="130" />
                 </columns>
             </TableView>
@@ -43,12 +44,12 @@
                         style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
                         text="🗑️ Eliminar" />
 
-
-                <Button onAction="#volverMenu" prefWidth="130"
+                <Button onAction="#handleVolverMenu" prefWidth="130"
                         style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
                         text="↩️ Volver" />
             </HBox>
         </VBox>
     </children>
 </AnchorPane>
+
 

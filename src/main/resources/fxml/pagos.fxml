@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -9,7 +8,6 @@
             prefWidth="850" prefHeight="600"
             style="-fx-background-color: linear-gradient(to bottom right, #f9f9f9, #e3f2fd);">
 
-    <!-- 🔹 TÍTULO -->
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10"
               style="-fx-background-color: #1976D2; -fx-padding: 15;">
@@ -18,7 +16,6 @@
         </HBox>
     </top>
 
-    <!-- 🔹 TABLA CENTRAL -->
     <center>
         <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20;">
             <TableView fx:id="pagosTable"
@@ -28,7 +25,7 @@
                     <TableColumn fx:id="idCol" text="ID Pago" prefWidth="100"/>
                     <TableColumn fx:id="envioCol" text="ID Envío" prefWidth="100"/>
                     <TableColumn fx:id="montoPagadoCol" text="Monto Pagado" prefWidth="150"/>
-                    <TableColumn fx:id="montoCalculadoCol" text="Monto Calculado" prefWidth="150"/>
+                    <TableColumn fx:id="montoCalculadoCol" text="Método de Pago" prefWidth="150"/>
                     <TableColumn fx:id="estadoCol" text="Estado" prefWidth="120"/>
                 </columns>
             </TableView>
@@ -38,7 +35,6 @@
         </VBox>
     </center>
 
-    <!-- 🔹 BOTONES ABAJO -->
     <bottom>
         <HBox alignment="CENTER" spacing="15" style="-fx-padding: 20;">
             <Button text="➕ Registrar Pago"
@@ -54,12 +50,9 @@
                     style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
 
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="↩️ Cerrar"
-                    onAction="#handleCerrar"
-                    style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+            <Button text="↩️ Volver" onAction="#handleVolver"
+                    style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;"/>
         </HBox>
     </bottom>
 </BorderPane>
-
-
-

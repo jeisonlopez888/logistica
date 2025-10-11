@@ -1,0 +1,15 @@
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="co.edu.uniquindio.logistica.ui.RastreoController"
+      spacing="10" alignment="CENTER" style="-fx-padding:20;">
+    <Label text="Rastreo de Envío" style="-fx-font-size:18; -fx-font-weight:bold;"/>
+    <TextField fx:id="idEnvioField" promptText="ID del envío"/>
+    <Button text="Buscar" onAction="#handleBuscar"/>
+    <Button text="↩️ Volver al Login" onAction="#handleVolverLogin"
+            style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    <Label fx:id="resultadoLabel"/>
+</VBox>
+

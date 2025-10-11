@@ -1,29 +1,51 @@
-
 package co.edu.uniquindio.logistica.factory;
 
-import co.edu.uniquindio.logistica.model.Envio;
-import co.edu.uniquindio.logistica.model.EnvioBuilder;
-import co.edu.uniquindio.logistica.model.Usuario;
-import co.edu.uniquindio.logistica.model.Direccion;
+import co.edu.uniquindio.logistica.model.*;
 import co.edu.uniquindio.logistica.store.DataStore;
 
 public class EntityFactory {
 
-    // ✅ Crear un usuario (solo crea el objeto, NO lo guarda todavía)
+    // ✅ Crear un usuario
     public static Usuario createUsuario(Long id, String nombre, String email, String telefono, String password, boolean admin) {
         return new Usuario(id, nombre, email, telefono, password, admin);
     }
 
-    // 🔹 Crear un envío (este sí puede registrar directamente porque tiene builder)
+    /**
+     * 🔹 Crear un envío (solo crea el objeto, NO lo guarda)
+     */
     public static Envio createEnvio(Usuario usuario, Direccion origen, Direccion destino, double peso) {
-        Envio envio = new EnvioBuilder()
-                .usuario(usuario)
-                .origen(origen)
-                .destino(destino)
-                .peso(peso)
-                .build();
+        Long id = DataStore.getInstance().nextId();
 
-        DataStore.getInstance().addEnvio(envio); // mantenerlo aquí está bien
+        // Asignar coordenadas ficticias según zona
+        if (origen != null && origen.getCoordenadas() == null)
+            origen.setCoordenadas(obtenerCoordenadasZona(origen.getCiudad()));
+        if (destino != null && destino.getCoordenadas() == null)
+            destino.setCoordenadas(obtenerCoordenadasZona(destino.getCiudad()));
+
+        // Crear el envío
+        Envio envio = new Envio();
+        envio.setId(id);
+        envio.setUsuario(usuario);
+        envio.setOrigen(origen);
+        envio.setDestino(destino);
+        envio.setPeso(peso);
+        envio.setEstado(Envio.EstadoEnvio.PENDIENTE);
+        envio.setFechaCreacion(java.time.LocalDateTime.now());
+
         return envio;
+    }
+
+    private static String obtenerCoordenadasZona(String zona) {
+        if (zona == null) return "0,0";
+        return switch (zona.toLowerCase()) {
+            case "sur" -> "-1.234,-75.567";
+            case "centro" -> "0.000,-75.000";
+            case "norte" -> "1.234,-75.789";
+            default -> "0,0";
+        };
+    }
+
+    public static Pago createPago(Envio envio, double monto, MetodoPago metodo) {
+        return new Pago(DataStore.getInstance().nextId(), envio, monto, metodo);
     }
 }

@@ -2,12 +2,26 @@ package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.Envio;
+import co.edu.uniquindio.logistica.model.MetodoPago;
 import co.edu.uniquindio.logistica.model.Pago;
+import co.edu.uniquindio.logistica.store.DataStore;
+import co.edu.uniquindio.logistica.util.Sesion;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+/**
+ * PagosController actualizado para usar la estructura de Pago que ya existe
+ * en tu DataStore (constructor: id, envio, montoPagado, montoCalculado, confirmado).
+ *
+ * No se modificó nada más del proyecto.
+ */
 public class PagosController {
 
     @FXML private TableView<Pago> pagosTable;
@@ -27,10 +41,10 @@ public class PagosController {
                 cell.getValue().getEnvio() != null ? cell.getValue().getEnvio().getId() : null
         ));
         montoPagadoCol.setCellValueFactory(cell -> new javafx.beans.property.SimpleObjectProperty<>(cell.getValue().getMontoPagado()));
-        montoCalculadoCol.setCellValueFactory(cell -> new javafx.beans.property.SimpleObjectProperty<>(cell.getValue().getMontoCalculado()));
-        estadoCol.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(
-                cell.getValue().isCompletado() ? "Completado" : "Pendiente"
-        ));
+
+
+        estadoCol.setCellValueFactory(cell ->
+                new javafx.beans.property.SimpleStringProperty(cell.getValue().isConfirmado() ? "Completado" : "Pendiente"));
 
         cargarPagos();
     }
@@ -49,46 +63,45 @@ public class PagosController {
                 Long envioId = Long.parseLong(envioIdStr);
                 Envio envio = facade.buscarEnvioPorId(envioId);
                 if (envio == null) {
-                    mensajeLabel.setText("❌ Envío no encontrado");
-                    mensajeLabel.setStyle("-fx-text-fill: red;");
+                    mostrarMensaje("❌ Envío no encontrado", "red");
                     return;
                 }
 
-                // 🔹 Calculamos primero el costo real
+                // calcular monto estimado (según la lógica centralizada en el facade/service)
                 double montoCalculado = facade.calcularTarifa(envio.getPeso());
 
-                // 🔹 Mostramos el valor al usuario antes de pedir el pago
+                // informar al usuario del monto calculado
                 Alert info = new Alert(Alert.AlertType.INFORMATION);
                 info.setTitle("Monto del envío");
                 info.setHeaderText("Costo calculado del envío:");
-                info.setContentText(String.format("El costo total es: $%.2f", montoCalculado));
+                info.setContentText(String.format("El costo estimado es: $%.2f", montoCalculado));
                 info.showAndWait();
 
-                // 🔹 Ahora pedimos el monto pagado
-                double montoPagado = pedirNumero("Ingrese el monto pagado (debe ser >= " + montoCalculado + "):");
+                // pedir al usuario el monto que va a pagar
+                double montoPagado = pedirNumero("Ingrese el monto pagado (puede ser >= o < al calculado):");
 
-                // 🔹 Redondeamos para comparar correctamente
-                double pagadoRedondeado = Math.round(montoPagado * 100.0) / 100.0;
-                double calculadoRedondeado = Math.round(montoCalculado * 100.0) / 100.0;
+                // determinar confirmación automática si pagó >= calculado
+                boolean confirmado = Math.round(montoPagado * 100.0) / 100.0 >= Math.round(montoCalculado * 100.0) / 100.0;
 
-                boolean completado = pagadoRedondeado >= calculadoRedondeado;
+                // crear Pago usando DataStore para generar el ID (tal como en tu DataStore y ejemplos)
+                Pago pago = new Pago(DataStore.getInstance().nextId(), envio, montoPagado, MetodoPago.TRANSFERENCIA);
 
-                Pago pago = new Pago(facade.generarId(), envio, montoPagado, montoCalculado, completado);
+                // agregar al store a través del facade (facade delega al store)
                 facade.addPago(pago);
 
                 cargarPagos();
-                mensajeLabel.setText(completado
-                        ? "✅ Pago completado correctamente"
-                        : "⚠️ Pago registrado pero pendiente (incompleto)");
-                mensajeLabel.setStyle("-fx-text-fill: " + (completado ? "green" : "orange") + ";");
+                mostrarMensaje(confirmado
+                        ? "✅ Pago registrado y completado correctamente"
+                        : "⚠️ Pago registrado pero pendiente (incompleto)", confirmado ? "green" : "orange");
 
             } catch (NumberFormatException e) {
-                mensajeLabel.setText("❌ ID inválido");
-                mensajeLabel.setStyle("-fx-text-fill: red;");
+                mostrarMensaje("❌ ID inválido", "red");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                mostrarMensaje("❌ Error al registrar el pago", "red");
             }
         });
     }
-
 
     private double pedirNumero(String prompt) {
         TextInputDialog dialog = new TextInputDialog();
@@ -109,36 +122,52 @@ public class PagosController {
         }
     }
 
+    @FXML
+    private void handleCompletarPago() {
+        Pago seleccionado = pagosTable.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarMensaje("❌ Selecciona un pago para completar", "red");
+            return;
+        }
+
+        if (seleccionado.isConfirmado()) {
+            mostrarMensaje("⚠️ Este pago ya está completado", "orange");
+            return;
+        }
+
+        // Llamar a facade.confirmarPago()
+        String resultado = facade.confirmarPago(seleccionado.getId());
+
+        pagosTable.refresh();
+        mostrarMensaje(resultado, resultado.contains("✅") ? "green" : "red");
+    }
+
+
     private void mostrarMensaje(String texto, String color) {
         mensajeLabel.setText(texto);
         mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
     }
 
+
     @FXML
-    private void handleCompletarPago() {
-        Pago seleccionado = pagosTable.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            mensajeLabel.setText("❌ Selecciona un pago para completar");
-            mensajeLabel.setStyle("-fx-text-fill: red;");
-            return;
+    private void handleVolver(ActionEvent event) {
+        try {
+            Sesion.cerrarSesion();
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/admin.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo volver al login.");
         }
-
-        if (seleccionado.isCompletado()) {
-            mensajeLabel.setText("⚠️ Este pago ya está completado");
-            mensajeLabel.setStyle("-fx-text-fill: orange;");
-            return;
-        }
-
-        seleccionado.setCompletado(true);
-        pagosTable.refresh();
-        mensajeLabel.setText("✅ Pago marcado como completado");
-        mensajeLabel.setStyle("-fx-text-fill: green;");
     }
 
-
-    @FXML
-    private void handleCerrar() {
-        Stage stage = (Stage) pagosTable.getScene().getWindow();
-        stage.close();
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

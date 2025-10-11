@@ -2,7 +2,12 @@ package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.util.ReportUtil;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -74,9 +79,11 @@ public class ReportesController {
                 }
                 case "Repartidores" -> {
                     if (esExcel)
-                        ReportUtil.exportarRepartidoresExcel(facade.getRepartidores(), ruta);
+                        ReportUtil.exportarRepartidoresExcel(facade.listarRepartidores()
+                                , ruta);
                     else
-                        ReportUtil.exportarRepartidoresPDF(facade.getRepartidores(), ruta);
+                        ReportUtil.exportarRepartidoresPDF(facade.listarRepartidores()
+                                , ruta);
                 }
                 case "Reporte General" -> {
                     if (esExcel) {
@@ -84,7 +91,8 @@ public class ReportesController {
                                 facade.listarUsuarios(),
                                 facade.listarTodosEnvios(),
                                 facade.getPagos(),
-                                facade.getRepartidores(),
+                                facade.listarRepartidores()
+                                ,
                                 ruta
                         );
                     } else {
@@ -92,7 +100,8 @@ public class ReportesController {
                                 facade.listarUsuarios(),
                                 facade.listarTodosEnvios(),
                                 facade.getPagos(),
-                                facade.getRepartidores(),
+                                facade.listarRepartidores()
+                                ,
                                 ruta
                         );
                     }
@@ -106,6 +115,27 @@ public class ReportesController {
             e.printStackTrace();
             mostrarMensaje("❌ Error al generar el reporte: " + e.getMessage(), "red");
         }
+    }
+
+    @FXML
+    private void handleVolverAdmin(ActionEvent event) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/admin.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo volver al login.");
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 
     private void mostrarMensaje(String texto, String color) {

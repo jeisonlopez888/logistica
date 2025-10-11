@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="20" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="co.edu.uniquindio.logistica.ui.UserAdminController">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <Label style="-fx-font-size: 18px;" text="Panel de Usuario - Plataforma de Logística" />
+
+    <Button onAction="#handleCrearEnvio" text="Crear Envío" />
+    <Button onAction="#handleVerHistorial" text="Ver Historial de Envíos" />
+    <Button text="Panel Admin" onAction="#handleVolverAdmin"/>
+
+
+
+</VBox>

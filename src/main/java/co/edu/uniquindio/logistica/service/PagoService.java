@@ -1,7 +1,6 @@
 package co.edu.uniquindio.logistica.service;
 
-import co.edu.uniquindio.logistica.model.Envio;
-import co.edu.uniquindio.logistica.model.Pago;
+import co.edu.uniquindio.logistica.model.*;
 import co.edu.uniquindio.logistica.store.DataStore;
 
 import java.util.List;
@@ -10,25 +9,36 @@ public class PagoService {
 
     private final DataStore store = DataStore.getInstance();
 
-    public void registrarPago(Pago pago) {
+    // Registrar pago simulado (no confirmado por defecto)
+    public Pago registrarPagoEnvio(Envio envio, double montoPagado, MetodoPago metodo) {
+        Pago pago = new Pago(store.nextId(), envio, montoPagado, metodo);
+        // No confirmamos aquí: la confirmación la hace el flujo de pago (facade / UI)
         store.addPago(pago);
+        return pago;
     }
 
+    // Listar todos los pagos
     public List<Pago> listarPagos() {
         return store.getPagos();
     }
 
-    /**
-     * Registra un pago para un envío.
-     * @param envio envío asociado
-     * @param montoPagado monto abonado por el usuario
-     * @param montoCalculado monto total según la tarifa
-     */
-    public Pago registrarPagoEnvio(Envio envio, double montoPagado, double montoCalculado) {
-        Pago pago = new Pago(store.nextId(), envio, montoPagado, montoCalculado, montoPagado >= montoCalculado);
-        store.addPago(pago);
-        return pago;
+    // Eliminar pago
+    public void eliminarPago(Pago pago) {
+        store.getPagos().remove(pago);
+    }
+
+    // Buscar pago por envío
+    public Pago buscarPagoPorEnvio(Envio envio) {
+        return store.getPagos().stream()
+                .filter(p -> p.getEnvio() != null && p.getEnvio().equals(envio))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Pago buscarPagoPorId(Long id) {
+        return store.getPagos().stream()
+                .filter(p -> p.getId() != null && p.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 }
-
-

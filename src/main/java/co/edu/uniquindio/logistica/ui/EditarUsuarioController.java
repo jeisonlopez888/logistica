@@ -17,13 +17,9 @@ public class EditarUsuarioController {
     @FXML private Label mensajeLabel;
 
     private Usuario usuario;
-    private LogisticaFacade facade;
     private Runnable onUsuarioEditado;
 
-    public void setFacade(LogisticaFacade facade) {
-        this.facade = facade;
-    }
-
+    private LogisticaFacade facade = LogisticaFacade.getInstance();
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
         if (usuario != null) {

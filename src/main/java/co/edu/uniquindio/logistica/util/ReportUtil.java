@@ -125,8 +125,8 @@ public class ReportUtil {
             row.createCell(0).setCellValue(p.getId() != null ? p.getId() : 0);
             row.createCell(1).setCellValue(p.getEnvio() != null && p.getEnvio().getId() != null ? p.getEnvio().getId() : 0);
             row.createCell(2).setCellValue(p.getMontoPagado());
-            row.createCell(3).setCellValue(p.isCompletado() ? "Sí" : "No");
-            row.createCell(4).setCellValue(p.getFechaPago() != null ? p.getFechaPago().format(DATE_FORMAT) : "");
+            row.createCell(3).setCellValue(p.isConfirmado() ? "Sí" : "No");
+            row.createCell(4).setCellValue(p.getFecha() != null ? p.getFecha().format(DATE_FORMAT) : "");
         }
 
         try (FileOutputStream fos = new FileOutputStream(rutaArchivo)) {
@@ -195,6 +195,7 @@ public class ReportUtil {
         h.createCell(2).setCellValue("Email");
         h.createCell(3).setCellValue("Teléfono");
         h.createCell(4).setCellValue("Admin");
+
         int ri = 1;
         for (Usuario u : usuarios) {
             Row r = s.createRow(ri++);
@@ -241,8 +242,8 @@ public class ReportUtil {
             r.createCell(0).setCellValue(p.getId() != null ? p.getId() : 0);
             r.createCell(1).setCellValue(p.getEnvio() != null && p.getEnvio().getId() != null ? p.getEnvio().getId() : 0);
             r.createCell(2).setCellValue(p.getMontoPagado());
-            r.createCell(3).setCellValue(p.isCompletado() ? "Sí" : "No");
-            r.createCell(4).setCellValue(p.getFechaPago() != null ? p.getFechaPago().format(DATE_FORMAT) : "");
+            r.createCell(3).setCellValue(p.isConfirmado() ? "Sí" : "No");
+            r.createCell(4).setCellValue(p.getFecha() != null ? p.getFecha().format(DATE_FORMAT) : "");
         }
     }
 
@@ -328,7 +329,7 @@ public class ReportUtil {
 
             for (Pago p : pagos) {
                 content.showText("ID: " + p.getId() + " | Monto: " + p.getMontoPagado() +
-                        " | Fecha: " + (p.getFechaPago() != null ? p.getFechaPago().format(DATE_FORMAT) : ""));
+                        " | Fecha: " + (p.getFecha() != null ? p.getFecha().format(DATE_FORMAT) : ""));
                 content.newLineAtOffset(0, -15);
             }
 
@@ -417,8 +418,8 @@ public class ReportUtil {
             String pagoStr = "Pago #" + (p.getId() != null ? p.getId() : "") +
                     " | Envío: " + (p.getEnvio() != null && p.getEnvio().getId() != null ? p.getEnvio().getId() : "N/A") +
                     " | Monto: $" + p.getMontoPagado() +
-                    " | Fecha: " + (p.getFechaPago() != null ? p.getFechaPago().toString() : "N/A") +
-                    " | Estado: " + (p.isCompletado() ? "Completado" : "Pendiente");
+                    " | Fecha: " + (p.getFecha() != null ? p.getFecha().toString() : "N/A") +
+                    " | Estado: " + (p.isConfirmado() ? "Completado" : "Pendiente");
             content.showText(pagoStr);
             content.newLineAtOffset(0, -15);
         }

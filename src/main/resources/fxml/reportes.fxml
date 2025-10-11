@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
+
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="co.edu.uniquindio.logistica.ui.ReportesController"
@@ -32,6 +32,7 @@
 
             <Button text="📁 Generar Reporte" onAction="#handleGenerarReporte"
                     style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+            <Button text="Panel Admin" onAction="#handleVolverAdmin"/>
 
             <Label fx:id="mensajeLabel" text="" style="-fx-font-size: 14px; -fx-text-fill: #1976D2;"/>
         </VBox>

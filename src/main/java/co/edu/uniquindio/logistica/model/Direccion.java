@@ -25,5 +25,10 @@ public class Direccion {
     public String toString() {
         return (alias != null && !alias.isEmpty() ? alias + " - " : "") + calle + ", " + ciudad;
     }
+
+
+    public void setCoordenadas(String coordenadas) {
+        this.coordenadas = coordenadas;
+    }
 }
 

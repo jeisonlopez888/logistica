@@ -12,7 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
-public class UserController {
+public class UserAdminController {
 
 
     private Usuario usuario;
@@ -37,6 +37,7 @@ public class UserController {
             ctrl.setOnEnvioCreado(() -> {
                 mostrarAlerta("Éxito", "El envío se registró correctamente.");
             });
+
 
             stage.setScene(new Scene(root));
             stage.setTitle("Crear Envío");
@@ -68,11 +69,9 @@ public class UserController {
     }
 
     @FXML
-    private void handleVolverLogin(ActionEvent event) {
+    private void handleVolverAdmin(ActionEvent event) {
         try {
-            Sesion.cerrarSesion();
-
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/admin.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();

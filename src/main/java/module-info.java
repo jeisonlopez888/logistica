@@ -12,18 +12,17 @@ module co.edu.uniquindio.logistica {
     requires com.almasb.fxgl.all;
     requires org.apache.poi.ooxml;
     requires org.apache.pdfbox;
+    requires java.desktop;
 
-    // abrir paquetes para reflexión / FXML
+    // 🔹 abrir paquetes para reflexión / FXML
     opens co.edu.uniquindio.logistica to javafx.fxml;
     opens co.edu.uniquindio.logistica.ui to javafx.fxml;
     opens co.edu.uniquindio.logistica.model to javafx.base, javafx.fxml;
+
+    // 🔹 agregar esta línea para permitir que JavaFX acceda a tus clases de prueba
+    opens co.edu.uniquindio.logistica.test to javafx.graphics;
 
     exports co.edu.uniquindio.logistica;
     exports co.edu.uniquindio.logistica.ui;
     exports co.edu.uniquindio.logistica.model;
 }
-
-
-
-
-

@@ -3,10 +3,13 @@ package co.edu.uniquindio.logistica.ui;
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.Usuario;
 import co.edu.uniquindio.logistica.util.Sesion;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -66,4 +69,43 @@ public class LoginController {
             mensajeLabel.setStyle("-fx-text-fill: red;");
         }
     }
+
+    @FXML
+    private void handleAbrirRegistro() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/registro.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Registro de Usuario");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleRastreo(ActionEvent event) {
+        try {
+            Sesion.cerrarSesion();
+
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/rastreo.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo volver al login.");
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+
+
 }

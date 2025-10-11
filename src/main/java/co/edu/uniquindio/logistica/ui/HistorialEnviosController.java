@@ -3,9 +3,12 @@ package co.edu.uniquindio.logistica.ui;
 import co.edu.uniquindio.logistica.model.Envio;
 import co.edu.uniquindio.logistica.model.Usuario;
 import co.edu.uniquindio.logistica.store.DataStore;
+import co.edu.uniquindio.logistica.util.Sesion;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -29,7 +32,9 @@ public class HistorialEnviosController {
     @FXML private TableColumn<Envio, Double> colPeso;
     @FXML private TableColumn<Envio, Envio.EstadoEnvio> colEstado;
     @FXML private TableColumn<Envio, String> colFechaCreacion;
+    @FXML private TableColumn<Envio, String> colFechaConfirmacion; // nueva columna
     @FXML private TableColumn<Envio, String> colFechaEntrega;
+    @FXML private TableColumn<Envio, String> colRepartidor; // nueva columna
 
     private Usuario usuario;
 
@@ -69,7 +74,14 @@ public class HistorialEnviosController {
 
         colPeso.setCellValueFactory(new PropertyValueFactory<>("peso"));
 
-        // 🔹 Columna editable para cambiar el estado
+        // Columna repartidor (nombre)
+        colRepartidor.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(
+                        cellData.getValue().getRepartidor() != null ? cellData.getValue().getRepartidor().getNombre() : ""
+                )
+        );
+
+        // Estado editable
         colEstado.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getEstado()));
         colEstado.setCellFactory(ComboBoxTableCell.forTableColumn(
@@ -81,14 +93,12 @@ public class HistorialEnviosController {
 
             envio.setEstado(nuevoEstado);
 
-            // 🔹 Si el envío fue entregado, asignar fecha actual
+            // Si el envío fue entregado, asignar fecha actual
             if (nuevoEstado == Envio.EstadoEnvio.ENTREGADO) {
                 envio.setFechaEntrega(LocalDateTime.now());
-            } else {
-                envio.setFechaEntrega(null);
             }
 
-            // 🔹 Guardar cambios en el DataStore
+            // Actualizar DataStore: reemplazar el envío por id
             DataStore.getInstance().getEnvios().replaceAll(e ->
                     e.getId().equals(envio.getId()) ? envio : e
             );
@@ -97,9 +107,11 @@ public class HistorialEnviosController {
             alert("✅ Estado actualizado a: " + nuevoEstado);
         });
 
-        // 🔹 Fechas
+        // Fechas
         colFechaCreacion.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleStringProperty(cellData.getValue().getFechaCreacionStr()));
+        colFechaConfirmacion.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getFechaConfirmacionStr()));
         colFechaEntrega.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleStringProperty(cellData.getValue().getFechaEntregaStr()));
 
@@ -112,9 +124,15 @@ public class HistorialEnviosController {
     }
 
     private void cargarHistorial() {
-        List<Envio> enviosUsuario = DataStore.getInstance().getEnvios().stream()
-                .filter(e -> e.getUsuario() != null && e.getUsuario().equals(usuario))
-                .collect(Collectors.toList());
+        List<Envio> enviosUsuario;
+        if (usuario == null) {
+            // si usuario == null mostramos todos (por ejemplo para admin)
+            enviosUsuario = DataStore.getInstance().getEnvios();
+        } else {
+            enviosUsuario = DataStore.getInstance().getEnvios().stream()
+                    .filter(e -> e.getUsuario() != null && e.getUsuario().equals(usuario))
+                    .collect(Collectors.toList());
+        }
 
         tablaEnvios.setItems(FXCollections.observableArrayList(enviosUsuario));
         tablaEnvios.refresh();
@@ -133,7 +151,8 @@ public class HistorialEnviosController {
             Parent root = loader.load();
 
             CrearEnvioController ctrl = loader.getController();
-            ctrl.setUsuario(usuario);
+            // compatibilidad ambos setters
+            ctrl.setUsuario(seleccionado.getUsuario());
             ctrl.setEnvioToEdit(seleccionado);
             ctrl.setOnEnvioCreado(() -> {
                 cargarHistorial();
@@ -167,12 +186,27 @@ public class HistorialEnviosController {
     }
 
     @FXML
-    private void volverMenu() {
-        Stage stage = (Stage) tablaEnvios.getScene().getWindow();
-        stage.close();
+    private void handleVolverMenu(ActionEvent event) {
+        try {
+            Sesion.cerrarSesion();
+
+            Parent root = javafx.fxml.FXMLLoader.load(getClass().getResource("/fxml/user.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo volver al login.");
+        }
     }
 
-
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
 
     private void alert(String msg) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);

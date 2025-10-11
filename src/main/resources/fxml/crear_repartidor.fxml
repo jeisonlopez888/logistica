@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="co.edu.uniquindio.logistica.ui.CrearRepartidorController"
+      alignment="CENTER" spacing="10" style="-fx-padding:20;" prefWidth="350">
+
+    <Label text="Registrar Repartidor" style="-fx-font-size:18; -fx-font-weight:bold;"/>
+
+    <TextField fx:id="idField" promptText="Cédula"/>
+    <TextField fx:id="nombreField" promptText="Nombre completo"/>
+    <TextField fx:id="telefonoField" promptText="Teléfono"/>
+    <TextField fx:id="zonaField" promptText="Zona (Norte, Centro, etc.)"/>
+    <CheckBox fx:id="disponibleCheck" text="Disponible para entregas"/>
+
+    <Button text="Guardar" onAction="#handleGuardar" style="-fx-background-color:#4CAF50; -fx-text-fill:white;"/>
+    <Label fx:id="mensajeLabel"/>
+</VBox>
+

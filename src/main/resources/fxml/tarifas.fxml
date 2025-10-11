@@ -21,7 +21,7 @@
             <HBox spacing="10">
                 <Button text="Agregar Tarifa" onAction="#handleAgregar"/>
                 <Button text="Eliminar Tarifa" onAction="#handleEliminar"/>
-                <Button text="Cerrar" onAction="#handleCerrar"/>
+                <Button text="Panel Admin" onAction="#handleVolverAdmin"/>
             </HBox>
 
             <Label fx:id="mensajeLabel" textFill="green"/>

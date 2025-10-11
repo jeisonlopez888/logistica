@@ -11,6 +11,9 @@
             <TextField fx:id="emailField" promptText="Correo electrónico"/>
             <PasswordField fx:id="passwordField" promptText="Contraseña"/>
             <Button text="Entrar" onAction="#handleLogin"/>
+            <Button text="Registrarse" onAction="#handleAbrirRegistro" maxWidth="150"/>
+            <Button text="↩️ Rastrear Envio" onAction="#handleRastreo"
+                    style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
             <Label fx:id="mensajeLabel" />
         </VBox>
     </children>

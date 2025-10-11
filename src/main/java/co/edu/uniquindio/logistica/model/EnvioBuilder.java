@@ -10,6 +10,12 @@ public class EnvioBuilder {
         envio.setEstado(Envio.EstadoEnvio.PENDIENTE); // Estado inicial por defecto
     }
 
+    // ✅ Nuevo método para asignar el ID del envío
+    public EnvioBuilder id(Long id) {
+        envio.setId(id);
+        return this;
+    }
+
     public EnvioBuilder usuario(Usuario usuario) {
         envio.setUsuario(usuario);
         return this;

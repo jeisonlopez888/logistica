@@ -3,40 +3,38 @@ package co.edu.uniquindio.logistica.model;
 import java.time.LocalDateTime;
 
 public class Pago {
-
     private Long id;
     private Envio envio;
     private double montoPagado;
-    private double montoCalculado;
-    private boolean completado;
-    private LocalDateTime fechaPago;
+    private MetodoPago metodo;
+    private LocalDateTime fecha;
+    private boolean confirmado;
 
-    public Pago(Long id, Envio envio, double montoPagado, double montoCalculado, boolean completado) {
+    public Pago(Long id, Envio envio, double montoPagado, MetodoPago metodo) {
         this.id = id;
         this.envio = envio;
         this.montoPagado = montoPagado;
-        this.montoCalculado = montoCalculado;
-        this.completado = completado;
-        this.fechaPago = LocalDateTime.now();
+        this.metodo = metodo;
+        this.fecha = LocalDateTime.now();
+        this.confirmado = false; // ahora NO se confirma automáticamente
     }
 
+    // Getters y Setters
     public Long getId() { return id; }
-    public Envio getEnvio() { return envio; }
-    public double getMontoPagado() { return montoPagado; }
-    public double getMontoCalculado() { return montoCalculado; }
-    public boolean isCompletado() { return completado; }
-    public LocalDateTime getFechaPago() { return fechaPago; }
-
     public void setId(Long id) { this.id = id; }
-    public void setEnvio(Envio envio) { this.envio = envio; }
-    public void setMontoPagado(double montoPagado) { this.montoPagado = montoPagado; }
-    public void setMontoCalculado(double montoCalculado) { this.montoCalculado = montoCalculado; }
-    public void setCompletado(boolean completado) { this.completado = completado; }
 
-    @Override
-    public String toString() {
-        return "Pago #" + id + " → $" + montoPagado +
-                " / $" + montoCalculado +
-                (completado ? " (Completado)" : " (Pendiente)");
-    }
+    public Envio getEnvio() { return envio; }
+    public void setEnvio(Envio envio) { this.envio = envio; }
+
+    public double getMontoPagado() { return montoPagado; }
+    public void setMontoPagado(double montoPagado) { this.montoPagado = montoPagado; }
+
+    public MetodoPago getMetodo() { return metodo; }
+    public void setMetodo(MetodoPago metodo) { this.metodo = metodo; }
+
+    public LocalDateTime getFecha() { return fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+
+    public boolean isConfirmado() { return confirmado; }
+    public void setConfirmado(boolean confirmado) { this.confirmado = confirmado; }
 }

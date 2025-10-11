@@ -1,30 +1,23 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
-import co.edu.uniquindio.logistica.model.Usuario;
-import co.edu.uniquindio.logistica.util.ReportUtil;
 import co.edu.uniquindio.logistica.util.Sesion;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class AdminController {
 
-    @FXML private TableView<Usuario> usuariosTable;
-    @FXML private TableColumn<Usuario, Long> idCol;
-    @FXML private TableColumn<Usuario, String> nombreCol;
-    @FXML private TableColumn<Usuario, String> emailCol;
-    @FXML private TableColumn<Usuario, String> telefonoCol;
-    @FXML private TableColumn<Usuario, String> passwordCol;
-    @FXML private TableColumn<Usuario, Boolean> adminCol;
-    @FXML private Label mensajeLabel;
+    @FXML
+    private Label mensajeLabel;
 
     private LogisticaFacade facade = LogisticaFacade.getInstance();
 
@@ -32,137 +25,127 @@ public class AdminController {
         this.facade = facade;
     }
 
-    @FXML
-    private void initialize() {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        nombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
-        telefonoCol.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-        passwordCol.setCellValueFactory(new PropertyValueFactory<>("password"));
-        adminCol.setCellValueFactory(new PropertyValueFactory<>("admin"));
-        cargarUsuarios();
-    }
-
-    private void cargarUsuarios() {
-        usuariosTable.setItems(FXCollections.observableArrayList(facade.listarUsuarios()));
-        usuariosTable.refresh();
-    }
+    // ---------------- BOTONES NUEVOS ----------------
 
     @FXML
-    private void handleEliminarUsuario() {
-        Usuario seleccionado = usuariosTable.getSelectionModel().getSelectedItem();
-        if (seleccionado != null) {
-            facade.listarUsuarios().remove(seleccionado);
-            cargarUsuarios();
-            mostrarMensaje("✅ Usuario eliminado correctamente", "green");
-        } else {
-            mostrarMensaje("❌ Selecciona un usuario para eliminar", "red");
-        }
-    }
-
-    @FXML
-    private void handleEditarUsuario() {
-        Usuario seleccionado = usuariosTable.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            mostrarMensaje("❌ Selecciona un usuario para editar", "red");
-            return;
-        }
-
+    private void handleVerUsuarios(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/editar_usuario.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/usuarios.fxml"));
             Parent root = loader.load();
 
-            EditarUsuarioController ctrl = loader.getController();
-            ctrl.setUsuario(seleccionado);
-            ctrl.setFacade(facade);
-            ctrl.setOnUsuarioEditado(this::cargarUsuarios);
+            // Obtener la ventana actual (Stage) desde el evento
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
-            Stage stage = new Stage();
+            // Establecer nueva escena con la vista usuarios
             stage.setScene(new Scene(root));
-            stage.setTitle("Editar Usuario");
-            stage.showAndWait();
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("❌ Error al abrir el editor de usuario", "red");
-        }
-    }
-
-    @FXML
-    private void handleCrearUsuario() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/crear_usuario.fxml"));
-            Parent root = loader.load();
-
-            CrearUsuarioController ctrl = loader.getController();
-            ctrl.setFacade(facade);
-            ctrl.setOnUsuarioCreado(this::cargarUsuarios);
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Crear Usuario");
-            stage.showAndWait();
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("❌ Error al abrir la ventana de creación de usuario", "red");
-        }
-    }
-
-    @FXML
-    private void handleUser() {
-        Usuario seleccionado = usuariosTable.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            mostrarMensaje("❌ Selecciona un usuario para abrir su panel", "red");
-            return;
-        }
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/user.fxml"));
-            Parent root = loader.load();
-
-            UserController ctrl = loader.getController();
-            ctrl.setUsuario(seleccionado);
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Panel de Usuario - " + seleccionado.getNombre());
+            stage.setTitle("Lista Completa de Usuarios");
             stage.show();
 
-            mostrarMensaje("✅ Panel abierto para " + seleccionado.getNombre(), "green");
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            mostrarMensaje("❌ Error al abrir el panel de usuario", "red");
+            mostrarMensaje("❌ Error al abrir la lista de usuarios", "red");
+        }
+    }
+
+
+
+    @FXML
+    private void handleVerAdministradores(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/admins.fxml"));
+            Parent root = loader.load();
+
+            // Obtener la ventana actual (Stage) desde el evento
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            // Establecer nueva escena con la vista usuarios
+            stage.setScene(new Scene(root));
+            stage.setTitle("Lista Completa de Administradores");
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al abrir la lista de usuarios", "red");
         }
     }
 
     @FXML
-    private void handleVerPagos() {
+    private void handleVerRepartidores(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/repartidores.fxml"));
+            Parent root = loader.load();
+
+            // Obtener la ventana actual (Stage) desde el evento
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            // Establecer nueva escena con la vista usuarios
+            stage.setScene(new Scene(root));
+            stage.setTitle("Lista Completa de Administradores");
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al abrir la lista de usuarios", "red");
+        }
+    }
+
+    @FXML
+    private void handleVerPagos(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pagos.fxml"));
             Parent root = loader.load();
 
-            Stage stage = new Stage();
+            // Obtener la ventana actual (Stage) desde el evento
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            // Establecer nueva escena con la vista usuarios
             stage.setScene(new Scene(root));
-            stage.setTitle("Gestión de Pagos");
+            stage.setTitle("Lista Completa de Administradores");
             stage.show();
-        } catch (Exception e) {
+
+        } catch (IOException e) {
             e.printStackTrace();
-            mostrarMensaje("❌ Error al abrir la gestión de pagos", "red");
+            mostrarMensaje("❌ Error al abrir la lista de usuarios", "red");
         }
     }
 
     @FXML
-    private void handleVerReportes() {
+    private void handleVerReportes(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/reportes.fxml"));
             Parent root = loader.load();
 
-            Stage stage = new Stage();
+            // Obtener la ventana actual (Stage) desde el evento
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            // Establecer nueva escena con la vista usuarios
             stage.setScene(new Scene(root));
-            stage.setTitle("Gestión de Reportes");
+            stage.setTitle("Lista Completa de Administradores");
             stage.show();
-        } catch (Exception e) {
+
+        } catch (IOException e) {
             e.printStackTrace();
-            mostrarMensaje("❌ Error al abrir la gestión de reportes", "red");
+            mostrarMensaje("❌ Error al abrir la lista de usuarios", "red");
+        }
+    }
+
+    @FXML
+    private void handleVerTarifas(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/tarifas.fxml"));
+            Parent root = loader.load();
+
+            // Obtener la ventana actual (Stage) desde el evento
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            // Establecer nueva escena con la vista usuarios
+            stage.setScene(new Scene(root));
+            stage.setTitle("Lista Completa de Administradores");
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al abrir la lista de usuarios", "red");
         }
     }
 
@@ -180,7 +163,19 @@ public class AdminController {
         }
     }
 
-
+    @FXML
+    private void handleVerUserAdmin(ActionEvent event) {
+        try {
+            Sesion.cerrarSesion();
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/user_admin.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo ver user.");
+        }
+    }
 
     // ---------------- UTIL ----------------
     private void mostrarMensaje(String texto, String color) {

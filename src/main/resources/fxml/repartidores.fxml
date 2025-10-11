@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="co.edu.uniquindio.logistica.ui.RepartidoresController"
+      spacing="10" alignment="CENTER" style="-fx-padding:20;">
+
+    <Label text="Gestión de Repartidores" style="-fx-font-size:18; -fx-font-weight:bold;"/>
+
+    <TableView fx:id="tablaRepartidores" prefHeight="350">
+        <columns>
+            <TableColumn fx:id="idCol" text="Cédula" prefWidth="100"/>
+            <TableColumn fx:id="nombreCol" text="Nombre" prefWidth="180"/>
+            <TableColumn fx:id="telefonoCol" text="Teléfono" prefWidth="130"/>
+            <TableColumn fx:id="zonaCol" text="Zona" prefWidth="120"/>
+            <TableColumn fx:id="disponibleCol" text="Disponible" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Agregar" onAction="#handleAgregar"/>
+        <Button text="Editar" onAction="#handleEditar"/>
+        <Button text="Eliminar" onAction="#handleEliminar"/>
+        <Button text="Actualizar" onAction="#cargarRepartidores"/>
+        <Button text="↩️ Volver" onAction="#handleVolver"
+                style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;"/>
+    </HBox>
+    <Label fx:id="mensajeLabel" text="" style="-fx-text-fill: #1976D2; -fx-font-weight: bold;"/>
+
+
+</VBox>
+
