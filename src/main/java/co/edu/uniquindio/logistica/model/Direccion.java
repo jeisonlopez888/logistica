@@ -28,7 +28,24 @@ public class Direccion {
 
 
     public void setCoordenadas(String coordenadas) {
+
         this.coordenadas = coordenadas;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public void setCalle(String calle) {
+        this.calle = calle;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
     }
 }
 

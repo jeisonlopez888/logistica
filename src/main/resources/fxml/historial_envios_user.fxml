@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.logistica.ui.HistorialEnviosUserController"
+            prefWidth="1600" prefHeight="750"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
+
+    <!-- ENCABEZADO -->
+    <top>
+        <VBox alignment="CENTER" spacing="8"
+              style="-fx-background-color: linear-gradient(to right, #7CB342, #558B2F);
+                     -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
+            <Label text="📦 Mi Historial de Envíos"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
+            <Label text="Consulta detallada de todos tus envíos realizados"
+                   style="-fx-text-fill: #E8F5E9; -fx-font-size: 13px; -fx-opacity: 0.9;"/>
+        </VBox>
+    </top>
+
+    <!-- CONTENIDO CENTRAL -->
+    <center>
+        <VBox spacing="15" style="-fx-padding: 20;">
+            
+            <!-- Tarjeta de tabla -->
+            <VBox spacing="10" style="-fx-background-color: rgba(255,255,255,0.95);
+                                      -fx-background-radius: 15;
+                                      -fx-padding: 20;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 3);">
+                
+                <Label text="Mis Envíos Registrados"
+                       style="-fx-font-size: 16px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+
+                <TableView fx:id="tablaEnvios" prefHeight="550" style="-fx-border-radius: 10; -fx-background-radius: 10;">
+                    <columns>
+                        <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="130"/>
+                        
+                        <!-- Origen -->
+                        <TableColumn fx:id="colOrigenDireccion" text="Origen - Dirección" prefWidth="150"/>
+                        <TableColumn fx:id="colOrigenCiudad" text="Orig. Zona" prefWidth="90"/>
+                        
+                        <!-- Destino -->
+                        <TableColumn fx:id="colDestinoDireccion" text="Destino - Dirección" prefWidth="150"/>
+                        <TableColumn fx:id="colDestinoCiudad" text="Dest. Zona" prefWidth="90"/>
+                        
+                        <!-- Detalles del paquete -->
+                        <TableColumn fx:id="colPeso" text="Peso (kg)" prefWidth="80"/>
+                        <TableColumn fx:id="colVolumen" text="Vol. (m³)" prefWidth="80"/>
+                        
+                        <!-- Opciones adicionales -->
+                        <TableColumn fx:id="colPrioridad" text="⚡ Prior." prefWidth="65"/>
+                        <TableColumn fx:id="colSeguro" text="🛡️ Seg." prefWidth="65"/>
+                        <TableColumn fx:id="colFragil" text="⚠️ Frágil" prefWidth="70"/>
+                        <TableColumn fx:id="colFirmaRequerida" text="✍️ Firma" prefWidth="70"/>
+                        
+                        <!-- Estado y costo -->
+                        <TableColumn fx:id="colEstado" text="Estado" prefWidth="110"/>
+                        <TableColumn fx:id="colCostoEstimado" text="Costo" prefWidth="90"/>
+                        
+                        <!-- Fechas -->
+                        <TableColumn fx:id="colFechaCreacion" text="F. Creación" prefWidth="120"/>
+                        <TableColumn fx:id="colFechaConfirmacion" text="F. Confirmación" prefWidth="130"/>
+                        <TableColumn fx:id="colFechaEntregaEstimada" text="F. Est. Entrega" prefWidth="130"/>
+                        <TableColumn fx:id="colFechaEntrega" text="F. Entrega Real" prefWidth="120"/>
+                        
+                        <!-- Repartidor -->
+                        <TableColumn fx:id="colRepartidor" text="Repartidor Asignado" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Botones de acción -->
+            <HBox alignment="CENTER" spacing="18" style="-fx-padding: 10 0 0 0;">
+                <Button text="✏️ Editar Envío" onAction="#editarEnvio"
+                        style="-fx-background-color: linear-gradient(to bottom right, #42A5F5, #1E88E5);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 25;
+                               -fx-effect: dropshadow(gaussian, rgba(30,136,229,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
+                <Button text="🗑️ Cancelar Envío" onAction="#eliminarEnvio"
+                        style="-fx-background-color: linear-gradient(to bottom right, #FFB300, #F57C00);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 25;
+                               -fx-effect: dropshadow(gaussian, rgba(245,124,0,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
+                <Button text="⚠️ Ver Incidencia" onAction="#verIncidencia"
+                        style="-fx-background-color: linear-gradient(to bottom right, #EF5350, #D32F2F);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 25;
+                               -fx-effect: dropshadow(gaussian, rgba(211,47,47,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
+                <Button text="↩️ Volver" onAction="#handleVolver"
+                        style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 25;
+                               -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- PIE DE PÁGINA -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 15;">
+            <Label text="© 2025 Plataforma Logística | Historial de Envíos"
+                   style="-fx-text-fill: #B3E5FC; -fx-font-size: 11px; -fx-opacity: 0.8;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

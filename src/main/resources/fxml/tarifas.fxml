@@ -1,31 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
+<BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="co.edu.uniquindio.logistica.ui.TarifasController"
-            prefWidth="600" prefHeight="400">
-    <children>
-        <VBox alignment="CENTER" spacing="10" layoutX="50" layoutY="30" prefWidth="500">
-            <Label text="Gestión de Tarifas" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            prefWidth="850" prefHeight="550"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
 
-            <TableView fx:id="tarifasTable" prefHeight="250">
-                <columns>
-                    <TableColumn fx:id="idCol" text="ID" prefWidth="80"/>
-                    <TableColumn fx:id="descripcionCol" text="Descripción" prefWidth="200"/>
-                    <TableColumn fx:id="baseCol" text="Base ($)" prefWidth="100"/>
-                    <TableColumn fx:id="porKiloCol" text="Por Kg ($)" prefWidth="100"/>
-                </columns>
-            </TableView>
+    <!-- ENCABEZADO -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15"
+              style="-fx-background-color: linear-gradient(to right, #26C6DA, #0097A7);
+                     -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
+            <Label text="⚙️ Gestión de Tarifas"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
+        </HBox>
+    </top>
 
-            <HBox spacing="10">
-                <Button text="Agregar Tarifa" onAction="#handleAgregar"/>
-                <Button text="Eliminar Tarifa" onAction="#handleEliminar"/>
-                <Button text="Panel Admin" onAction="#handleVolverAdmin"/>
+    <!-- CONTENIDO CENTRAL -->
+    <center>
+        <VBox spacing="20" style="-fx-padding: 25;">
+            
+            <!-- Tarjeta de tabla -->
+            <VBox spacing="15" style="-fx-background-color: rgba(255,255,255,0.95);
+                                      -fx-background-radius: 15;
+                                      -fx-padding: 25;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 3);">
+                
+                <Label text="Tarifas Configuradas del Sistema"
+                       style="-fx-font-size: 16px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+
+                <TableView fx:id="tarifasTable" prefHeight="300" style="-fx-border-radius: 10; -fx-background-radius: 10;">
+                    <columns>
+                        <TableColumn fx:id="idCol" text="ID" prefWidth="80"/>
+                        <TableColumn fx:id="descripcionCol" text="Descripción" prefWidth="300"/>
+                        <TableColumn fx:id="baseCol" text="Costo Base ($)" prefWidth="150"/>
+                        <TableColumn fx:id="porKiloCol" text="Costo por Kg ($)" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Mensaje de estado -->
+            <Label fx:id="mensajeLabel" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white;"/>
+
+            <!-- Botones de acción -->
+            <HBox alignment="CENTER" spacing="20" style="-fx-padding: 10 0 0 0;">
+                <Button text="➕ Agregar Tarifa" onAction="#handleAgregar"
+                        style="-fx-background-color: linear-gradient(to bottom right, #26C6DA, #0097A7);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 30;
+                               -fx-effect: dropshadow(gaussian, rgba(0,151,167,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
+                <Button text="🗑️ Eliminar Tarifa" onAction="#handleEliminar"
+                        style="-fx-background-color: linear-gradient(to bottom right, #EF5350, #D32F2F);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 30;
+                               -fx-effect: dropshadow(gaussian, rgba(211,47,47,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
+                <Button text="↩️ Volver" onAction="#handleVolverAdmin"
+                        style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 30;
+                               -fx-cursor: hand;"/>
             </HBox>
-
-            <Label fx:id="mensajeLabel" textFill="green"/>
         </VBox>
-    </children>
-</AnchorPane>
+    </center>
 
+    <!-- PIE DE PÁGINA -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 15;">
+            <Label text="© 2025 Plataforma Logística | Configuración de Tarifas"
+                   style="-fx-text-fill: #B3E5FC; -fx-font-size: 11px; -fx-opacity: 0.8;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

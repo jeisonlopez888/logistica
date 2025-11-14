@@ -1,23 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
+<BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="co.edu.uniquindio.logistica.ui.LoginController"
-            prefWidth="400" prefHeight="300">
-    <children>
-        <VBox alignment="CENTER" spacing="10" layoutX="50" layoutY="50" prefWidth="300" prefHeight="200">
-            <Label text="Iniciar Sesión" style="-fx-font-size: 18px;"/>
-            <TextField fx:id="emailField" promptText="Correo electrónico"/>
-            <PasswordField fx:id="passwordField" promptText="Contraseña"/>
-            <Button text="Entrar" onAction="#handleLogin"/>
-            <Button text="Registrarse" onAction="#handleAbrirRegistro" maxWidth="150"/>
-            <Button text="↩️ Rastrear Envio" onAction="#handleRastreo"
-                    style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
-            <Label fx:id="mensajeLabel" />
+            prefWidth="500" prefHeight="650"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
+
+    <!-- ENCABEZADO -->
+    <top>
+        <VBox alignment="CENTER" spacing="15" style="-fx-padding: 40 20 20 20;">
+            <Label text="🚚 Sistema Logístico"
+                   style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 2px;"/>
+            <Label text="Plataforma de Envíos y Entregas"
+                   style="-fx-font-size: 14px; -fx-text-fill: #80DEEA; -fx-opacity: 0.9;"/>
         </VBox>
-    </children>
-</AnchorPane>
+    </top>
 
+    <!-- FORMULARIO CENTRAL -->
+    <center>
+        <VBox alignment="CENTER" spacing="20" style="-fx-padding: 30;">
+            <!-- Contenedor del formulario con estilo de tarjeta -->
+            <VBox alignment="CENTER" spacing="18" style="-fx-background-color: rgba(255,255,255,0.95);
+                                                           -fx-background-radius: 20;
+                                                           -fx-padding: 40 50;
+                                                           -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0, 0, 5);"
+                  maxWidth="350">
+                
+                <Label text="Iniciar Sesión"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #01579B;"/>
 
+                <!-- Campo Email -->
+                <VBox spacing="8">
+                    <Label text="📧 Correo Electrónico"
+                           style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                    <TextField fx:id="emailField" promptText="ejemplo@correo.com"
+                               style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                      -fx-border-radius: 8; -fx-background-radius: 8;
+                                      -fx-padding: 12; -fx-font-size: 14px;"
+                               prefWidth="250"/>
+                </VBox>
 
+                <!-- Campo Contraseña -->
+                <VBox spacing="8">
+                    <Label text="🔒 Contraseña"
+                           style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                    <PasswordField fx:id="passwordField" promptText="••••••••"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 12; -fx-font-size: 14px;"
+                                   prefWidth="250"/>
+                </VBox>
+
+                <!-- Botón Entrar -->
+                <Button text="Entrar" onAction="#handleLogin"
+                        style="-fx-background-color: linear-gradient(to right, #0277BD, #01579B);
+                               -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 14 40;
+                               -fx-effect: dropshadow(gaussian, rgba(1,87,155,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"
+                        prefWidth="250"/>
+
+                <!-- Mensaje de estado -->
+                <Label fx:id="mensajeLabel" style="-fx-text-fill: #D32F2F; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+
+                <!-- Separador -->
+                <Separator prefWidth="250" style="-fx-background-color: #CFD8DC;"/>
+
+                <!-- Opciones secundarias -->
+                <VBox spacing="12" alignment="CENTER">
+                    <Button text="Registrarse" onAction="#handleAbrirRegistro"
+                            style="-fx-background-color: transparent; -fx-text-fill: #0277BD;
+                                   -fx-font-size: 14px; -fx-font-weight: bold; -fx-underline: true;
+                                   -fx-cursor: hand;"/>
+                    
+                    <Button text="🔍 Rastrear Envío" onAction="#handleRastreo"
+                            style="-fx-background-color: linear-gradient(to right, #757575, #616161);
+                                   -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                   -fx-background-radius: 8; -fx-padding: 10 30;
+                                   -fx-cursor: hand;"
+                            prefWidth="250"/>
+                </VBox>
+            </VBox>
+        </VBox>
+    </center>
+
+    <!-- PIE DE PÁGINA -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 20;">
+            <Label text="© 2025 Plataforma Logística | Servicio de Entregas Rápidas"
+                   style="-fx-text-fill: #B3E5FC; -fx-font-size: 11px; -fx-opacity: 0.8;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

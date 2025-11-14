@@ -1,49 +1,56 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
-import co.edu.uniquindio.logistica.model.*;
-import co.edu.uniquindio.logistica.service.TarifaService;
-import co.edu.uniquindio.logistica.store.DataStore;
+import co.edu.uniquindio.logistica.model.DTO.DireccionDTO;
+import co.edu.uniquindio.logistica.model.DTO.EnvioDTO;
+import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
+import co.edu.uniquindio.logistica.model.MetodoPago;
 import co.edu.uniquindio.logistica.util.Sesion;
+import co.edu.uniquindio.logistica.util.ValidacionUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import java.io.IOException;
 
-public class CrearEnvioController {
+/**
+ * Controlador base para crear/editar envíos - Solo valida datos y usa DTOs
+ */
+public abstract class CrearEnvioController {
 
-    @FXML private TextField origenDireccionField;
-    @FXML private ComboBox<String> zonaOrigenCombo;
-    @FXML private TextField destinoDireccionField;
-    @FXML private ComboBox<String> zonaDestinoCombo;
-    @FXML private TextField pesoField;
-    @FXML private CheckBox prioridadCheck;
-    @FXML private CheckBox seguroCheck;
-    @FXML private Label costoLabel;
-    @FXML private Label mensajeLabel;
-    @FXML private Button crearBtn;
+    @FXML protected TextField origenDireccionField;
+    @FXML protected ComboBox<String> zonaOrigenCombo;
+    @FXML protected TextField destinoDireccionField;
+    @FXML protected ComboBox<String> zonaDestinoCombo;
+    @FXML protected TextField pesoField;
+    @FXML protected ComboBox<String> tipoPaqueteCombo;
+    @FXML protected TextField largoField;
+    @FXML protected TextField anchoField;
+    @FXML protected TextField altoField;
+    @FXML protected CheckBox prioridadCheck;
+    @FXML protected CheckBox seguroCheck;
+    @FXML protected CheckBox fragilCheck;
+    @FXML protected CheckBox firmaRequeridaCheck;
+    @FXML protected Label costoLabel;
+    @FXML protected Label mensajeLabel;
+    @FXML protected Button crearBtn;
+    @FXML protected HBox dimensionesBox;
 
-    private final LogisticaFacade facade = LogisticaFacade.getInstance();
-    private final TarifaService tarifaService = new TarifaService();
+    protected final LogisticaFacade facade = LogisticaFacade.getInstance();
 
-    private Usuario usuarioActual;
-    private Runnable onEnvioCreado;
+    protected UsuarioDTO usuarioActual;
+    protected Runnable onEnvioCreado;
+    protected double costoEstimadoActual = 0.0;
 
-    private double costoEstimadoActual = 0.0;
-
-    // ✅ Método actual
-    public void setUsuarioActual(Usuario usuario) {
-        this.usuarioActual = usuario;
+    public void setUsuarioActual(UsuarioDTO usuarioDTO) {
+        this.usuarioActual = usuarioDTO;
     }
 
-    // ✅ Método adicional para compatibilidad con controladores antiguos
-    public void setUsuario(Usuario usuario) {
-        setUsuarioActual(usuario);
+    public void setUsuario(UsuarioDTO usuarioDTO) {
+        setUsuarioActual(usuarioDTO);
     }
 
     public void setOnEnvioCreado(Runnable onEnvioCreado) {
@@ -51,70 +58,86 @@ public class CrearEnvioController {
     }
 
     @FXML
-    private void initialize() {
+    protected void initialize() {
         zonaOrigenCombo.getItems().addAll("Sur", "Centro", "Norte");
         zonaDestinoCombo.getItems().addAll("Sur", "Centro", "Norte");
 
-        // ✅ Recuperar automáticamente el usuario logueado desde Sesion
+        tipoPaqueteCombo.getItems().addAll("Sobre", "Paquete", "Caja");
+        tipoPaqueteCombo.setOnAction(e -> {
+            boolean esCaja = "Caja".equals(tipoPaqueteCombo.getValue());
+            largoField.setDisable(!esCaja);
+            anchoField.setDisable(!esCaja);
+            altoField.setDisable(!esCaja);
+        });
+
+        largoField.setDisable(true);
+        anchoField.setDisable(true);
+        altoField.setDisable(true);
+
         if (Sesion.getUsuarioActual() != null) {
             this.usuarioActual = Sesion.getUsuarioActual();
         }
     }
 
-
-    /** 🔹 Paso 1: Calcular tarifa estimada antes de crear */
+    /** Calcular tarifa estimada usando DTOs */
     @FXML
-    private void handleCotizar() {
+    protected void handleCotizar() {
         try {
-            if (usuarioActual == null) {
-                mostrarMensaje("⚠️ No se ha asignado el usuario actual", "orange");
+            if (usuarioActual == null) usuarioActual = Sesion.getUsuarioActual();
+
+            if (!validarCampos()) return;
+
+            // Validación de datos
+            double peso = Double.parseDouble(pesoField.getText());
+            if (!ValidacionUtil.esPesoValido(peso)) {
+                mostrarMensaje("⚠️ El peso debe ser mayor a 0 y menor a 1000 kg", "orange");
                 return;
             }
 
-            String dirOrigen = origenDireccionField.getText();
-            String zonaOrigen = zonaOrigenCombo.getValue();
-            String dirDestino = destinoDireccionField.getText();
-            String zonaDestino = zonaDestinoCombo.getValue();
-            String pesoStr = pesoField.getText();
-
-            if (dirOrigen.isEmpty() || zonaOrigen == null ||
-                    dirDestino.isEmpty() || zonaDestino == null || pesoStr.isEmpty()) {
-                mostrarMensaje("❌ Todos los campos son obligatorios", "red");
+            double volumen = calcularVolumen();
+            if (!ValidacionUtil.esVolumenValido(volumen)) {
+                mostrarMensaje("⚠️ El volumen excede el máximo permitido", "orange");
                 return;
             }
 
-            double peso = Double.parseDouble(pesoStr);
+            // Crear DTOs de direcciones
+            DireccionDTO origenDTO = facade.crearDireccion("Origen",
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), zonaOrigenCombo.getValue());
+            DireccionDTO destinoDTO = facade.crearDireccion("Destino",
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), zonaDestinoCombo.getValue());
 
-            Direccion origen = new Direccion(DataStore.getInstance().nextId(), "Origen", dirOrigen, "", zonaOrigen);
-            Direccion destino = new Direccion(DataStore.getInstance().nextId(), "Destino", dirDestino, "", zonaDestino);
+            // Crear DTO de envío temporal para cálculo
+            EnvioDTO envioTempDTO = new EnvioDTO();
+            envioTempDTO.setOrigen(origenDTO);
+            envioTempDTO.setDestino(destinoDTO);
+            envioTempDTO.setPeso(peso);
+            envioTempDTO.setVolumen(volumen);
+            envioTempDTO.setPrioridad(prioridadCheck.isSelected());
+            envioTempDTO.setSeguro(seguroCheck.isSelected());
+            envioTempDTO.setFragil(fragilCheck != null && fragilCheck.isSelected());
+            envioTempDTO.setFirmaRequerida(firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected());
 
-            Envio envioTemp = new Envio();
-            envioTemp.setOrigen(origen);
-            envioTemp.setDestino(destino);
-            envioTemp.setPeso(peso);
-            envioTemp.setUsuario(usuarioActual);
-            envioTemp.setPrioridad(prioridadCheck.isSelected());
-            envioTemp.setSeguro(seguroCheck.isSelected());
-
-            double total = tarifaService.calcularTarifa(envioTemp);
+            // Calcular tarifa usando Facade (trabaja con DTOs)
+            double total = facade.calcularTarifa(envioTempDTO);
             costoEstimadoActual = total;
-
             costoLabel.setText(String.format("$ %.2f", total));
-            crearBtn.setDisable(false);
+            if (crearBtn != null) crearBtn.setDisable(false);
             mostrarMensaje("💰 Costo estimado calculado correctamente", "green");
 
         } catch (NumberFormatException e) {
-            mostrarMensaje("⚠️ El peso debe ser numérico", "orange");
+            mostrarMensaje("⚠️ El peso o las dimensiones deben ser numéricos", "orange");
         } catch (Exception e) {
             e.printStackTrace();
             mostrarMensaje("❌ Error al calcular la tarifa", "red");
         }
     }
 
-    /** 🔹 Paso 2: Crear envío, registrar y confirmar pago */
+    /** Crear y pagar usando DTOs */
     @FXML
-    private void handleCrear() {
+    protected void handleCrear() {
         try {
+            if (usuarioActual == null) usuarioActual = Sesion.getUsuarioActual();
+
             if (costoEstimadoActual <= 0) {
                 mostrarMensaje("⚠️ Primero calcule el costo antes de confirmar", "orange");
                 return;
@@ -125,9 +148,7 @@ public class CrearEnvioController {
             pagoDialog.setHeaderText("Total a pagar: $" + costoEstimadoActual);
             pagoDialog.setContentText("¿Desea confirmar el pago y registrar el envío?");
             pagoDialog.showAndWait().ifPresent(result -> {
-                if (result == ButtonType.OK) {
-                    procesarEnvioYPago();
-                }
+                if (result == ButtonType.OK) procesarEnvioYPago();
             });
 
         } catch (Exception e) {
@@ -136,28 +157,46 @@ public class CrearEnvioController {
         }
     }
 
-
-
-    private void procesarEnvioYPago() {
+    protected void procesarEnvioYPago() {
         try {
-            String dirOrigen = origenDireccionField.getText();
-            String zonaOrigen = zonaOrigenCombo.getValue();
-            String dirDestino = destinoDireccionField.getText();
-            String zonaDestino = zonaDestinoCombo.getValue();
+            // Asegurar que tenemos el usuario actual de sesión
+            if (usuarioActual == null) {
+                usuarioActual = Sesion.getUsuarioActual();
+            }
+
+            if (usuarioActual == null) {
+                mostrarMensaje("❌ Error: No hay usuario en sesión", "red");
+                return;
+            }
+
+            if (!validarCampos()) return;
+
             double peso = Double.parseDouble(pesoField.getText());
+            double volumen = calcularVolumen();
 
-            Direccion origen = new Direccion(DataStore.getInstance().nextId(), "Origen", dirOrigen, "", zonaOrigen);
-            Direccion destino = new Direccion(DataStore.getInstance().nextId(), "Destino", dirDestino, "", zonaDestino);
+            // Crear DTOs
+            DireccionDTO origenDTO = facade.crearDireccion("Origen",
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), zonaOrigenCombo.getValue());
+            DireccionDTO destinoDTO = facade.crearDireccion("Destino",
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), zonaDestinoCombo.getValue());
 
-            Envio envio = facade.crearEnvio(usuarioActual, origen, destino, peso);
-            envio.setPrioridad(prioridadCheck.isSelected());
-            envio.setSeguro(seguroCheck.isSelected());
-            envio.setCostoEstimado(costoEstimadoActual);
+            // Crear envío usando Facade con el usuario actual (trabaja con DTOs)
+            EnvioDTO envioDTO = facade.crearEnvio(usuarioActual, origenDTO, destinoDTO, peso);
+            envioDTO.setIdUsuario(usuarioActual.getId()); // Asegurar que tiene el ID del usuario
+            envioDTO.setVolumen(volumen);
+            envioDTO.setPrioridad(prioridadCheck.isSelected());
+            envioDTO.setSeguro(seguroCheck.isSelected());
+            envioDTO.setFragil(fragilCheck != null && fragilCheck.isSelected());
+            envioDTO.setFirmaRequerida(firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected());
+            envioDTO.setCostoEstimado(costoEstimadoActual);
 
-            Pago pago = facade.registrarPagoSimulado(envio, costoEstimadoActual, MetodoPago.TARJETA_CREDITO);
-            facade.confirmarPago(pago.getId());
+            // Registrar envío
+            facade.registrarEnvio(envioDTO);
 
-            mostrarMensaje("✅ Envío registrado y pago confirmado.\nRepartidor asignado si hay disponible.", "green");
+            // Registrar pago simulado
+            facade.registrarPagoSimulado(envioDTO.getId(), costoEstimadoActual, MetodoPago.TARJETA_CREDITO);
+
+            mostrarMensaje("✅ Envío #" + envioDTO.getId() + " creado para " + usuarioActual.getNombre() + " y repartidor asignado.", "green");
             limpiarCampos();
 
             if (onEnvioCreado != null) onEnvioCreado.run();
@@ -168,109 +207,107 @@ public class CrearEnvioController {
         }
     }
 
+    /** Guardar envío (estado SOLICITADO) usando DTOs */
     @FXML
-    private void handleCancelar() {
-        limpiarCampos();
-        mostrarMensaje("ℹ️ Creación cancelada", "#1976D2");
-    }
-
-    private void limpiarCampos() {
-        origenDireccionField.clear();
-        destinoDireccionField.clear();
-        pesoField.clear();
-        zonaOrigenCombo.getSelectionModel().clearSelection();
-        zonaDestinoCombo.getSelectionModel().clearSelection();
-        prioridadCheck.setSelected(false);
-        seguroCheck.setSelected(false);
-        costoLabel.setText("—");
-        crearBtn.setDisable(true);
-    }
-
-    /**
-     * Método de compatibilidad para controladores que intentan editar un envío existente.
-     * Actualmente no se usa en esta versión, pero se deja para evitar errores de compilación.
-     */
-    public void setEnvioToEdit(Envio envio) {
-        // Opcionalmente podrías cargar datos en el formulario si decides permitir edición.
-        if (envio != null) {
-            origenDireccionField.setText(envio.getOrigenDireccion());
-            destinoDireccionField.setText(envio.getDestinoDireccion());
-            pesoField.setText(String.valueOf(envio.getPeso()));
-
-            if (envio.getOrigen() != null) zonaOrigenCombo.setValue(envio.getOrigen().getCoordenadas());
-            if (envio.getDestino() != null) zonaDestinoCombo.setValue(envio.getDestino().getCoordenadas());
-
-            prioridadCheck.setSelected(envio.isPrioridad());
-            seguroCheck.setSelected(envio.isSeguro());
-            costoLabel.setText(String.format("$ %.2f", envio.getCostoEstimado()));
-        }
-    }
-
-    @FXML
-    private void handleGuardarEnvio() {
+    protected void handleGuardarEnvio() {
         try {
-            String dirOrigen = origenDireccionField.getText();
-            String zonaOrigen = zonaOrigenCombo.getValue();
-            String dirDestino = destinoDireccionField.getText();
-            String zonaDestino = zonaDestinoCombo.getValue();
-            double peso = Double.parseDouble(pesoField.getText());
+            // Asegurar que tenemos el usuario actual de sesión
+            if (usuarioActual == null) {
+                usuarioActual = Sesion.getUsuarioActual();
+            }
 
-            Direccion origen = new Direccion(DataStore.getInstance().nextId(), "Origen", dirOrigen, "", zonaOrigen);
-            Direccion destino = new Direccion(DataStore.getInstance().nextId(), "Destino", dirDestino, "", zonaDestino);
-
-            Envio envio = new Envio();
-            // No asignar ID manualmente, DataStore lo hará automáticamente
-            envio.setOrigen(origen);
-            envio.setDestino(destino);
-            envio.setPeso(peso);
-            envio.setUsuario(usuarioActual);
-            envio.setPrioridad(prioridadCheck.isSelected());
-            envio.setSeguro(seguroCheck.isSelected());
-            envio.setEstado(Envio.EstadoEnvio.PENDIENTE);
-
-            // Registrar envío, DataStore asigna ID automáticamente
-            facade.registrarEnvio(envio);
-
-            mostrarMensaje("✅ Envío guardado correctamente con estado PENDIENTE", "green");
-            limpiarCampos();
-
-        } catch (NumberFormatException e) {
-            mostrarMensaje("❌ Peso inválido, ingresa un número válido", "red");
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("❌ Error desconocido al guardar envío", "red");
-        }
-    }
-
-
-
-    @FXML
-    private void handleVerDesglose() {
-        try {
-            String dirOrigen = origenDireccionField.getText();
-            String zonaOrigen = zonaOrigenCombo.getValue();
-            String dirDestino = destinoDireccionField.getText();
-            String zonaDestino = zonaDestinoCombo.getValue();
-            String pesoStr = pesoField.getText();
-
-            if (dirOrigen.isEmpty() || zonaOrigen == null ||
-                    dirDestino.isEmpty() || zonaDestino == null || pesoStr.isEmpty()) {
-                mostrarMensaje("⚠️ Completa los datos del envío antes de ver el desglose.", "orange");
+            if (usuarioActual == null) {
+                mostrarMensaje("❌ Error: No hay usuario en sesión", "red");
                 return;
             }
 
-            double peso = Double.parseDouble(pesoStr);
+            if (!validarCampos()) return;
 
-            Direccion origen = new Direccion(DataStore.getInstance().nextId(), "Origen", dirOrigen, "", zonaOrigen);
-            Direccion destino = new Direccion(DataStore.getInstance().nextId(), "Destino", dirDestino, "", zonaDestino);
+            double peso = Double.parseDouble(pesoField.getText());
+            double volumen = calcularVolumen();
 
-            Envio envioTemp = new Envio();
-            envioTemp.setOrigen(origen);
-            envioTemp.setDestino(destino);
-            envioTemp.setPeso(peso);
-            envioTemp.setUsuario(usuarioActual);
-            envioTemp.setPrioridad(prioridadCheck.isSelected());
-            envioTemp.setSeguro(seguroCheck.isSelected());
+            // Crear DTOs
+            DireccionDTO origenDTO = facade.crearDireccion("Origen",
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), zonaOrigenCombo.getValue());
+            DireccionDTO destinoDTO = facade.crearDireccion("Destino",
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), zonaDestinoCombo.getValue());
+
+            // Crear envío usando Facade con el usuario actual (trabaja con DTOs)
+            EnvioDTO envioDTO = facade.crearEnvio(usuarioActual, origenDTO, destinoDTO, peso);
+            envioDTO.setIdUsuario(usuarioActual.getId()); // Asegurar que tiene el ID del usuario
+            envioDTO.setVolumen(volumen);
+            envioDTO.setPrioridad(prioridadCheck.isSelected());
+            envioDTO.setSeguro(seguroCheck.isSelected());
+            envioDTO.setFragil(fragilCheck != null && fragilCheck.isSelected());
+            envioDTO.setFirmaRequerida(firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected());
+            envioDTO.setEstado(EnvioDTO.EstadoEnvio.SOLICITADO);
+
+            // Registrar envío
+            facade.registrarEnvio(envioDTO);
+            mostrarMensaje("✅ Envío #" + envioDTO.getId() + " guardado para " + usuarioActual.getNombre() + " con estado SOLICITADO", "green");
+            limpiarCampos();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al guardar envío", "red");
+        }
+    }
+
+    /** Validaciones de campos */
+    protected boolean validarCampos() {
+        if (ValidacionUtil.isEmpty(origenDireccionField.getText()) ||
+                ValidacionUtil.isEmpty(destinoDireccionField.getText()) ||
+                ValidacionUtil.isEmpty(pesoField.getText()) ||
+                zonaOrigenCombo.getValue() == null ||
+                zonaDestinoCombo.getValue() == null ||
+                tipoPaqueteCombo.getValue() == null) {
+            mostrarMensaje("⚠️ Todos los campos son obligatorios", "orange");
+            return false;
+        }
+        return true;
+    }
+
+    /** Cálculo de volumen según tipo */
+    protected double calcularVolumen() {
+        String tipo = tipoPaqueteCombo.getValue();
+        if ("Sobre".equals(tipo)) return 0.001;
+        if ("Paquete".equals(tipo)) return 0.01;
+        if ("Caja".equals(tipo)) {
+            try {
+                double largo = Double.parseDouble(largoField.getText());
+                double ancho = Double.parseDouble(anchoField.getText());
+                double alto = Double.parseDouble(altoField.getText());
+                return (largo * ancho * alto) / 1_000_000; // cm³ → m³
+            } catch (NumberFormatException e) {
+                return 0.005; // Valor por defecto
+            }
+        }
+        return 0.005;
+    }
+
+    @FXML
+    protected void handleVerDesglose(ActionEvent event) {
+        try {
+            if (!validarCampos()) return;
+
+            double peso = Double.parseDouble(pesoField.getText());
+            double volumen = calcularVolumen();
+
+            // Crear DTOs
+            DireccionDTO origenDTO = facade.crearDireccion("Origen",
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), zonaOrigenCombo.getValue());
+            DireccionDTO destinoDTO = facade.crearDireccion("Destino",
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), zonaDestinoCombo.getValue());
+
+            // Crear DTO temporal
+            EnvioDTO envioTempDTO = new EnvioDTO();
+            envioTempDTO.setOrigen(origenDTO);
+            envioTempDTO.setDestino(destinoDTO);
+            envioTempDTO.setPeso(peso);
+            envioTempDTO.setVolumen(volumen);
+            envioTempDTO.setPrioridad(prioridadCheck.isSelected());
+            envioTempDTO.setSeguro(seguroCheck.isSelected());
+            envioTempDTO.setCostoEstimado(facade.calcularTarifa(envioTempDTO));
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/detalle_tarifa.fxml"));
             Parent root = loader.load();
@@ -281,43 +318,46 @@ public class CrearEnvioController {
 
             DetalleTarifaController controller = loader.getController();
             controller.setStage(stage);
-            controller.mostrarDetalle(envioTemp);
+            controller.mostrarDetalle(envioTempDTO);
 
             stage.show();
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             mostrarMensaje("❌ Error al abrir el detalle de tarifa.", "red");
-        } catch (NumberFormatException e) {
-            mostrarMensaje("⚠️ El peso debe ser numérico para calcular el desglose.", "orange");
         }
     }
 
-    private void mostrarMensaje(String texto, String color) {
+    protected void limpiarCampos() {
+        origenDireccionField.clear();
+        destinoDireccionField.clear();
+        pesoField.clear();
+        largoField.clear();
+        anchoField.clear();
+        altoField.clear();
+        zonaOrigenCombo.getSelectionModel().clearSelection();
+        zonaDestinoCombo.getSelectionModel().clearSelection();
+        tipoPaqueteCombo.getSelectionModel().clearSelection();
+        prioridadCheck.setSelected(false);
+        seguroCheck.setSelected(false);
+        if (fragilCheck != null) fragilCheck.setSelected(false);
+        if (firmaRequeridaCheck != null) firmaRequeridaCheck.setSelected(false);
+        costoLabel.setText("—");
+        if (crearBtn != null) crearBtn.setDisable(true);
+    }
+
+    protected void mostrarMensaje(String texto, String color) {
         mensajeLabel.setText(texto);
         mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
     }
 
-    @FXML
-    private void handleVolverMenu(ActionEvent event) {
-        try {
-            Sesion.cerrarSesion();
-
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/user.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarAlerta("Error", "No se pudo volver al login.");
-        }
-    }
-
-    private void mostrarAlerta(String titulo, String mensaje) {
+    protected void mostrarAlerta(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
+
+    @FXML
+    public abstract void setEnvioToEdit(EnvioDTO envioDTO);
 }

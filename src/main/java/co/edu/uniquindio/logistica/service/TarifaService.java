@@ -21,82 +21,64 @@ public class TarifaService {
                 .orElse(null);
     }
 
-    /**
-     * Compatibilidad: anterior calcularTarifa por peso.
-     * Usa la primera tarifa registrada como base.
-     */
     public double calcularTarifa(double peso) {
         Tarifa t = store.getTarifas().isEmpty() ? null : store.getTarifas().get(0);
         return (t != null) ? t.calcularCosto(peso) : 0;
     }
 
-    /**
-     * Calcula el costo total para un Envío considerando:
-     * - tarifa base y costo por kilo (se toma la primera tarifa disponible como referencia)
-     * - cargo por volumen (proporcional)
-     * - recargo por zonas origen/destino (reglas especificadas)
-     * - recargo por prioridad (express)
-     * - seguro (servicio adicional)
-     *
-     * Devuelve solo el total. Si necesitas desglose, usa desglosarTarifa(envio).
-     */
     public double calcularTarifa(Envio envio) {
         TarifaDetalle d = desglosarTarifa(envio);
         return d.getTotal();
     }
 
-    /**
-     * Retorna un desglose de componentes de la tarifa: base, porPeso, porVolumen,
-     * recargoZona, recargoPrioridad, seguro y total.
-     */
     public TarifaDetalle desglosarTarifa(Envio envio) {
         Tarifa t = store.getTarifas().isEmpty() ? null : store.getTarifas().get(0);
 
         double base = (t != null) ? t.getCostoBase() : 0.0;
         double porKilo = (t != null) ? t.getCostoPorKilo() : 0.0;
+        double porVolumen = (t != null) ? t.getCostoPorVolumen() : 0.0;
+        double recargoSeguroConfig = (t != null) ? t.getRecargoSeguro() : 0.0;
 
+        // --- COMPONENTES ---
         double componentePeso = envio.getPeso() * porKilo;
 
-        // Volumen: asumo que volumen está en cm3; convierto a "equivalente kilos" de forma simple:
-        // volumenFactor = volumen / 1000 -> metros cúbicos aproximado => multiplicar por porKilo
-        double componenteVolumen = envio.getVolumen() > 0 ? (envio.getVolumen() / 1000.0) * porKilo : 0.0;
+        // Volumen (convertido a m³)
+        double componenteVolumen = (envio.getVolumen() > 0)
+                ? envio.getVolumen() * porVolumen
+                : 0.0;
 
         double subtotal = base + componentePeso + componenteVolumen;
 
-        // Recargo por zonas según reglas:
+        // --- RECARGOS ---
         double recargoZona = calcularRecargoPorZona(envio.getOrigen(), envio.getDestino(), envio.getPeso(), porKilo);
+        double recargoPrioridad = envio.isPrioridad() ? subtotal * 0.25 : 0.0;
 
-        // Recargo por prioridad (ej: 20% del subtotal)
-        double recargoPrioridad = envio.isPrioridad() ? subtotal * 0.20 : 0.0;
-
-        // Seguro: ejemplo 2% del subtotal + recargos (puedes ajustar)
-        double recargoSeguro = envio.isSeguro() ? (subtotal + recargoZona + recargoPrioridad) * 0.02 : 0.0;
+        // Recargo por seguro configurable
+        double recargoSeguro;
+        if (envio.isSeguro()) {
+            if (recargoSeguroConfig > 1) {
+                recargoSeguro = recargoSeguroConfig;
+            } else {
+                recargoSeguro = subtotal * recargoSeguroConfig;
+            }
+        } else {
+            recargoSeguro = 0.0;
+        }
 
         double total = subtotal + recargoZona + recargoPrioridad + recargoSeguro;
-
-        // redondeo a 2 decimales
         total = Math.round(total * 100.0) / 100.0;
 
-        return new TarifaDetalle(base, componentePeso, componenteVolumen, recargoZona, recargoPrioridad, recargoSeguro, total);
+        return new TarifaDetalle(base, componentePeso, componenteVolumen,
+                recargoZona, recargoPrioridad, recargoSeguro, total);
     }
 
-    /**
-     * Implementa las reglas de zona:
-     * - si origen CENTRO y destino SUR o NORTE: +5% por kilo
-     * - si origen SUR y destino CENTRO: +5% por kilo
-     * - si origen SUR y destino NORTE: +10% por kilo
-     * - viceversa para origen NORTE -> CENTRO 5%, NORTE->SUR 10%
-     *
-     * Este método devuelve un valor monetario (no porcentaje) calculado sobre el peso * porKilo.
-     */
     private double calcularRecargoPorZona(co.edu.uniquindio.logistica.model.Direccion origen,
                                           co.edu.uniquindio.logistica.model.Direccion destino,
                                           double peso, double porKilo) {
         if (origen == null || destino == null) return 0.0;
-        String o = origen.getCoordenadas() != null ? origen.getCoordenadas().toLowerCase() : origen.getCiudad() != null ? origen.getCiudad().toLowerCase() : "";
-        String d = destino.getCoordenadas() != null ? destino.getCoordenadas().toLowerCase() : destino.getCiudad() != null ? destino.getCiudad().toLowerCase() : "";
+        String o = origen.getCoordenadas() != null ? origen.getCoordenadas().toLowerCase() : "";
+        String d = destino.getCoordenadas() != null ? destino.getCoordenadas().toLowerCase() : "";
 
-        // Normalizar
         o = o.trim();
         d = d.trim();
 
@@ -110,21 +92,12 @@ public class TarifaService {
         } else if (o.contains("norte")) {
             if (d.contains("centro")) recargoPercent = 0.05;
             else if (d.contains("sur")) recargoPercent = 0.10;
-        } else {
-            // Si no coincide con etiquetas, intentar comparar exactas "sur", "centro", "norte"
-            if (o.equals("centro") && (d.equals("sur") || d.equals("norte"))) recargoPercent = 0.05;
-            if (o.equals("sur") && d.equals("centro")) recargoPercent = 0.05;
-            if (o.equals("sur") && d.equals("norte")) recargoPercent = 0.10;
-            if (o.equals("norte") && d.equals("centro")) recargoPercent = 0.05;
-            if (o.equals("norte") && d.equals("sur")) recargoPercent = 0.10;
         }
 
         double recargoMonetario = peso * porKilo * recargoPercent;
-        // redondeo
         return Math.round(recargoMonetario * 100.0) / 100.0;
     }
 
-    // Clase para devolver desglose
     public static class TarifaDetalle {
         private final double base;
         private final double porPeso;
@@ -134,7 +107,8 @@ public class TarifaService {
         private final double recargoSeguro;
         private final double total;
 
-        public TarifaDetalle(double base, double porPeso, double porVolumen, double recargoZona, double recargoPrioridad, double recargoSeguro, double total) {
+        public TarifaDetalle(double base, double porPeso, double porVolumen,
+                             double recargoZona, double recargoPrioridad, double recargoSeguro, double total) {
             this.base = base;
             this.porPeso = porPeso;
             this.porVolumen = porVolumen;

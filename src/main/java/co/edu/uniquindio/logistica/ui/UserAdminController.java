@@ -1,7 +1,7 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
-import co.edu.uniquindio.logistica.model.Usuario;
+import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
 import co.edu.uniquindio.logistica.util.Sesion;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,37 +12,36 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
+/**
+ * Controlador de Usuario Admin - Solo valida y usa DTOs
+ */
 public class UserAdminController {
 
-
-    private Usuario usuario;
+    private UsuarioDTO usuario;
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuario(UsuarioDTO usuarioDTO) {
+        this.usuario = usuarioDTO;
+        Sesion.setUsuarioActual(usuarioDTO);
+    }
+
+    public void setUsuarioActual(UsuarioDTO usuarioDTO) {
+        setUsuario(usuarioDTO);
     }
 
     @FXML
-    private void handleCrearEnvio(ActionEvent event) {
+    private void handleCrearEnvioAdmin(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/crear_envio.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/crear_envio_admin.fxml"));
             Parent root = loader.load();
+            CrearEnvioAdminController ctrl = loader.getController();
+            ctrl.setUsuarioActual(usuario != null ? usuario : Sesion.getUsuarioActual());
+            ctrl.setOnEnvioCreado(() -> mostrarAlerta("Éxito", "El envío se registró correctamente."));
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            CrearEnvioController ctrl = loader.getController();
-            // ✅ Corregido: el método ahora es setUsuarioActual()
-            ctrl.setUsuarioActual(usuario);
-
-            // ✅ Si tienes una callback en CrearEnvioController (opcional)
-            ctrl.setOnEnvioCreado(() -> {
-                mostrarAlerta("Éxito", "El envío se registró correctamente.");
-            });
-
-
             stage.setScene(new Scene(root));
-            stage.setTitle("Crear Envío");
+            stage.setTitle("Crear Envío (Admin)");
             stage.show();
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,17 +49,16 @@ public class UserAdminController {
     }
 
     @FXML
-    private void handleVerHistorial(ActionEvent event) {
+    private void handleVerHistorialAdmin(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/historial_envios.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/historial_envios_admin.fxml"));
             Parent root = loader.load();
+            HistorialEnviosAdminController ctrl = loader.getController();
+            ctrl.setUsuario(usuario != null ? usuario : Sesion.getUsuarioActual());
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            HistorialEnviosController ctrl = loader.getController();
-            ctrl.setUsuario(usuario);
-
             stage.setScene(new Scene(root));
-            stage.setTitle("Historial de Envíos");
+            stage.setTitle("Historial de Envíos (Admin)");
             stage.show();
 
         } catch (Exception e) {
@@ -71,7 +69,8 @@ public class UserAdminController {
     @FXML
     private void handleVolverAdmin(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/admin.fxml"));
+            Sesion.cerrarSesion();
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/Login.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();

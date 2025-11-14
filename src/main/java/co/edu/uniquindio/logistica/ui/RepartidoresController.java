@@ -1,8 +1,7 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
-import co.edu.uniquindio.logistica.model.Repartidor;
-import co.edu.uniquindio.logistica.util.Sesion;
+import co.edu.uniquindio.logistica.model.DTO.RepartidorDTO;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,14 +13,18 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
+/**
+ * Controlador de Repartidores - Solo valida datos y se comunica con Facade usando DTOs
+ */
 public class RepartidoresController {
 
-    @FXML private TableView<Repartidor> tablaRepartidores;
-    @FXML private TableColumn<Repartidor, Long> idCol;
-    @FXML private TableColumn<Repartidor, String> nombreCol;
-    @FXML private TableColumn<Repartidor, String> telefonoCol;
-    @FXML private TableColumn<Repartidor, String> zonaCol;
-    @FXML private TableColumn<Repartidor, Boolean> disponibleCol;
+    @FXML private TableView<RepartidorDTO> tablaRepartidores;
+    @FXML private TableColumn<RepartidorDTO, Long> idCol;
+    @FXML private TableColumn<RepartidorDTO, String> nombreCol;
+    @FXML private TableColumn<RepartidorDTO, String> documentoCol;
+    @FXML private TableColumn<RepartidorDTO, String> telefonoCol;
+    @FXML private TableColumn<RepartidorDTO, String> zonaCol;
+    @FXML private TableColumn<RepartidorDTO, Boolean> disponibleCol;
     @FXML private Label mensajeLabel;
 
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
@@ -30,6 +33,7 @@ public class RepartidoresController {
     private void initialize() {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        documentoCol.setCellValueFactory(new PropertyValueFactory<>("documento"));
         telefonoCol.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         zonaCol.setCellValueFactory(new PropertyValueFactory<>("zona"));
         disponibleCol.setCellValueFactory(new PropertyValueFactory<>("disponible"));
@@ -45,12 +49,12 @@ public class RepartidoresController {
 
     @FXML
     private void handleAgregar() {
-        abrirFormulario(null); // null = nuevo repartidor
+        abrirFormulario(null);
     }
 
     @FXML
     private void handleEditar() {
-        Repartidor seleccionado = tablaRepartidores.getSelectionModel().getSelectedItem();
+        RepartidorDTO seleccionado = tablaRepartidores.getSelectionModel().getSelectedItem();
         if (seleccionado == null) {
             mostrarMensaje("⚠️ Selecciona un repartidor para editar", "orange");
             return;
@@ -58,7 +62,7 @@ public class RepartidoresController {
         abrirFormulario(seleccionado);
     }
 
-    private void abrirFormulario(Repartidor repartidor) {
+    private void abrirFormulario(RepartidorDTO repartidorDTO) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/crear_repartidor.fxml"));
             Parent root = loader.load();
@@ -66,13 +70,13 @@ public class RepartidoresController {
             CrearRepartidorController ctrl = loader.getController();
             ctrl.setOnRepartidorCreado(this::cargarRepartidores);
 
-            if (repartidor != null) {
-                ctrl.setRepartidor(repartidor); // cargar datos existentes
+            if (repartidorDTO != null) {
+                ctrl.setRepartidor(repartidorDTO);
             }
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
-            stage.setTitle(repartidor == null ? "Registrar Repartidor" : "Editar Repartidor");
+            stage.setTitle(repartidorDTO == null ? "Registrar Repartidor" : "Editar Repartidor");
             stage.showAndWait();
 
         } catch (Exception e) {
@@ -83,35 +87,41 @@ public class RepartidoresController {
 
     @FXML
     private void handleEliminar() {
-        Repartidor seleccionado = tablaRepartidores.getSelectionModel().getSelectedItem();
+        RepartidorDTO seleccionado = tablaRepartidores.getSelectionModel().getSelectedItem();
         if (seleccionado == null) {
             mostrarMensaje("⚠️ Selecciona un repartidor para eliminar", "orange");
             return;
         }
 
-        facade.eliminarRepartidor(seleccionado);
-        cargarRepartidores();
-        mostrarMensaje("✅ Repartidor eliminado correctamente", "green");
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar eliminación");
+        confirm.setHeaderText(null);
+        confirm.setContentText("¿Seguro que deseas eliminar al repartidor '" + seleccionado.getNombre() + "'?");
+        confirm.showAndWait().ifPresent(bt -> {
+            if (bt == ButtonType.OK) {
+                facade.eliminarRepartidor(seleccionado.getId());
+                cargarRepartidores();
+                mostrarMensaje("✅ Repartidor eliminado correctamente", "green");
+            }
+        });
     }
 
     @FXML
     private void handleVolver(ActionEvent event) {
         try {
-            Sesion.cerrarSesion();
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/admin.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarAlerta("Error", "No se pudo volver al login.");
+            mostrarAlerta("Error", "No se pudo volver al panel admin.");
         }
     }
 
-
     private void mostrarMensaje(String texto, String color) {
         mensajeLabel.setText(texto);
-        mensajeLabel.setStyle("-fx-text-fill:" + color + ";");
+        mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
     }
 
     private void mostrarAlerta(String titulo, String mensaje) {

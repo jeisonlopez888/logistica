@@ -1,16 +1,20 @@
 package co.edu.uniquindio.logistica.util;
 
-import co.edu.uniquindio.logistica.model.Usuario;
+import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
 
+/**
+ * Clase para gestionar la sesión del usuario actual.
+ * Trabaja con DTOs, no con entidades.
+ */
 public class Sesion {
 
-    private static Usuario usuarioActual;
+    private static UsuarioDTO usuarioActual;
 
-    public static void setUsuarioActual(Usuario usuario) {
+    public static void setUsuarioActual(UsuarioDTO usuario) {
         usuarioActual = usuario;
     }
 
-    public static Usuario getUsuarioActual() {
+    public static UsuarioDTO getUsuarioActual() {
         return usuarioActual;
     }
 

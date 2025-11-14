@@ -1,42 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.logistica.ui.RegistroController"
+            prefWidth="550" prefHeight="750"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="co.edu.uniquindio.logistica.ui.CrearUsuarioController"
-      alignment="CENTER" spacing="10" prefWidth="400" prefHeight="600"
-      style="-fx-background-color: #f9f9f9; -fx-padding: 20;">
+    <!-- ENCABEZADO -->
+    <top>
+        <HBox alignment="CENTER" spacing="15"
+              style="-fx-background-color: linear-gradient(to right, #42A5F5, #1E88E5);
+                     -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
+            <Label text="📝 Registro de Usuario"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
+        </HBox>
+    </top>
 
-    <Label text="Registro de Usuario" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <!-- FORMULARIO CENTRAL -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox alignment="CENTER" spacing="20" style="-fx-padding: 30;">
+                
+                <!-- Tarjeta de formulario -->
+                <VBox spacing="18" style="-fx-background-color: rgba(255,255,255,0.95);
+                                           -fx-background-radius: 15;
+                                           -fx-padding: 35;
+                                           -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0, 0, 5);"
+                      maxWidth="450">
+                    
+                    <Label text="Datos Personales"
+                           style="-fx-font-size: 18px; -fx-text-fill: #01579B; -fx-font-weight: bold;"/>
 
-    <TextField fx:id="idField" promptText="Cédula"/>
-    <TextField fx:id="nombreField" promptText="Nombre completo"/>
-    <TextField fx:id="emailField" promptText="Correo electrónico"/>
-    <TextField fx:id="telefonoField" promptText="Teléfono"/>
-    <PasswordField fx:id="passwordField" promptText="Contraseña"/>
+                    <!-- Cédula -->
+                    <VBox spacing="6">
+                        <Label text="Cédula *" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <TextField fx:id="idField" promptText="Número de identificación"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10; -fx-font-size: 13px;"/>
+                    </VBox>
 
-    <Separator/>
-    <Label text="Dirección de Origen" style="-fx-font-weight: bold;"/>
-    <TextField fx:id="alias1Field" promptText="Alias (ej: Casa)"/>
-    <TextField fx:id="detalle1Field" promptText="Dirección completa"/>
-    <!-- 🔹 Nueva lista desplegable para zona de origen -->
-    <ComboBox fx:id="zonaOrigenCombo" promptText="Seleccione zona de origen (Sur, Centro, Norte)"/>
+                    <!-- Nombre -->
+                    <VBox spacing="6">
+                        <Label text="Nombre Completo *" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <TextField fx:id="nombreField" promptText="Ej: Juan Pérez"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10; -fx-font-size: 13px;"/>
+                    </VBox>
 
-    <Separator/>
-    <Label text="Dirección de Destino (opcional)" style="-fx-font-weight: bold;"/>
-    <TextField fx:id="alias2Field" promptText="Alias (ej: Trabajo)"/>
-    <TextField fx:id="detalle2Field" promptText="Dirección completa"/>
-    <!-- 🔹 Nueva lista desplegable para zona de destino -->
-    <ComboBox fx:id="zonaDestinoCombo" promptText="Seleccione zona de destino (Sur, Centro, Norte)"/>
+                    <!-- Email -->
+                    <VBox spacing="6">
+                        <Label text="Correo Electrónico *" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <TextField fx:id="emailField" promptText="correo@ejemplo.com"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10; -fx-font-size: 13px;"/>
+                    </VBox>
 
-    <Button text="Registrarse" onAction="#handleRegistrar"
-            style="-fx-background-color: #1976D2; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 6 12;"/>
-    <Button text="↩️ Volver al Login" onAction="#handleVolverLogin"
-            style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+                    <!-- Teléfono -->
+                    <VBox spacing="6">
+                        <Label text="Teléfono *" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <TextField fx:id="telefonoField" promptText="3001234567"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10; -fx-font-size: 13px;"/>
+                    </VBox>
 
-    <Label fx:id="mensajeLabel"/>
-</VBox>
+                    <!-- Contraseña -->
+                    <VBox spacing="6">
+                        <Label text="Contraseña *" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <PasswordField fx:id="passwordField" promptText="Mínimo 4 caracteres"
+                                       style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                              -fx-border-radius: 8; -fx-background-radius: 8;
+                                              -fx-padding: 10; -fx-font-size: 13px;"/>
+                    </VBox>
 
+                    <Separator style="-fx-background-color: #CFD8DC;"/>
 
+                    <!-- Dirección de Origen -->
+                    <Label text="Dirección de Origen"
+                           style="-fx-font-size: 16px; -fx-text-fill: #01579B; -fx-font-weight: bold;"/>
 
+                    <VBox spacing="6">
+                        <Label text="Alias" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <TextField fx:id="alias1Field" promptText="Ej: Casa"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10; -fx-font-size: 13px;"/>
+                    </VBox>
 
+                    <VBox spacing="6">
+                        <Label text="Dirección" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <TextField fx:id="detalle1Field" promptText="Calle 10 # 5-20"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10; -fx-font-size: 13px;"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Zona" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <ComboBox fx:id="zonaOrigenCombo" promptText="Seleccione zona"
+                                  style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                         -fx-border-radius: 8; -fx-background-radius: 8;"
+                                  prefWidth="380"/>
+                    </VBox>
+
+                    <Separator style="-fx-background-color: #CFD8DC;"/>
+
+                    <!-- Dirección de Destino (Opcional) -->
+                    <Label text="Dirección de Destino (Opcional)"
+                           style="-fx-font-size: 16px; -fx-text-fill: #01579B; -fx-font-weight: bold;"/>
+
+                    <VBox spacing="6">
+                        <Label text="Alias" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <TextField fx:id="alias2Field" promptText="Ej: Trabajo"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10; -fx-font-size: 13px;"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Dirección" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <TextField fx:id="detalle2Field" promptText="Cra 14 # 2-30"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10; -fx-font-size: 13px;"/>
+                    </VBox>
+
+                    <VBox spacing="6">
+                        <Label text="Zona" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                        <ComboBox fx:id="zonaDestinoCombo" promptText="Seleccione zona"
+                                  style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                         -fx-border-radius: 8; -fx-background-radius: 8;"
+                                  prefWidth="380"/>
+                    </VBox>
+
+                    <!-- Botones -->
+                    <HBox spacing="15" alignment="CENTER" style="-fx-padding: 15 0 0 0;">
+                        <Button text="Registrarse" onAction="#handleRegistrar"
+                                style="-fx-background-color: linear-gradient(to right, #0277BD, #01579B);
+                                       -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                       -fx-background-radius: 10; -fx-padding: 12 35;
+                                       -fx-effect: dropshadow(gaussian, rgba(1,87,155,0.5), 8, 0, 0, 3);
+                                       -fx-cursor: hand;"/>
+                        
+                        <Button text="Volver" onAction="#handleVolver"
+                                style="-fx-background-color: linear-gradient(to right, #757575, #616161);
+                                       -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                       -fx-background-radius: 10; -fx-padding: 12 35;
+                                       -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <!-- Mensaje -->
+                    <Label fx:id="mensajeLabel" wrapText="true" alignment="CENTER"
+                           style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- PIE DE PÁGINA -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 15;">
+            <Label text="© 2025 Plataforma Logística | Registro de Usuarios"
+                   style="-fx-text-fill: #B3E5FC; -fx-font-size: 11px; -fx-opacity: 0.8;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -1,34 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="co.edu.uniquindio.logistica.ui.RepartidoresController"
-      spacing="10" alignment="CENTER" style="-fx-padding:20;">
+<BorderPane prefHeight="600" prefWidth="1000"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.logistica.ui.RepartidoresController">
 
-    <Label text="Gestión de Repartidores" style="-fx-font-size:18; -fx-font-weight:bold;"/>
+    <!-- ENCABEZADO -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15"
+              style="-fx-background-color: linear-gradient(to right, #EF5350, #D32F2F);
+                     -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
+            <Label text="🚚 Gestión de Repartidores"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
+        </HBox>
+    </top>
 
-    <TableView fx:id="tablaRepartidores" prefHeight="350">
-        <columns>
-            <TableColumn fx:id="idCol" text="Cédula" prefWidth="100"/>
-            <TableColumn fx:id="nombreCol" text="Nombre" prefWidth="180"/>
-            <TableColumn fx:id="telefonoCol" text="Teléfono" prefWidth="130"/>
-            <TableColumn fx:id="zonaCol" text="Zona" prefWidth="120"/>
-            <TableColumn fx:id="disponibleCol" text="Disponible" prefWidth="100"/>
-        </columns>
-    </TableView>
+    <!-- CONTENIDO CENTRAL -->
+    <center>
+        <VBox spacing="20" style="-fx-padding: 25;">
+            
+            <!-- Tarjeta de tabla -->
+            <VBox spacing="15" style="-fx-background-color: rgba(255,255,255,0.95);
+                                      -fx-background-radius: 15;
+                                      -fx-padding: 25;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 3);">
+                
+                <Label text="Lista de Repartidores Registrados"
+                       style="-fx-font-size: 16px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
 
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Agregar" onAction="#handleAgregar"/>
-        <Button text="Editar" onAction="#handleEditar"/>
-        <Button text="Eliminar" onAction="#handleEliminar"/>
-        <Button text="Actualizar" onAction="#cargarRepartidores"/>
-        <Button text="↩️ Volver" onAction="#handleVolver"
-                style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;"/>
-    </HBox>
-    <Label fx:id="mensajeLabel" text="" style="-fx-text-fill: #1976D2; -fx-font-weight: bold;"/>
+                <TableView fx:id="tablaRepartidores" prefHeight="350" style="-fx-border-radius: 10; -fx-background-radius: 10;">
+                    <columns>
+                        <TableColumn fx:id="idCol" prefWidth="80" text="ID"/>
+                        <TableColumn fx:id="documentoCol" prefWidth="130" text="Documento"/>
+                        <TableColumn fx:id="nombreCol" prefWidth="200" text="Nombre"/>
+                        <TableColumn fx:id="telefonoCol" prefWidth="140" text="Teléfono"/>
+                        <TableColumn fx:id="zonaCol" prefWidth="150" text="Zona"/>
+                        <TableColumn fx:id="disponibleCol" prefWidth="120" text="Disponible"/>
+                    </columns>
+                </TableView>
+            </VBox>
 
+            <!-- Mensaje de estado -->
+            <Label fx:id="mensajeLabel" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white;"/>
 
-</VBox>
+            <!-- Botones de acción -->
+            <HBox alignment="CENTER" spacing="20" style="-fx-padding: 10 0 0 0;">
+                <Button text="➕ Agregar Repartidor" onAction="#handleAgregar"
+                        style="-fx-background-color: linear-gradient(to bottom right, #66BB6A, #43A047);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 30;
+                               -fx-effect: dropshadow(gaussian, rgba(67,160,71,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
 
+                <Button text="✏️ Editar Repartidor" onAction="#handleEditar"
+                        style="-fx-background-color: linear-gradient(to bottom right, #42A5F5, #1E88E5);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 30;
+                               -fx-effect: dropshadow(gaussian, rgba(30,136,229,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
+                <Button text="🗑️ Eliminar Repartidor" onAction="#handleEliminar"
+                        style="-fx-background-color: linear-gradient(to bottom right, #EF5350, #D32F2F);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 30;
+                               -fx-effect: dropshadow(gaussian, rgba(211,47,47,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
+                <Button text="↩️ Volver" onAction="#handleVolver"
+                        style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 30;
+                               -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- PIE DE PÁGINA -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 15;">
+            <Label text="© 2025 Plataforma Logística | Gestión de Repartidores"
+                   style="-fx-text-fill: #B3E5FC; -fx-font-size: 11px; -fx-opacity: 0.8;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

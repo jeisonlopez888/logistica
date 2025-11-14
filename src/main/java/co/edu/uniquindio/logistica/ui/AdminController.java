@@ -1,6 +1,7 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
+import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
 import co.edu.uniquindio.logistica.util.Sesion;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,10 +20,17 @@ public class AdminController {
     @FXML
     private Label mensajeLabel;
 
+    private UsuarioDTO usuario;
+
     private LogisticaFacade facade = LogisticaFacade.getInstance();
 
     public void setFacade(LogisticaFacade facade) {
         this.facade = facade;
+    }
+
+    public void setUsuario(UsuarioDTO usuario) {
+        this.usuario = usuario;
+        Sesion.setUsuarioActual(usuario);
     }
 
     // ---------------- BOTONES NUEVOS ----------------
@@ -32,11 +40,7 @@ public class AdminController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/usuarios.fxml"));
             Parent root = loader.load();
-
-            // Obtener la ventana actual (Stage) desde el evento
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            // Establecer nueva escena con la vista usuarios
             stage.setScene(new Scene(root));
             stage.setTitle("Lista Completa de Usuarios");
             stage.show();
@@ -54,11 +58,7 @@ public class AdminController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/admins.fxml"));
             Parent root = loader.load();
-
-            // Obtener la ventana actual (Stage) desde el evento
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            // Establecer nueva escena con la vista usuarios
             stage.setScene(new Scene(root));
             stage.setTitle("Lista Completa de Administradores");
             stage.show();
@@ -74,11 +74,7 @@ public class AdminController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/repartidores.fxml"));
             Parent root = loader.load();
-
-            // Obtener la ventana actual (Stage) desde el evento
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            // Establecer nueva escena con la vista usuarios
             stage.setScene(new Scene(root));
             stage.setTitle("Lista Completa de Administradores");
             stage.show();
@@ -94,11 +90,23 @@ public class AdminController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pagos.fxml"));
             Parent root = loader.load();
-
-            // Obtener la ventana actual (Stage) desde el evento
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Lista Completa de Pagos");
+            stage.show();
 
-            // Establecer nueva escena con la vista usuarios
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al abrir la lista de Pagoss", "red");
+        }
+    }
+
+    @FXML
+    private void handleVerReportes(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/reportes.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Lista Completa de Administradores");
             stage.show();
@@ -110,22 +118,18 @@ public class AdminController {
     }
 
     @FXML
-    private void handleVerReportes(ActionEvent event) {
+    private void handleVerMetricas(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/reportes.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/metricas.fxml"));
             Parent root = loader.load();
-
-            // Obtener la ventana actual (Stage) desde el evento
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            // Establecer nueva escena con la vista usuarios
             stage.setScene(new Scene(root));
-            stage.setTitle("Lista Completa de Administradores");
+            stage.setTitle("Panel de Métricas Operativas");
             stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
-            mostrarMensaje("❌ Error al abrir la lista de usuarios", "red");
+            mostrarMensaje("❌ Error al abrir el panel de métricas", "red");
         }
     }
 
@@ -135,17 +139,34 @@ public class AdminController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/tarifas.fxml"));
             Parent root = loader.load();
 
-            // Obtener la ventana actual (Stage) desde el evento
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            // Establecer nueva escena con la vista usuarios
             stage.setScene(new Scene(root));
-            stage.setTitle("Lista Completa de Administradores");
+            stage.setTitle("Gestión de Tarifas");
             stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
-            mostrarMensaje("❌ Error al abrir la lista de usuarios", "red");
+            mostrarMensaje("❌ Error al abrir las tarifas", "red");
+        }
+    }
+
+    @FXML
+    private void handleVerTodosLosEnvios(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/historial_envios_admin.fxml"));
+            Parent root = loader.load();
+
+            HistorialEnviosAdminController controller = loader.getController();
+            controller.setUsuario(null); // null = ver todos los envíos
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Todos los Envíos del Sistema");
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al abrir el historial de envíos", "red");
         }
     }
 

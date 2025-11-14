@@ -2,12 +2,19 @@ package co.edu.uniquindio.logistica.facade;
 
 import co.edu.uniquindio.logistica.factory.EntityFactory;
 import co.edu.uniquindio.logistica.model.*;
+import co.edu.uniquindio.logistica.model.DTO.*;
 import co.edu.uniquindio.logistica.service.*;
 import co.edu.uniquindio.logistica.store.DataStore;
+import co.edu.uniquindio.logistica.util.Mappers.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * Facade que actúa como capa de presentación entre controladores y servicios.
+ * Trabaja exclusivamente con DTOs, convirtiendo a entidades para los servicios.
+ */
 public class LogisticaFacade {
 
     private final UsuarioService usuarioService;
@@ -15,6 +22,7 @@ public class LogisticaFacade {
     private final TarifaService tarifaService;
     private final PagoService pagoService;
     private final DataStore store;
+    private final RepartidorService repartidorService;
 
     private static LogisticaFacade instance;
 
@@ -24,6 +32,7 @@ public class LogisticaFacade {
         this.tarifaService = new TarifaService();
         this.pagoService = new PagoService();
         this.store = DataStore.getInstance();
+        this.repartidorService = new RepartidorService();
     }
 
     public static LogisticaFacade getInstance() {
@@ -33,182 +42,282 @@ public class LogisticaFacade {
         return instance;
     }
 
-    // Usuarios
-    public Usuario login(String email, String password) {
-        return usuarioService.login(email, password);
+    // ========== USUARIOS ==========
+    
+    public UsuarioDTO login(String email, String password) {
+        Usuario usuario = usuarioService.login(email, password);
+        return UsuarioMapper.toDTO(usuario);
     }
 
-    public List<Usuario> listarUsuarios() {
-        return usuarioService.listarUsuarios();
+    public List<UsuarioDTO> listarUsuarios() {
+        return usuarioService.listarUsuarios().stream()
+                .map(UsuarioMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public void registrarUsuario(Usuario usuario) {
+    public void registrarUsuario(UsuarioDTO usuarioDTO) {
+        Usuario usuario = UsuarioMapper.toEntity(usuarioDTO);
         usuarioService.registrarUsuario(usuario);
     }
 
-    public Usuario crearUsuario(Long id, String nombre, String email, String telefono, String password, boolean admin) {
+    public UsuarioDTO crearUsuario(Long id, String nombre, String email, String telefono, String password, boolean admin) {
         Usuario usuario = EntityFactory.createUsuario(id, nombre, email, telefono, password, admin);
-        registrarUsuario(usuario);
-        return usuario;
+        usuarioService.registrarUsuario(usuario);
+        return UsuarioMapper.toDTO(usuario);
     }
 
-    // Envíos
-    public void registrarEnvio(Envio envio) {
+    public void eliminarUsuario(Long idUsuario) {
+        Usuario usuario = store.getUsuarios().stream()
+                .filter(u -> u.getId().equals(idUsuario))
+                .findFirst()
+                .orElse(null);
+        if (usuario != null) {
+            store.getUsuarios().remove(usuario);
+        }
+    }
+
+    public UsuarioDTO buscarUsuarioPorEmail(String email) {
+        Usuario usuario = store.getUsuarios().stream()
+                .filter(u -> u.getEmail().equalsIgnoreCase(email))
+                .findFirst()
+                .orElse(null);
+        return UsuarioMapper.toDTO(usuario);
+    }
+
+    // ========== ENVÍOS ==========
+    
+    public void registrarEnvio(EnvioDTO envioDTO) {
+        Envio envio = EnvioMapper.toEntity(envioDTO);
         envioService.registrarEnvio(envio);
     }
 
-    public List<Envio> listarEnviosPorUsuario(Usuario usuario) {
-        return envioService.listarEnviosPorUsuario(usuario);
+    public List<EnvioDTO> listarEnviosPorUsuario(Long idUsuario) {
+        Usuario usuario = store.getUsuarios().stream()
+                .filter(u -> u.getId().equals(idUsuario))
+                .findFirst()
+                .orElse(null);
+        if (usuario == null) return List.of();
+        
+        return envioService.listarEnviosPorUsuario(usuario).stream()
+                .map(EnvioMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public List<Envio> listarTodosEnvios() {
-        return envioService.listarTodos();
+    public List<EnvioDTO> listarTodosEnvios() {
+        return envioService.listarTodos().stream()
+                .map(EnvioMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public void eliminarEnvio(Envio envio) {
-        envioService.eliminarEnvio(envio);
+    public void eliminarEnvio(Long idEnvio) {
+        Envio envio = store.getEnvios().stream()
+                .filter(e -> e.getId().equals(idEnvio))
+                .findFirst()
+                .orElse(null);
+        if (envio != null) {
+            envioService.eliminarEnvio(envio);
+        }
     }
 
-    public Envio buscarEnvioPorId(Long id) {
-        return store.getEnvios().stream()
+    public EnvioDTO buscarEnvioPorId(Long id) {
+        Envio envio = store.getEnvios().stream()
                 .filter(e -> e.getId().equals(id))
                 .findFirst()
                 .orElse(null);
+        return EnvioMapper.toDTO(envio);
     }
 
-    /**
-     * Crear un nuevo envío.
-     * Aseguramos que el envío tenga asignado el usuario antes de registrarlo.
-     */
-    public Envio crearEnvio(Usuario usuario, Direccion origen, Direccion destino, double peso) {
+    public EnvioDTO crearEnvio(UsuarioDTO usuarioDTO, DireccionDTO origenDTO, DireccionDTO destinoDTO, double peso) {
+        Usuario usuario = UsuarioMapper.toEntity(usuarioDTO);
+        Direccion origen = DireccionMapper.toEntity(origenDTO);
+        Direccion destino = DireccionMapper.toEntity(destinoDTO);
+        
         Envio envio = EntityFactory.createEnvio(usuario, origen, destino, peso);
-        // Por si EntityFactory no asignó el usuario, lo forzamos:
-        if (envio.getUsuario() == null && usuario != null) {
-            envio.setUsuario(usuario);
-        }
         if (envio.getFechaCreacion() == null) {
             envio.setFechaCreacion(LocalDateTime.now());
         }
-        registrarEnvio(envio);
-        return envio;
+        envioService.registrarEnvio(envio);
+        return EnvioMapper.toDTO(envio);
     }
 
-    // Pagos
-    public void addPago(Pago pago) {
-        store.addPago(pago);
-    }
-
-    public Pago registrarPagoSimulado(Envio envio, double monto, MetodoPago metodo) {
-        return pagoService.registrarPagoEnvio(envio, monto, metodo);
-    }
-
-    public List<Pago> getPagos() {
-        return pagoService.listarPagos();
-    }
-
-    public Pago buscarPagoPorId(Long id) {
-        return pagoService.buscarPagoPorId(id);
-    }
-
-    public void eliminarPago(Pago pago) {
-        pagoService.eliminarPago(pago);
-    }
-
-    /**
-     * Confirmar un pago:
-     * - marcar pago confirmado
-     * - setear fecha de confirmación en el envío
-     * - cambiar estado del envío a CONFIRMADO y luego intentar asignar repartidor
-     * Devuelve mensaje con resultado y, si aplica, nombre del repartidor asignado.
-     */
-    public String confirmarPago(Long pagoId) {
-        Pago pago = store.getPagos().stream()
-                .filter(p -> p.getId().equals(pagoId))
+    public List<EnvioDTO> buscarEnviosPorEstado(Long idUsuario, EnvioDTO.EstadoEnvio estadoDTO) {
+        Usuario usuario = store.getUsuarios().stream()
+                .filter(u -> u.getId().equals(idUsuario))
                 .findFirst()
                 .orElse(null);
-
-        if (pago == null) return "❌ No se encontró el pago.";
-
-        pago.setConfirmado(true);
-
-        Envio envio = pago.getEnvio();
-        if (envio != null) {
-            // Fecha de confirmación
-            envio.setFechaConfirmacion(LocalDateTime.now());
-            // Estado inicial: CONFIRMADO
-            envio.setEstado(Envio.EstadoEnvio.CONFIRMADO);
-
-            // Intentar asignar repartidor automáticamente
-            boolean asignado = envioService.asignarRepartidor(envio);
-
-            // Guardar cambios explícitamente en el DataStore (por si el objeto no es el mismo)
-            store.getEnvios().replaceAll(e -> e.getId().equals(envio.getId()) ? envio : e);
-
-            if (asignado) {
-                return "✅ Pago confirmado y repartidor asignado: " +
-                        (envio.getRepartidor() != null ? envio.getRepartidor().getNombre() : "Desconocido");
-            } else {
-                return "✅ Pago confirmado, pero no hay repartidores disponibles en la zona.";
-            }
-        }
-
-        return "⚠️ Pago confirmado, pero el envío asociado no existe.";
+        if (usuario == null) return List.of();
+        
+        Envio.EstadoEnvio estado = Envio.EstadoEnvio.valueOf(estadoDTO.name());
+        return store.getEnvios().stream()
+                .filter(e -> e.getUsuario() != null && e.getUsuario().equals(usuario) && e.getEstado() == estado)
+                .map(EnvioMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    // Tarifas
-    public void addTarifa(Tarifa tarifa) {
+    public boolean asignarRepartidor(Long idEnvio) {
+        Envio envio = store.getEnvios().stream()
+                .filter(e -> e.getId().equals(idEnvio))
+                .findFirst()
+                .orElse(null);
+        if (envio == null) return false;
+        return envioService.asignarRepartidor(envio);
+    }
+
+    public String obtenerIncidencia(Long idEnvio) {
+        return envioService.obtenerIncidencia(idEnvio);
+    }
+
+    // ========== PAGOS ==========
+    
+    public PagoDTO registrarPagoSimulado(Long idEnvio, double monto, MetodoPago metodo) {
+        Envio envio = store.getEnvios().stream()
+                .filter(e -> e.getId().equals(idEnvio))
+                .findFirst()
+                .orElse(null);
+        if (envio == null) return null;
+        
+        Pago pago = pagoService.registrarPagoEnvio(envio, monto, metodo);
+        return PagoMapper.toDTO(pago);
+    }
+
+    public List<PagoDTO> getPagos() {
+        return pagoService.listarPagos().stream()
+                .map(PagoMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public PagoDTO buscarPagoPorId(Long id) {
+        Pago pago = pagoService.buscarPagoPorId(id);
+        return PagoMapper.toDTO(pago);
+    }
+
+    public void eliminarPago(Long idPago) {
+        Pago pago = store.getPagos().stream()
+                .filter(p -> p.getId().equals(idPago))
+                .findFirst()
+                .orElse(null);
+        if (pago != null) {
+            pagoService.eliminarPago(pago);
+        }
+    }
+
+    public String confirmarPago(Long pagoId) {
+        return pagoService.confirmarPago(pagoId);
+    }
+
+    // ========== TARIFAS ==========
+    
+    public void addTarifa(TarifaDTO tarifaDTO) {
+        Tarifa tarifa = TarifaMapper.toEntity(tarifaDTO);
         store.addTarifa(tarifa);
     }
 
-    public void eliminarTarifa(Tarifa tarifa) {
-        store.getTarifas().remove(tarifa);
+    public void eliminarTarifa(Long idTarifa) {
+        Tarifa tarifa = store.getTarifas().stream()
+                .filter(t -> t.getId().equals(idTarifa))
+                .findFirst()
+                .orElse(null);
+        if (tarifa != null) {
+            store.getTarifas().remove(tarifa);
+        }
     }
 
-    public List<Tarifa> getTarifas() {
-        return store.getTarifas();
+    public List<TarifaDTO> getTarifas() {
+        return store.getTarifas().stream()
+                .map(TarifaMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public double calcularTarifa(double peso) {
         return tarifaService.calcularTarifa(peso);
     }
 
-    // Repartidores
-    public void registrarRepartidor(Repartidor repartidor) {
+    public double calcularTarifa(EnvioDTO envioDTO) {
+        Envio envio = EnvioMapper.toEntity(envioDTO);
+        return tarifaService.calcularTarifa(envio);
+    }
+
+    public TarifaService.TarifaDetalle desglosarTarifa(EnvioDTO envioDTO) {
+        Envio envio = EnvioMapper.toEntity(envioDTO);
+        return tarifaService.desglosarTarifa(envio);
+    }
+
+    // ========== REPARTIDORES ==========
+    
+    public void registrarRepartidor(RepartidorDTO repartidorDTO) {
+        Repartidor repartidor = RepartidorMapper.toEntity(repartidorDTO);
         store.addRepartidor(repartidor);
     }
 
-    public void eliminarRepartidor(Repartidor repartidor) {
-        store.getRepartidores().remove(repartidor);
+    public void eliminarRepartidor(Long idRepartidor) {
+        Repartidor repartidor = store.getRepartidores().stream()
+                .filter(r -> r.getId().equals(idRepartidor))
+                .findFirst()
+                .orElse(null);
+        if (repartidor != null) {
+            store.getRepartidores().remove(repartidor);
+        }
     }
 
-    public List<Repartidor> listarRepartidores() {
-        return store.getRepartidores();
-    }
-
-    public Repartidor buscarRepartidorPorId(Long id) {
+    public List<RepartidorDTO> listarRepartidores() {
         return store.getRepartidores().stream()
+                .map(RepartidorMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public RepartidorDTO buscarRepartidorPorId(Long id) {
+        Repartidor repartidor = store.getRepartidores().stream()
                 .filter(r -> r.getId().equals(id))
                 .findFirst()
                 .orElse(null);
+        return RepartidorMapper.toDTO(repartidor);
     }
 
-    // Utilidades
-    public Usuario buscarUsuarioPorEmail(String email) {
-        return store.getUsuarios().stream()
-                .filter(u -> u.getEmail().equalsIgnoreCase(email))
+    public RepartidorDTO buscarRepartidorPorNombre(String nombre) {
+        Repartidor repartidor = store.getRepartidores().stream()
+                .filter(r -> r.getNombre().equals(nombre))
                 .findFirst()
                 .orElse(null);
+        return RepartidorMapper.toDTO(repartidor);
     }
 
-    public List<Envio> buscarEnviosPorEstado(Usuario usuario, Envio.EstadoEnvio estado) {
-        return store.getEnvios().stream()
-                .filter(e -> e.getUsuario() != null && e.getUsuario().equals(usuario) && e.getEstado() == estado)
-                .toList();
-    }
-
-    public List<Repartidor> listarRepartidoresDisponibles() {
+    public List<RepartidorDTO> listarNombresRepartidoresDisponibles() {
         return store.getRepartidores().stream()
                 .filter(Repartidor::isDisponible)
-                .toList();
+                .map(RepartidorMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public void marcarRepartidorNoDisponible(Long idRepartidor) {
+        Repartidor repartidor = store.getRepartidores().stream()
+                .filter(r -> r.getId().equals(idRepartidor))
+                .findFirst()
+                .orElse(null);
+        if (repartidor != null) {
+            repartidorService.marcarNoDisponible(repartidor);
+        }
+    }
+
+    public void marcarRepartidorDisponible(Long idRepartidor) {
+        Repartidor repartidor = store.getRepartidores().stream()
+                .filter(r -> r.getId().equals(idRepartidor))
+                .findFirst()
+                .orElse(null);
+        if (repartidor != null) {
+            repartidorService.marcarDisponible(repartidor);
+        }
+    }
+
+    // ========== UTILIDADES ==========
+    
+    public DireccionDTO crearDireccion(String nombre, String calle, String coordenadas, String ciudad) {
+        Direccion direccion = new Direccion(DataStore.getInstance().nextId(), nombre, calle, coordenadas, ciudad);
+        return DireccionMapper.toDTO(direccion);
+    }
+
+    // Métodos legacy para compatibilidad con código existente (deberían ser refactorizados)
+    @Deprecated
+    public List<Envio> listarTodosLosEnvios() {
+        return envioService.listarTodos();
     }
 }

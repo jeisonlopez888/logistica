@@ -1,41 +1,41 @@
 package co.edu.uniquindio.logistica.model;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Envio implements Serializable {
+public class Envio {
 
     public enum EstadoEnvio {
-        SOLICITADO, PENDIENTE, CONFIRMADO, ASIGNADO, EN_CAMINO, ENTREGADO, CANCELADO, INCIDENCIA
+        SOLICITADO, CONFIRMADO, ASIGNADO, EN_RUTA, ENTREGADO, CANCELADO, INCIDENCIA
     }
 
     private Long id;
+    private Usuario usuario;
     private Direccion origen;
     private Direccion destino;
     private double peso;
-    private double volumen; // ✅ Mantiene volumen del paquete (cm³ o m³)
+    private double volumen;
     private boolean prioridad;
     private boolean seguro;
-    private Usuario usuario;
-    private EstadoEnvio estado;
+    private boolean fragil;
+    private boolean firmaRequerida;
     private double costoEstimado;
+    private EstadoEnvio estado;
+    private Repartidor repartidor;
+    private String incidenciaDescripcion;
+
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaConfirmacion;
     private LocalDateTime fechaEntrega;
-    private LocalDateTime fechaEntregaEstimada; // ✅ Añadido para compatibilidad con EnvioService
-    private Repartidor repartidor;
+    private LocalDateTime fechaEntregaEstimada;
+    private LocalDateTime fechaIncidencia;
 
-    public Envio() {
-        this.estado = EstadoEnvio.PENDIENTE;
-        this.fechaCreacion = LocalDateTime.now();
-    }
-
-    // ========================
-    // ✅ Getters / Setters
-    // ========================
+    // ✅ Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 
     public Direccion getOrigen() { return origen; }
     public void setOrigen(Direccion origen) { this.origen = origen; }
@@ -55,20 +55,23 @@ public class Envio implements Serializable {
     public boolean isSeguro() { return seguro; }
     public void setSeguro(boolean seguro) { this.seguro = seguro; }
 
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    public boolean isFragil() { return fragil; }
+    public void setFragil(boolean fragil) { this.fragil = fragil; }
 
-    public EstadoEnvio getEstado() { return estado; }
-    public void setEstado(EstadoEnvio estado) {
-        this.estado = estado;
-        if (estado == EstadoEnvio.CONFIRMADO && fechaConfirmacion == null)
-            fechaConfirmacion = LocalDateTime.now();
-        if (estado == EstadoEnvio.ENTREGADO && fechaEntrega == null)
-            fechaEntrega = LocalDateTime.now();
-    }
+    public boolean isFirmaRequerida() { return firmaRequerida; }
+    public void setFirmaRequerida(boolean firmaRequerida) { this.firmaRequerida = firmaRequerida; }
 
     public double getCostoEstimado() { return costoEstimado; }
     public void setCostoEstimado(double costoEstimado) { this.costoEstimado = costoEstimado; }
+
+    public EstadoEnvio getEstado() { return estado; }
+    public void setEstado(EstadoEnvio estado) { this.estado = estado; }
+
+    public Repartidor getRepartidor() { return repartidor; }
+    public void setRepartidor(Repartidor repartidor) { this.repartidor = repartidor; }
+
+    public String getIncidenciaDescripcion() { return incidenciaDescripcion; }
+    public void setIncidenciaDescripcion(String incidenciaDescripcion) { this.incidenciaDescripcion = incidenciaDescripcion; }
 
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
@@ -79,30 +82,50 @@ public class Envio implements Serializable {
     public LocalDateTime getFechaEntrega() { return fechaEntrega; }
     public void setFechaEntrega(LocalDateTime fechaEntrega) { this.fechaEntrega = fechaEntrega; }
 
-    // ✅ NUEVO: soporta fecha estimada de entrega
-    public LocalDateTime getFechaEntregaEstimada() { return fechaEntregaEstimada; }
-    public void setFechaEntregaEstimada(LocalDateTime fechaEntregaEstimada) { this.fechaEntregaEstimada = fechaEntregaEstimada; }
+    public LocalDateTime getFechaEntregaEstimada() {
+        return fechaEntregaEstimada;
+    }
+    public void setFechaEntregaEstimada(LocalDateTime fechaEntregaEstimada) {
+        this.fechaEntregaEstimada = fechaEntregaEstimada;
+    }
 
-    public Repartidor getRepartidor() { return repartidor; }
-    public void setRepartidor(Repartidor repartidor) { this.repartidor = repartidor; }
+    public LocalDateTime getFechaIncidencia() { return fechaIncidencia; }
+    public void setFechaIncidencia(LocalDateTime fechaIncidencia) { this.fechaIncidencia = fechaIncidencia; }
 
-    // ========================
-    // ✅ Helpers para interfaz
-    // ========================
-    public String getOrigenDireccion() { return origen == null ? "" : origen.getCalle(); }
-    public String getDestinoDireccion() { return destino == null ? "" : destino.getCalle(); }
+    // ✅ Métodos auxiliares para mostrar en tabla sin errores
+    public String getOrigenDireccion() {
+        return origen != null ? origen.getCalle() : "";
+    }
+
+    public String getOrigenCiudad() {
+        return origen != null ? origen.getCiudad() : "";
+    }
+
+    public String getDestinoDireccion() {
+        return destino != null ? destino.getCalle() : "";
+    }
+
+    public String getDestinoCiudad() {
+        return destino != null ? destino.getCiudad() : "";
+    }
 
     public String getFechaCreacionStr() {
-        return fechaCreacion == null ? "" : fechaCreacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        return fechaCreacion != null ? fechaCreacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
     }
 
     public String getFechaConfirmacionStr() {
-        return fechaConfirmacion == null ? "" : fechaConfirmacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        return fechaConfirmacion != null ? fechaConfirmacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
     }
 
     public String getFechaEntregaStr() {
-        return fechaEntrega == null ? "" : fechaEntrega.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        return fechaEntrega != null ? fechaEntrega.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
     }
 
-  
+    public String getIncidenciaResumen() {
+        return incidenciaDescripcion != null && !incidenciaDescripcion.isEmpty()
+                ? (incidenciaDescripcion.length() > 25
+                ? incidenciaDescripcion.substring(0, 25) + "..."
+                : incidenciaDescripcion)
+                : "";
+    }
 }

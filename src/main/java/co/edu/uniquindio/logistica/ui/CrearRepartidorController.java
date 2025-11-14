@@ -1,14 +1,20 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
-import co.edu.uniquindio.logistica.model.Repartidor;
+import co.edu.uniquindio.logistica.model.DTO.RepartidorDTO;
+import co.edu.uniquindio.logistica.store.DataStore;
+import co.edu.uniquindio.logistica.util.ValidacionUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+/**
+ * Controlador de Crear Repartidor - Solo valida y usa DTOs
+ */
 public class CrearRepartidorController {
 
     @FXML private TextField idField;
+    @FXML private TextField documentoField;
     @FXML private TextField nombreField;
     @FXML private TextField telefonoField;
     @FXML private TextField zonaField;
@@ -17,54 +23,75 @@ public class CrearRepartidorController {
 
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
     private Runnable onRepartidorCreado;
-    private Repartidor repartidorEditando;
+    private RepartidorDTO repartidorEditandoDTO;
 
     public void setOnRepartidorCreado(Runnable onRepartidorCreado) {
         this.onRepartidorCreado = onRepartidorCreado;
     }
 
-    public void setRepartidor(Repartidor r) {
-        this.repartidorEditando = r;
-        idField.setText(String.valueOf(r.getId()));
-        nombreField.setText(r.getNombre());
-        telefonoField.setText(r.getTelefono());
-        zonaField.setText(r.getZona());
-        disponibleCheck.setSelected(r.isDisponible());
+    public void setRepartidor(RepartidorDTO rDTO) {
+        this.repartidorEditandoDTO = rDTO;
+        idField.setText(String.valueOf(rDTO.getId()));
+        documentoField.setText(rDTO.getDocumento() != null ? rDTO.getDocumento() : "");
+        nombreField.setText(rDTO.getNombre());
+        telefonoField.setText(rDTO.getTelefono());
+        zonaField.setText(rDTO.getZona());
+        disponibleCheck.setSelected(rDTO.isDisponible());
 
-        idField.setDisable(true); // No se permite cambiar la cédula
+        idField.setDisable(true);
+        documentoField.setDisable(true);
     }
 
     @FXML
     private void handleGuardar() {
         try {
+            String documento = documentoField.getText();
             String nombre = nombreField.getText();
             String telefono = telefonoField.getText();
             String zona = zonaField.getText();
             boolean disponible = disponibleCheck.isSelected();
 
-            if (nombre.isEmpty() || telefono.isEmpty() || zona.isEmpty()) {
+            // Validación
+            if (ValidacionUtil.isEmpty(nombre) || ValidacionUtil.isEmpty(telefono) || ValidacionUtil.isEmpty(zona)) {
                 mostrarMensaje("❌ Todos los campos son obligatorios", "red");
                 return;
             }
 
-            if (repartidorEditando == null) {
-                Long cedula = Long.parseLong(idField.getText());
+            if (!ValidacionUtil.esTelefonoValido(telefono)) {
+                mostrarMensaje("❌ Teléfono inválido (debe tener 10 dígitos)", "red");
+                return;
+            }
 
-                boolean existe = facade.listarRepartidores().stream()
-                        .anyMatch(r -> r.getId().equals(cedula));
-                if (existe) {
-                    mostrarMensaje("⚠️ Ya existe un repartidor con esa cédula", "orange");
+            if (repartidorEditandoDTO == null) {
+                // Validar documento si está presente
+                if (!ValidacionUtil.isEmpty(documento) && !documento.matches("\\d+")) {
+                    mostrarMensaje("❌ El documento debe ser numérico", "red");
                     return;
                 }
 
-                Repartidor nuevo = new Repartidor(cedula, nombre, telefono, zona, disponible);
-                facade.registrarRepartidor(nuevo);
+                Long id = DataStore.getInstance().nextId();
+                RepartidorDTO nuevoDTO = new RepartidorDTO();
+                nuevoDTO.setId(id);
+                nuevoDTO.setDocumento(documento);
+                nuevoDTO.setNombre(nombre);
+                nuevoDTO.setTelefono(telefono);
+                nuevoDTO.setZona(zona);
+                nuevoDTO.setDisponible(disponible);
+
+                facade.registrarRepartidor(nuevoDTO);
                 mostrarMensaje("✅ Repartidor registrado correctamente", "green");
             } else {
                 // Editar datos
-                facade.eliminarRepartidor(repartidorEditando);
-                Repartidor actualizado = new Repartidor(repartidorEditando.getId(), nombre, telefono, zona, disponible);
-                facade.registrarRepartidor(actualizado);
+                RepartidorDTO actualizadoDTO = new RepartidorDTO();
+                actualizadoDTO.setId(repartidorEditandoDTO.getId());
+                actualizadoDTO.setDocumento(repartidorEditandoDTO.getDocumento());
+                actualizadoDTO.setNombre(nombre);
+                actualizadoDTO.setTelefono(telefono);
+                actualizadoDTO.setZona(zona);
+                actualizadoDTO.setDisponible(disponible);
+
+                facade.eliminarRepartidor(repartidorEditandoDTO.getId());
+                facade.registrarRepartidor(actualizadoDTO);
                 mostrarMensaje("✅ Repartidor actualizado correctamente", "green");
             }
 
@@ -73,8 +100,6 @@ public class CrearRepartidorController {
             Stage stage = (Stage) mensajeLabel.getScene().getWindow();
             stage.close();
 
-        } catch (NumberFormatException e) {
-            mostrarMensaje("❌ La cédula debe ser numérica", "red");
         } catch (Exception e) {
             mostrarMensaje("⚠️ Error al guardar repartidor", "red");
             e.printStackTrace();
@@ -83,6 +108,6 @@ public class CrearRepartidorController {
 
     private void mostrarMensaje(String texto, String color) {
         mensajeLabel.setText(texto);
-        mensajeLabel.setStyle("-fx-text-fill:" + color + ";");
+        mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
     }
 }

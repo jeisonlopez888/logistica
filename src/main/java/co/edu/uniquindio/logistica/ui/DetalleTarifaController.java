@@ -1,11 +1,14 @@
 package co.edu.uniquindio.logistica.ui;
 
-import co.edu.uniquindio.logistica.model.Envio;
-import co.edu.uniquindio.logistica.service.TarifaService;
+import co.edu.uniquindio.logistica.facade.LogisticaFacade;
+import co.edu.uniquindio.logistica.model.DTO.EnvioDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
+/**
+ * Controlador de Detalle de Tarifa - Solo muestra información
+ */
 public class DetalleTarifaController {
 
     @FXML private Label baseLabel;
@@ -16,7 +19,7 @@ public class DetalleTarifaController {
     @FXML private Label seguroLabel;
     @FXML private Label totalLabel;
 
-    private final TarifaService tarifaService = new TarifaService();
+    private final LogisticaFacade facade = LogisticaFacade.getInstance();
 
     private Stage stage;
 
@@ -24,8 +27,9 @@ public class DetalleTarifaController {
         this.stage = stage;
     }
 
-    public void mostrarDetalle(Envio envio) {
-        TarifaService.TarifaDetalle detalle = tarifaService.desglosarTarifa(envio);
+    public void mostrarDetalle(EnvioDTO envioDTO) {
+        // Obtener desglose usando Facade (trabaja con DTOs)
+        co.edu.uniquindio.logistica.service.TarifaService.TarifaDetalle detalle = facade.desglosarTarifa(envioDTO);
 
         baseLabel.setText(String.format("$ %.2f", detalle.getBase()));
         pesoLabel.setText(String.format("$ %.2f", detalle.getPorPeso()));
@@ -41,4 +45,3 @@ public class DetalleTarifaController {
         if (stage != null) stage.close();
     }
 }
-

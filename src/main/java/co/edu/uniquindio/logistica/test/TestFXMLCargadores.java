@@ -12,12 +12,32 @@ public class TestFXMLCargadores extends Application {
     @Override
     public void start(Stage stage) {
         List<String> vistas = List.of(
+
                 "/fxml/login.fxml",
                 "/fxml/admin.fxml",
                 "/fxml/usuarios.fxml",
                 "/fxml/admins.fxml",
                 "/fxml/repartidores.fxml",
-                "/fxml/crear_usuario.fxml"
+                "/fxml/crear_usuario_admin.fxml",
+                "/fxml/crear_envio_user.fxml",
+                "/fxml/crear_repartidor.fxml",
+                "/fxml/detalle_tarifa.fxml",
+                "/fxml/editar_usuario_admin.fxml",
+                "/fxml/editar_usuario_user.fxml",
+                "/fxml/historial_envios_user.fxml",
+                "/fxml/user.fxml",
+                "/fxml/pagos.fxml",
+                "/fxml/rastreo.fxml",
+                "/fxml/registro.fxml",
+                "/fxml/reportes.fxml",
+                "/fxml/tarifas.fxml",
+                "/fxml/user_admin.fxml",
+                "/fxml/crear_envio_admin.fxml",
+                "/fxml/historial_envios_admin.fxml",
+                "/fxml/editar_envio.fxml"
+
+
+
         );
 
         System.out.println("🔍 Iniciando test de carga FXML...");

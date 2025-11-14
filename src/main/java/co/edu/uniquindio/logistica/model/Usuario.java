@@ -12,6 +12,7 @@ public class Usuario {
     private String password;
     private boolean admin;
     private List<Direccion> direcciones = new ArrayList<>();
+    private List<MetodoPago> metodosPago = new ArrayList<>();
 
     public Usuario() {
     }
@@ -33,6 +34,7 @@ public class Usuario {
     public String getPassword() { return password; }
     public boolean isAdmin() { return admin; }
     public List<Direccion> getDirecciones() { return direcciones; }
+    public List<MetodoPago> getMetodosPago() { return metodosPago; }
 
     // Setters
     public void setId(Long id) { this.id = id; }
@@ -42,6 +44,17 @@ public class Usuario {
     public void setPassword(String password) { this.password = password; }
     public void setAdmin(boolean admin) { this.admin = admin; }
     public void setDirecciones(List<Direccion> direcciones) { this.direcciones = direcciones; }
+    public void setMetodosPago(List<MetodoPago> metodosPago) { this.metodosPago = metodosPago; }
+
+    public void agregarMetodoPago(MetodoPago metodo) {
+        if (!metodosPago.contains(metodo)) {
+            metodosPago.add(metodo);
+        }
+    }
+
+    public void eliminarMetodoPago(MetodoPago metodo) {
+        metodosPago.remove(metodo);
+    }
 
     @Override
     public boolean equals(Object o) {

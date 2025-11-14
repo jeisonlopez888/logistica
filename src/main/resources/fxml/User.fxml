@@ -1,20 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="20" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="co.edu.uniquindio.logistica.ui.UserController">
-    <padding>
-        <Insets bottom="20" left="20" right="20" top="20" />
-    </padding>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12"
+            fx:controller="co.edu.uniquindio.logistica.ui.UserController"
+            prefWidth="900" prefHeight="550"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
 
-    <Label style="-fx-font-size: 18px;" text="Panel de Usuario - Plataforma de Logística" />
+    <!-- ENCABEZADO -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20"
+              style="-fx-background-color: linear-gradient(to right, #00c6ff, #0072ff);
+                     -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
+            <Label text="👤 Panel de Usuario"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
+        </HBox>
+    </top>
 
-    <Button onAction="#handleCrearEnvio" text="Crear Envío" />
-    <Button onAction="#handleVerHistorial" text="Ver Historial de Envíos" />
-    <Button text="Volver al Login" onAction="#handleVolverLogin"/>
+    <!-- CUERPO CENTRAL -->
+    <center>
+        <VBox spacing="30" alignment="CENTER" style="-fx-padding: 40;">
+            
+            <Label text="Bienvenido a tu Panel de Gestión de Envíos"
+                   style="-fx-font-size: 18px; -fx-text-fill: #E0F7FA; -fx-font-weight: bold; -fx-opacity: 0.9;"/>
 
+            <!-- Tarjetas de opciones -->
+            <GridPane hgap="30" vgap="30" alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
+                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints vgrow="ALWAYS"/>
+                    <RowConstraints vgrow="ALWAYS"/>
+                </rowConstraints>
 
+                <!-- Fila 1 -->
+                <Button text="📦 Crear Envío" onAction="#handleCrearEnvio"
+                        GridPane.columnIndex="0" GridPane.rowIndex="0"
+                        style="-fx-background-color: linear-gradient(to bottom right, #42A5F5, #1E88E5);
+                               -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
+                               -fx-background-radius: 14; -fx-padding: 35 50;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);
+                               -fx-cursor: hand;"
+                        prefWidth="280" prefHeight="100"/>
 
-</VBox>
+                <Button text="👤 Editar Perfil" onAction="#handleEditarUsuario"
+                        GridPane.columnIndex="1" GridPane.rowIndex="0"
+                        style="-fx-background-color: linear-gradient(to bottom right, #AB47BC, #8E24AA);
+                               -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
+                               -fx-background-radius: 14; -fx-padding: 35 50;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);
+                               -fx-cursor: hand;"
+                        prefWidth="280" prefHeight="100"/>
+
+                <!-- Fila 2 -->
+                <Button text="📋 Ver Historial" onAction="#handleVerHistorial"
+                        GridPane.columnIndex="0" GridPane.rowIndex="1"
+                        style="-fx-background-color: linear-gradient(to bottom right, #66BB6A, #43A047);
+                               -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
+                               -fx-background-radius: 14; -fx-padding: 35 50;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);
+                               -fx-cursor: hand;"
+                        prefWidth="280" prefHeight="100"/>
+
+                <Button text="↩️ Volver al Login" onAction="#handleVolver"
+                        GridPane.columnIndex="1" GridPane.rowIndex="1"
+                        style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);
+                               -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
+                               -fx-background-radius: 14; -fx-padding: 35 50;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);
+                               -fx-cursor: hand;"
+                        prefWidth="280" prefHeight="100"/>
+            </GridPane>
+
+        </VBox>
+    </center>
+
+    <!-- PIE DE PÁGINA -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 15;">
+            <Label text="© 2025 Plataforma Logística | Gestión de Envíos"
+                   style="-fx-text-fill: #B3E5FC; -fx-font-size: 12px; -fx-opacity: 0.8;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

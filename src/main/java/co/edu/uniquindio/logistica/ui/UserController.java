@@ -1,7 +1,7 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
-import co.edu.uniquindio.logistica.model.Usuario;
+import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
 import co.edu.uniquindio.logistica.util.Sesion;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,36 +12,32 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
+/**
+ * Controlador de Usuario - Solo valida y usa DTOs
+ */
 public class UserController {
 
-
-    private Usuario usuario;
+    private UsuarioDTO usuario;
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuario(UsuarioDTO usuarioDTO) {
+        this.usuario = usuarioDTO;
+        Sesion.setUsuarioActual(usuarioDTO);
     }
 
     @FXML
     private void handleCrearEnvio(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/crear_envio.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/crear_envio_user.fxml"));
             Parent root = loader.load();
+            CrearEnvioUserController ctrl = loader.getController();
+            ctrl.setUsuarioActual(usuario != null ? usuario : Sesion.getUsuarioActual());
+            ctrl.setOnEnvioCreado(() -> mostrarAlerta("Éxito", "El envío se registró correctamente."));
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            CrearEnvioController ctrl = loader.getController();
-            // ✅ Corregido: el método ahora es setUsuarioActual()
-            ctrl.setUsuarioActual(usuario);
-
-            // ✅ Si tienes una callback en CrearEnvioController (opcional)
-            ctrl.setOnEnvioCreado(() -> {
-                mostrarAlerta("Éxito", "El envío se registró correctamente.");
-            });
-
             stage.setScene(new Scene(root));
             stage.setTitle("Crear Envío");
             stage.show();
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,15 +45,35 @@ public class UserController {
     }
 
     @FXML
+    private void handleEditarUsuario(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/editar_usuario_user.fxml"));
+            Parent root = loader.load();
+
+            EditarUsuarioUserController controller = loader.getController();
+            controller.setUsuario(usuario != null ? usuario : Sesion.getUsuarioActual());
+            controller.setOnUsuarioEditado(() -> mostrarAlerta("Éxito", "Usuario actualizado correctamente."));
+
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.setScene(new Scene(root));
+            currentStage.setTitle("Editar Usuario");
+            currentStage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("❌ Error al abrir la ventana de edición de usuario.", "red");
+        }
+    }
+
+    @FXML
     private void handleVerHistorial(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/historial_envios.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/historial_envios_user.fxml"));
             Parent root = loader.load();
+            HistorialEnviosUserController ctrl = loader.getController();
+            ctrl.setUsuario(usuario != null ? usuario : Sesion.getUsuarioActual());
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            HistorialEnviosController ctrl = loader.getController();
-            ctrl.setUsuario(usuario);
-
             stage.setScene(new Scene(root));
             stage.setTitle("Historial de Envíos");
             stage.show();
@@ -68,11 +84,10 @@ public class UserController {
     }
 
     @FXML
-    private void handleVolverLogin(ActionEvent event) {
+    private void handleVolver(ActionEvent event) {
         try {
             Sesion.cerrarSesion();
-
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/Login.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();

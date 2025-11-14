@@ -1,41 +1,37 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
-import co.edu.uniquindio.logistica.model.Direccion;
-import co.edu.uniquindio.logistica.model.Usuario;
-import co.edu.uniquindio.logistica.util.Sesion;
+import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import javafx.util.Callback;
-import javafx.scene.control.TableCell;
+import java.util.stream.Collectors;
 
-import java.awt.*;
-
+/**
+ * Controlador de Usuarios - Solo valida datos y se comunica con Facade usando DTOs
+ */
 public class UsuariosController {
+
     @FXML private Label mensajeLabel;
-
-
-    @FXML private TableView<Usuario> tablaUsuarios;
-    @FXML private TableColumn<Usuario, Long> idCol;
-    @FXML private TableColumn<Usuario, String> nombreCol;
-    @FXML private TableColumn<Usuario, String> emailCol;
-    @FXML private TableColumn<Usuario, String> telefonoCol;
-    @FXML private TableColumn<Usuario, String> passwordCol;
-    @FXML private TableColumn<Usuario, Boolean> rolCol;
-    @FXML private TableColumn<Usuario, String> direccionesCol;
+    @FXML private TableView<UsuarioDTO> tablaUsuarios;
+    @FXML private TableColumn<UsuarioDTO, Long> idCol;
+    @FXML private TableColumn<UsuarioDTO, String> nombreCol;
+    @FXML private TableColumn<UsuarioDTO, String> emailCol;
+    @FXML private TableColumn<UsuarioDTO, String> telefonoCol;
+    @FXML private TableColumn<UsuarioDTO, String> passwordCol;
+    @FXML private TableColumn<UsuarioDTO, String> rolCol;
+    @FXML private TableColumn<UsuarioDTO, String> direccionesCol;
 
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
+    private final ObservableList<UsuarioDTO> usuariosList = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
@@ -44,96 +40,106 @@ public class UsuariosController {
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         telefonoCol.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         passwordCol.setCellValueFactory(new PropertyValueFactory<>("password"));
-
-        // Mostrar rol como texto (Administrador / Usuario)
-        rolCol.setCellValueFactory(new PropertyValueFactory<>("admin"));
-        rolCol.setCellFactory(column -> new TableCell<Usuario, Boolean>() {
-            @Override
-            protected void updateItem(Boolean isAdmin, boolean empty) {
-                super.updateItem(isAdmin, empty);
-                if (empty || isAdmin == null) {
-                    setText(null);
-                } else {
-                    setText(isAdmin ? "Administrador" : "Usuario");
-                }
-            }
-        });
-
-        // Mostrar direcciones concatenadas
+        rolCol.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().isAdmin() ? "Administrador" : "Usuario"));
         direccionesCol.setCellValueFactory(cellData -> {
-            Usuario u = cellData.getValue();
-            StringBuilder sb = new StringBuilder();
-            for (Direccion d : u.getDirecciones()) {
-                sb.append(d.getAlias()).append(" (").append(d.getCiudad()).append("), ");
-            }
-            String texto = sb.isEmpty() ? "Sin direcciones" : sb.substring(0, sb.length() - 2);
-            return new javafx.beans.property.SimpleStringProperty(texto);
+            UsuarioDTO u = cellData.getValue();
+            String direcciones = u.getDirecciones().stream()
+                    .map(d -> d.getAlias() + " (" + d.getCoordenadas() + ")")
+                    .collect(Collectors.joining(", "));
+            return new javafx.beans.property.SimpleStringProperty(direcciones.isEmpty() ? "Sin direcciones" : direcciones);
         });
 
-        tablaUsuarios.setItems(FXCollections.observableArrayList(facade.listarUsuarios()));
+        cargarUsuarios();
+    }
+
+    private void cargarUsuarios() {
+        usuariosList.setAll(facade.listarUsuarios());
+        tablaUsuarios.setItems(usuariosList);
+    }
+
+    @FXML
+    private void handleEditarUsuario(ActionEvent event) {
+        UsuarioDTO seleccionado = tablaUsuarios.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarMensaje("⚠️ Selecciona un usuario para editar", "orange");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/editar_usuario_admin.fxml"));
+            Parent root = loader.load();
+
+            EditarUsuarioAdminController controller = loader.getController();
+            controller.setUsuario(seleccionado); // Ya es UsuarioDTO
+            controller.setOnUsuarioEditado(this::cargarUsuarios);
+
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.setScene(new Scene(root));
+            currentStage.setTitle("Editar Usuario");
+            currentStage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al abrir la ventana de edición", "red");
+        }
     }
 
     @FXML
     private void handleVolver(ActionEvent event) {
         try {
-            Sesion.cerrarSesion();
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/admin.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.setScene(new Scene(root));
+            currentStage.show();
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarAlerta("Error", "No se pudo volver al login.");
+            mostrarMensaje("❌ No se pudo volver al panel admin", "red");
         }
     }
 
     @FXML
     private void handleCrearUsuario(ActionEvent event) {
         try {
-            Sesion.cerrarSesion();
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/crear_usuario.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/crear_usuario_admin.fxml"));
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.close();
+            Stage stage = new Stage();
             stage.setScene(new Scene(root));
+            stage.setTitle("Crear Usuario");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarAlerta("Error", "No se pudo Crear Usuario.");
-        }
-    }
-
-    @FXML
-    private void handleEditarUsuario(ActionEvent event) {
-        try {
-            Sesion.cerrarSesion();
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/editar_usuario.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarAlerta("Error", "No se pudo Editar Usuario.");
+            mostrarAlerta("Error", "No se pudo crear usuario.");
         }
     }
 
     @FXML
     private void handleEliminarUsuario(ActionEvent event) {
         try {
-            Sesion.cerrarSesion();
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/usuarios.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
+            UsuarioDTO seleccionado = tablaUsuarios.getSelectionModel().getSelectedItem();
+
+            if (seleccionado == null) {
+                mostrarAlerta("Aviso", "⚠️ Debes seleccionar un usuario para eliminar.");
+                return;
+            }
+
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Confirmar eliminación");
+            confirm.setHeaderText(null);
+            confirm.setContentText("¿Seguro que deseas eliminar al usuario '" + seleccionado.getNombre() + "'?");
+            var resultado = confirm.showAndWait();
+
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                facade.eliminarUsuario(seleccionado.getId());
+                tablaUsuarios.getItems().remove(seleccionado);
+                mostrarAlerta("Éxito", "✅ Usuario eliminado con éxito.");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarAlerta("Error", "No se pudo eliminar Usuario.");
+            mostrarAlerta("Error", "❌ No se pudo eliminar el usuario.");
         }
-    }
-
-
-    // ---------------- UTIL ----------------
-    private void mostrarMensaje(String texto, String color) {
-        mensajeLabel.setText(texto);
-        mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
     }
 
     private void mostrarAlerta(String titulo, String mensaje) {
@@ -143,5 +149,9 @@ public class UsuariosController {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
-}
 
+    private void mostrarMensaje(String texto, String color) {
+        mensajeLabel.setText(texto);
+        mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
+    }
+}

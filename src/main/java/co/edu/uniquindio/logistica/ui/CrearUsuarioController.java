@@ -1,79 +1,79 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
-import co.edu.uniquindio.logistica.model.Direccion;
-import co.edu.uniquindio.logistica.model.Usuario;
-import co.edu.uniquindio.logistica.store.DataStore;
-import co.edu.uniquindio.logistica.util.Sesion;
+import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
+import co.edu.uniquindio.logistica.util.ValidacionUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Clase base abstracta con la lógica común de creación de usuarios.
+ * Se extiende por controladores como CrearUsuarioAdminController y RegistroUsuarioController.
+ */
+public abstract class CrearUsuarioController {
 
-public class CrearUsuarioController {
+    @FXML protected TextField idField;
+    @FXML protected TextField nombreField;
+    @FXML protected TextField emailField;
+    @FXML protected TextField telefonoField;
+    @FXML protected PasswordField passwordField;
+    @FXML protected Label mensajeLabel;
 
-    @FXML private TextField idField;
-    @FXML private TextField nombreField;
-    @FXML private TextField emailField;
-    @FXML private TextField telefonoField;
-    @FXML private PasswordField passwordField;
-    @FXML private CheckBox adminCheck;
-    @FXML private Label mensajeLabel;
+    // Campos opcionales (direcciones)
+    @FXML protected TextField alias1Field;
+    @FXML protected TextField detalle1Field;
+    @FXML protected TextField alias2Field;
+    @FXML protected TextField detalle2Field;
+    @FXML protected ComboBox<String> zonaOrigenCombo;
+    @FXML protected ComboBox<String> zonaDestinoCombo;
 
-    // Campos para direcciones
-    @FXML private TextField alias1Field;
-    @FXML private TextField detalle1Field;
-    @FXML private TextField alias2Field;
-    @FXML private TextField detalle2Field;
+    // Solo los controladores que lo tengan (admin) inicializarán este campo
+    @FXML protected CheckBox adminCheck;
 
-    // 🔹 Nuevos campos de selección de zona
-    @FXML private ComboBox<String> zonaOrigenCombo;
-    @FXML private ComboBox<String> zonaDestinoCombo;
-
-    private LogisticaFacade facade = LogisticaFacade.getInstance();
-    private Runnable onUsuarioCreado;
-
-    public void setFacade(LogisticaFacade facade) {
-        this.facade = facade;
-    }
+    protected final LogisticaFacade facade = LogisticaFacade.getInstance();
+    protected Runnable onUsuarioCreado;
 
     public void setOnUsuarioCreado(Runnable onUsuarioCreado) {
         this.onUsuarioCreado = onUsuarioCreado;
     }
 
     @FXML
-    private void initialize() {
-        zonaOrigenCombo.getItems().addAll("Sur", "Centro", "Norte");
-        zonaDestinoCombo.getItems().addAll("Sur", "Centro", "Norte");
+    protected void initialize() {
+        if (zonaOrigenCombo != null)
+            zonaOrigenCombo.getItems().addAll("Sur", "Centro", "Norte");
+        if (zonaDestinoCombo != null)
+            zonaDestinoCombo.getItems().addAll("Sur", "Centro", "Norte");
     }
 
+    /** 🔹 Lógica genérica de creación de usuario */
     @FXML
-    private void handleRegistrar() {
+    protected void handleRegistrar() {
         try {
-            Long id = Long.parseLong(idField.getText());
-            String nombre = nombreField.getText();
-            String email = emailField.getText();
-            String telefono = telefonoField.getText();
+            Long id = Long.parseLong(idField.getText().trim());
+            String nombre = nombreField.getText().trim();
+            String email = emailField.getText().trim();
+            String telefono = telefonoField.getText().trim();
             String password = passwordField.getText();
-            boolean admin = adminCheck != null && adminCheck.isSelected();
 
-            String zonaOrigen = zonaOrigenCombo.getValue();
-            String zonaDestino = zonaDestinoCombo.getValue();
+            // cada subclase decide si puede o no marcar admin
+            boolean admin = getAdminFlag();
 
-            // Validaciones
-            if (nombre.isEmpty() || email.isEmpty() || telefono.isEmpty() || password.isEmpty() ||
-                    zonaOrigen == null || zonaDestino == null) {
-                mostrarMensaje("❌ Todos los campos y zonas son obligatorios", "red");
+            // Validaciones básicas
+            if (ValidacionUtil.isEmpty(nombre) || ValidacionUtil.isEmpty(email) || ValidacionUtil.isEmpty(password)) {
+                mostrarMensaje("❌ Nombre, correo y contraseña son obligatorios", "red");
+                return;
+            }
+            if (!ValidacionUtil.isEmailValid(email)) {
+                mostrarMensaje("❌ Formato de correo inválido", "red");
+                return;
+            }
+            if (!ValidacionUtil.isEmpty(telefono) && !ValidacionUtil.isPhoneValid(telefono)) {
+                mostrarMensaje("❌ Formato de teléfono inválido", "red");
                 return;
             }
 
+            // Validar duplicado
             boolean existe = facade.listarUsuarios().stream()
                     .anyMatch(u -> u.getId().equals(id) || u.getEmail().equalsIgnoreCase(email));
             if (existe) {
@@ -81,97 +81,74 @@ public class CrearUsuarioController {
                 return;
             }
 
-            Usuario nuevo = facade.crearUsuario(id, nombre, email, telefono, password, admin);
+            // Crear usuario usando Facade (retorna UsuarioDTO)
+            UsuarioDTO nuevoDTO = facade.crearUsuario(id, nombre, email, telefono, password, admin);
 
-            // Crear lista de direcciones
-            List<Direccion> direcciones = new ArrayList<>();
+            // Crear direcciones usando Facade (retorna DireccionDTO)
+            java.util.List<co.edu.uniquindio.logistica.model.DTO.DireccionDTO> direccionesDTO = new java.util.ArrayList<>();
+            String zonaOrigen = zonaOrigenCombo != null ? zonaOrigenCombo.getValue() : null;
+            String zonaDestino = zonaDestinoCombo != null ? zonaDestinoCombo.getValue() : null;
 
-            // Dirección 1 (Origen)
-            if (!detalle1Field.getText().isEmpty()) {
-                Direccion d1 = new Direccion(
-                        DataStore.getInstance().nextId(),
-
+            if (zonaOrigen != null && !ValidacionUtil.isEmpty(detalle1Field.getText())) {
+                co.edu.uniquindio.logistica.model.DTO.DireccionDTO d1 = facade.crearDireccion(
                         alias1Field.getText().isEmpty() ? "Origen" : alias1Field.getText(),
                         detalle1Field.getText(),
-                        "", // campo ciudad vacío
-                        zonaOrigen // 🔹 Guardamos la zona de origen en coordenadas
+                        "",
+                        zonaOrigen
                 );
-                direcciones.add(d1);
-            } else {
-                mostrarMensaje("❌ Debes ingresar la dirección de origen", "red");
-                return;
+                direccionesDTO.add(d1);
             }
 
-            // Dirección 2 (Destino)
-            if (!detalle2Field.getText().isEmpty()) {
-                Direccion d2 = new Direccion(
-                        DataStore.getInstance().nextId(),
-
+            if (zonaDestino != null && !ValidacionUtil.isEmpty(detalle2Field.getText())) {
+                co.edu.uniquindio.logistica.model.DTO.DireccionDTO d2 = facade.crearDireccion(
                         alias2Field.getText().isEmpty() ? "Destino" : alias2Field.getText(),
                         detalle2Field.getText(),
-                        "", // campo ciudad vacío
-                        zonaDestino // 🔹 Guardamos la zona de destino en coordenadas
+                        "",
+                        zonaDestino
                 );
-                direcciones.add(d2);
-            } else {
-                mostrarMensaje("❌ Debes ingresar la dirección de destino", "red");
-                return;
+                direccionesDTO.add(d2);
             }
 
-            nuevo.setDirecciones(direcciones);
-
+            // Actualizar usuario con direcciones
+            nuevoDTO.setDirecciones(direccionesDTO);
+            facade.registrarUsuario(nuevoDTO);
             mostrarMensaje("✅ Usuario creado correctamente", "green");
-            limpiarCampos();
 
+            limpiarCampos();
             if (onUsuarioCreado != null) onUsuarioCreado.run();
 
         } catch (NumberFormatException e) {
-            mostrarMensaje("❌ El ID debe ser un número válido", "red");
+            mostrarMensaje("❌ El ID debe ser numérico", "red");
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarMensaje("⚠️ Error al crear el usuario", "red");
+            mostrarMensaje("⚠️ Error al crear usuario: " + e.getMessage(), "red");
         }
     }
 
+    /** 🔸 Metodo que define si el usuario puede marcar admin (cada subclase lo implementa) */
+    protected abstract boolean getAdminFlag();
+
+    /** 🔸 Metodo para volver según la vista (cada subclase lo implementa) */
     @FXML
-    private void handleVolverLogin(ActionEvent event) {
-        try {
-            Sesion.cerrarSesion();
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarAlerta("Error", "No se pudo volver al login.");
-        }
-    }
+    protected abstract void handleVolver(ActionEvent event);
 
-    private void mostrarAlerta(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
-    }
-
-    private void mostrarMensaje(String texto, String color) {
+    protected void mostrarMensaje(String texto, String color) {
         mensajeLabel.setText(texto);
-        mensajeLabel.setStyle("-fx-text-fill:" + color + ";");
+        mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
     }
 
-    private void limpiarCampos() {
+    protected void limpiarCampos() {
         idField.clear();
         nombreField.clear();
         emailField.clear();
         telefonoField.clear();
         passwordField.clear();
         if (adminCheck != null) adminCheck.setSelected(false);
-        alias1Field.clear();
-        detalle1Field.clear();
-        alias2Field.clear();
-        detalle2Field.clear();
-        zonaOrigenCombo.getSelectionModel().clearSelection();
-        zonaDestinoCombo.getSelectionModel().clearSelection();
+        if (alias1Field != null) alias1Field.clear();
+        if (detalle1Field != null) detalle1Field.clear();
+        if (alias2Field != null) alias2Field.clear();
+        if (detalle2Field != null) detalle2Field.clear();
+        if (zonaOrigenCombo != null) zonaOrigenCombo.getSelectionModel().clearSelection();
+        if (zonaDestinoCombo != null) zonaDestinoCombo.getSelectionModel().clearSelection();
     }
 }

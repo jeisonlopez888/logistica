@@ -1,80 +1,78 @@
 package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
-import co.edu.uniquindio.logistica.model.Usuario;
+import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.util.stream.Collectors;
+
+/**
+ * Controlador de Administradores - Solo valida y usa DTOs
+ */
 public class AdminsController {
 
-    @FXML private TableView<Usuario> usuariosTable;
-    @FXML private TableColumn<Usuario, Long> idCol;
-    @FXML private TableColumn<Usuario, String> nombreCol;
-    @FXML private TableColumn<Usuario, String> emailCol;
-    @FXML private TableColumn<Usuario, String> telefonoCol;
-    @FXML private TableColumn<Usuario, String> passwordCol;
-    @FXML private TableColumn<Usuario, Boolean> adminCol;
     @FXML private Label mensajeLabel;
+    @FXML private TableView<UsuarioDTO> usuarioTableView;
+    @FXML private TableColumn<UsuarioDTO, Long> idCol;
+    @FXML private TableColumn<UsuarioDTO, String> nombreCol;
+    @FXML private TableColumn<UsuarioDTO, String> emailCol;
+    @FXML private TableColumn<UsuarioDTO, String> telefonoCol;
+    @FXML private TableColumn<UsuarioDTO, String> passwordCol;
+    @FXML private TableColumn<UsuarioDTO, String> rolCol;
+    @FXML private TableColumn<UsuarioDTO, String> direccionesCol;
 
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
-    private final ObservableList<Usuario> listaUsuarios = FXCollections.observableArrayList();
+    private final ObservableList<UsuarioDTO> listaUsuarios = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
-        idCol.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getId()));
-        nombreCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getNombre()));
-        emailCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getEmail()));
-        telefonoCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getTelefono()));
-        passwordCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getPassword()));
-        adminCol.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().isAdmin()));
-
+        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        nombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
+        telefonoCol.setCellValueFactory(new PropertyValueFactory<>("telefono"));
+        passwordCol.setCellValueFactory(new PropertyValueFactory<>("password"));
+        rolCol.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().isAdmin() ? "Administrador" : "Usuario"));
+        direccionesCol.setCellValueFactory(cellData -> {
+            UsuarioDTO u = cellData.getValue();
+            String direcciones = u.getDirecciones().stream()
+                    .map(d -> d.getAlias() + " (" + d.getCoordenadas() + ")")
+                    .collect(Collectors.joining(", "));
+            return new javafx.beans.property.SimpleStringProperty(direcciones.isEmpty() ? "Sin direcciones" : direcciones);
+        });
         cargarUsuarios();
     }
 
-    /** 🔹 Cargar solo usuarios administradores */
+    /** Cargar solo usuarios administradores usando DTOs */
     private void cargarUsuarios() {
         listaUsuarios.clear();
-        listaUsuarios.addAll(facade.listarUsuarios().stream().filter(Usuario::isAdmin).toList());
-        usuariosTable.setItems(listaUsuarios);
+        listaUsuarios.addAll(facade.listarUsuarios().stream()
+                .filter(UsuarioDTO::isAdmin)
+                .toList());
+        usuarioTableView.setItems(listaUsuarios);
     }
 
-    /** 🔹 Mostrar mensajes */
+    /** Mostrar mensajes */
     private void mostrarMensaje(String texto, String color) {
         mensajeLabel.setText(texto);
         mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
     }
 
-    /** 🔹 Crear usuario nuevo */
-    @FXML
-    private void handleCrearUsuario() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/crear_usuario.fxml"));
-            Parent root = loader.load();
-
-            CrearUsuarioController controller = loader.getController();
-            controller.setFacade(facade);
-            controller.setOnUsuarioCreado(this::cargarUsuarios);
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Crear Usuario");
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("⚠️ Error al abrir la ventana de creación", "red");
-        }
-    }
-
-    /** 🔹 Editar usuario seleccionado */
+    /** Editar usuario seleccionado */
     @FXML
     private void handleEditarUsuario() {
-        Usuario seleccionado = usuariosTable.getSelectionModel().getSelectedItem();
+        UsuarioDTO seleccionado = usuarioTableView.getSelectionModel().getSelectedItem();
         if (seleccionado == null) {
             mostrarMensaje("⚠️ Selecciona un usuario para editar", "orange");
             return;
@@ -82,25 +80,53 @@ public class AdminsController {
         mostrarMensaje("✏️ Función de edición en desarrollo", "blue");
     }
 
-    /** 🔹 Eliminar usuario seleccionado */
+    /** Eliminar usuario seleccionado usando DTOs */
     @FXML
-    private void handleEliminarUsuario() {
-        Usuario seleccionado = usuariosTable.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            mostrarMensaje("⚠️ Selecciona un usuario para eliminar", "orange");
-            return;
+    private void handleEliminarUsuario(ActionEvent event) {
+        try {
+            UsuarioDTO seleccionado = usuarioTableView.getSelectionModel().getSelectedItem();
+
+            if (seleccionado == null) {
+                mostrarAlerta("Aviso", "⚠️ Debes seleccionar un usuario para eliminar.");
+                return;
+            }
+
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Confirmar eliminación");
+            confirm.setHeaderText(null);
+            confirm.setContentText("¿Seguro que deseas eliminar al usuario '" + seleccionado.getNombre() + "'?");
+            var resultado = confirm.showAndWait();
+
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                facade.eliminarUsuario(seleccionado.getId());
+                usuarioTableView.getItems().remove(seleccionado);
+                mostrarAlerta("Éxito", "✅ Usuario eliminado con éxito.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "❌ No se pudo eliminar el usuario.");
         }
-
     }
 
-    /** 🔹 Ir al panel de usuario */
+    /** Ir al panel de usuario */
     @FXML
-    private void handleUser() {
-        mostrarMensaje("👤 Abriendo panel de usuario...", "#1976D2");
-        // Aquí podrías cargar user.fxml si es necesario
+    private void handleVerUser(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/user.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Panel de Usuario");
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al abrir la lista de usuarios", "red");
+        }
     }
 
-    /** 🔹 Volver al login */
+    /** Volver al login */
     @FXML
     private void handleVolver() {
         try {
@@ -111,13 +137,20 @@ public class AdminsController {
             stage.setTitle("Inicio de Sesión");
             stage.show();
 
-            // cerrar la ventana actual
-            Stage current = (Stage) usuariosTable.getScene().getWindow();
+            Stage current = (Stage) usuarioTableView.getScene().getWindow();
             current.close();
 
         } catch (Exception e) {
             e.printStackTrace();
             mostrarMensaje("❌ Error al volver al Admin", "red");
         }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

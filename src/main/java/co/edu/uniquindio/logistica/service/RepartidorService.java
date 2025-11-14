@@ -36,7 +36,6 @@ public class RepartidorService {
                 .orElse(null);
     }
 
-
     // 🔹 Marcar repartidor como no disponible
     public void marcarNoDisponible(Repartidor repartidor) {
         if (repartidor == null) return;
@@ -54,5 +53,38 @@ public class RepartidorService {
                 repartidor.getNombre(), repartidor.getTelefono(),
                 repartidor.getZona(), true));
     }
-}
 
+    // 🔹 🔸 NUEVO: Listar repartidores disponibles por nombre (para ComboBox)
+    public List<String> listarRepartidoresDisponibles() {
+        return listarDisponibles().stream()
+                .map(Repartidor::getNombre)
+                .collect(Collectors.toList());
+    }
+
+    // 🔹 🔸 NUEVO: Buscar repartidor por nombre exacto
+    public Repartidor buscarPorNombre(String nombre) {
+        if (nombre == null || nombre.isBlank()) return null;
+        return store.getRepartidores().stream()
+                .filter(r -> r.getNombre().equalsIgnoreCase(nombre))
+                .findFirst()
+                .orElse(null);
+    }
+
+
+
+
+
+
+
+
+    // Devuelve un repartidor disponible (el primero libre)
+    public Repartidor obtenerRepartidorDisponible() {
+        return DataStore.getInstance().getRepartidores().stream()
+                .filter(Repartidor::isDisponible)
+                .findFirst()
+                .orElse(null);
+    }
+
+
+
+}

@@ -10,14 +10,15 @@ public class Tarifa {
     private String descripcion;
     private double costoBase;
     private double costoPorKilo;
-    private double costoPorVolumen; // costo adicional por volumen (opcional)
-    private double recargoSeguro;   // nuevo campo para recargo por seguro (porcentaje o valor fijo)
+    private double costoPorVolumen; // costo adicional por volumen
+    private double recargoSeguro;   // recargo por seguro (porcentaje o valor fijo)
 
     public Tarifa(Long id, String descripcion, double costoBase, double costoPorKilo) {
         this(id, descripcion, costoBase, costoPorKilo, 0, 0);
     }
 
-    public Tarifa(Long id, String descripcion, double costoBase, double costoPorKilo, double costoPorVolumen, double recargoSeguro) {
+    public Tarifa(Long id, String descripcion, double costoBase, double costoPorKilo,
+                  double costoPorVolumen, double recargoSeguro) {
         this.id = id;
         this.descripcion = descripcion;
         this.costoBase = costoBase;
@@ -43,8 +44,7 @@ public class Tarifa {
     public void setRecargoSeguro(double recargoSeguro) { this.recargoSeguro = recargoSeguro; }
 
     /**
-     * Método de compatibilidad simple: calcula el costo total en base al peso.
-     * (Usado por el código de inicialización y ejemplos antiguos)
+     * Metodo de compatibilidad antigua: calcula el costo total solo en base al peso.
      */
     public double calcularCosto(double peso) {
         return costoBase + (peso * costoPorKilo);

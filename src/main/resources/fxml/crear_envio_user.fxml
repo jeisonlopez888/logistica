@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.logistica.ui.CrearEnvioUserController"
+            prefWidth="900" prefHeight="700"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
+
+    <!-- ENCABEZADO -->
+    <top>
+        <HBox alignment="CENTER" spacing="15"
+              style="-fx-background-color: linear-gradient(to right, #7CB342, #558B2F);
+                     -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
+            <Label text="📦 Crear / Cotizar Envío"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
+        </HBox>
+    </top>
+
+    <!-- CONTENIDO CENTRAL -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox spacing="20" style="-fx-padding: 25;">
+                
+                <!-- Tarjeta de formulario -->
+                <GridPane hgap="20" vgap="15"
+                          style="-fx-background-color: rgba(255,255,255,0.95);
+                                 -fx-background-radius: 15;
+                                 -fx-padding: 30;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 3);">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+                        <ColumnConstraints halignment="LEFT" minWidth="320"/>
+                    </columnConstraints>
+
+                    <!-- Origen -->
+                    <Label text="📍 Dirección de origen:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <TextField fx:id="origenDireccionField" promptText="Ej: Calle 45 #10-23"
+                               GridPane.rowIndex="0" GridPane.columnIndex="1"
+                               style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                      -fx-border-radius: 8; -fx-background-radius: 8;
+                                      -fx-padding: 10; -fx-font-size: 13px;"/>
+
+                    <Label text="Zona de origen:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="zonaOrigenCombo" promptText="Seleccione zona"
+                              GridPane.rowIndex="1" GridPane.columnIndex="1"
+                              style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                     -fx-border-radius: 8; -fx-background-radius: 8;"
+                              prefWidth="320"/>
+
+                    <!-- Destino -->
+                    <Label text="📍 Dirección de destino:" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <TextField fx:id="destinoDireccionField" promptText="Ej: Avenida Central 55"
+                               GridPane.rowIndex="2" GridPane.columnIndex="1"
+                               style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                      -fx-border-radius: 8; -fx-background-radius: 8;
+                                      -fx-padding: 10; -fx-font-size: 13px;"/>
+
+                    <Label text="Zona de destino:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="zonaDestinoCombo" promptText="Seleccione zona"
+                              GridPane.rowIndex="3" GridPane.columnIndex="1"
+                              style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                     -fx-border-radius: 8; -fx-background-radius: 8;"
+                              prefWidth="320"/>
+
+                    <!-- Tipo de paquete -->
+                    <Label text="📦 Tipo de paquete:" GridPane.rowIndex="4" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="tipoPaqueteCombo" promptText="Seleccione tipo"
+                              GridPane.rowIndex="4" GridPane.columnIndex="1"
+                              style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                     -fx-border-radius: 8; -fx-background-radius: 8;"
+                              prefWidth="320"/>
+
+                    <!-- Peso -->
+                    <Label text="⚖️ Peso (kg):" GridPane.rowIndex="5" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <TextField fx:id="pesoField" promptText="Ej: 5.0"
+                               GridPane.rowIndex="5" GridPane.columnIndex="1"
+                               style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                      -fx-border-radius: 8; -fx-background-radius: 8;
+                                      -fx-padding: 10; -fx-font-size: 13px;"/>
+
+                    <!-- Dimensiones -->
+                    <Label text="📏 Dimensiones (cm):" GridPane.rowIndex="6" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <HBox fx:id="dimensionesBox" spacing="10" GridPane.rowIndex="6" GridPane.columnIndex="1">
+                        <TextField fx:id="largoField" promptText="Largo" prefWidth="100"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
+                        <TextField fx:id="anchoField" promptText="Ancho" prefWidth="100"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
+                        <TextField fx:id="altoField" promptText="Alto" prefWidth="100"
+                                   style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                          -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
+                    </HBox>
+
+                    <!-- Opciones adicionales -->
+                    <Label text="🎁 Opciones adicionales:" GridPane.rowIndex="7" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <VBox spacing="8" GridPane.rowIndex="7" GridPane.columnIndex="1">
+                        <CheckBox fx:id="prioridadCheck" text="⚡ Prioridad (entrega rápida)"
+                                  style="-fx-font-size: 13px; -fx-text-fill: #37474F;"/>
+                        <CheckBox fx:id="seguroCheck" text="🛡️ Seguro (protección del paquete)"
+                                  style="-fx-font-size: 13px; -fx-text-fill: #37474F;"/>
+                        <CheckBox fx:id="fragilCheck" text="⚠️ Frágil (manejo especial)"
+                                  style="-fx-font-size: 13px; -fx-text-fill: #37474F;"/>
+                        <CheckBox fx:id="firmaRequeridaCheck" text="✍️ Firma requerida"
+                                  style="-fx-font-size: 13px; -fx-text-fill: #37474F;"/>
+                    </VBox>
+
+                    <!-- Costo -->
+                    <Label text="💵 Costo estimado:" GridPane.rowIndex="8" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <Label fx:id="costoLabel" text="—"
+                           GridPane.rowIndex="8" GridPane.columnIndex="1"
+                           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #43A047;"/>
+                </GridPane>
+
+                <!-- Mensaje dinámico -->
+                <Label fx:id="mensajeLabel" wrapText="true"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+
+                <!-- Botones de acción -->
+                <HBox spacing="15" alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+                    <Button text="💰 Cotizar" onAction="#handleCotizar"
+                            style="-fx-background-color: linear-gradient(to bottom right, #42A5F5, #1E88E5);
+                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                   -fx-background-radius: 10; -fx-padding: 12 25;
+                                   -fx-effect: dropshadow(gaussian, rgba(30,136,229,0.5), 8, 0, 0, 3);
+                                   -fx-cursor: hand;"/>
+
+                    <Button fx:id="crearBtn" text="✅ Crear y Pagar" onAction="#handleCrear" disable="true"
+                            style="-fx-background-color: linear-gradient(to bottom right, #66BB6A, #43A047);
+                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                   -fx-background-radius: 10; -fx-padding: 12 25;
+                                   -fx-effect: dropshadow(gaussian, rgba(67,160,71,0.5), 8, 0, 0, 3);
+                                   -fx-cursor: hand;"/>
+
+                    <Button text="📋 Guardar (SOLICITADO)" onAction="#handleGuardarEnvio"
+                            style="-fx-background-color: linear-gradient(to bottom right, #FFB300, #F57C00);
+                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                   -fx-background-radius: 10; -fx-padding: 12 25;
+                                   -fx-cursor: hand;"/>
+
+                    <Button text="🔎 Ver Desglose" onAction="#handleVerDesglose"
+                            style="-fx-background-color: linear-gradient(to bottom right, #26C6DA, #0097A7);
+                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                   -fx-background-radius: 10; -fx-padding: 12 25;
+                                   -fx-cursor: hand;"/>
+
+                    <Button text="↩️ Volver" onAction="#handleVolver"
+                            style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);
+                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                   -fx-background-radius: 10; -fx-padding: 12 25;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- PIE DE PÁGINA -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 15;">
+            <Label text="© 2025 Plataforma Logística | Creación de Envíos"
+                   style="-fx-text-fill: #B3E5FC; -fx-font-size: 11px; -fx-opacity: 0.8;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

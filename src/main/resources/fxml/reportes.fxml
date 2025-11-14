@@ -1,42 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
+<?import javafx.geometry.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="co.edu.uniquindio.logistica.ui.ReportesController"
-            prefWidth="600" prefHeight="400"
-            style="-fx-background-color: linear-gradient(to bottom right, #f9f9f9, #e3f2fd);">
+            prefWidth="750" prefHeight="650"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
 
+    <!-- ENCABEZADO -->
     <top>
-        <HBox alignment="CENTER" style="-fx-background-color: #1976D2; -fx-padding: 15;">
+        <HBox alignment="CENTER" spacing="15"
+              style="-fx-background-color: linear-gradient(to right, #7CB342, #558B2F);
+                     -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
             <Label text="📊 Generar Reportes"
-                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
         </HBox>
     </top>
 
+    <!-- CONTENIDO CENTRAL -->
     <center>
-        <VBox spacing="20" alignment="CENTER" style="-fx-padding: 30;">
-            <Label text="Seleccione el tipo de reporte:"
-                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0D47A1;"/>
+        <VBox spacing="25" alignment="CENTER" style="-fx-padding: 35;">
+            
+            <!-- Tarjeta de formulario -->
+            <VBox spacing="20" style="-fx-background-color: rgba(255,255,255,0.95);
+                                      -fx-background-radius: 15;
+                                      -fx-padding: 40;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0, 0, 5);"
+                  maxWidth="550">
+                
+                <!-- Tipo de reporte -->
+                <VBox spacing="10" alignment="CENTER">
+                    <Label text="Seleccione el tipo de reporte:"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #01579B;"/>
+                    <ComboBox fx:id="tipoReporteCombo" prefWidth="400"
+                              style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                     -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10;"/>
+                </VBox>
 
-            <ComboBox fx:id="tipoReporteCombo" prefWidth="250"/>
+                <Separator style="-fx-background-color: #CFD8DC;"/>
 
-            <Label text="Seleccione el formato de salida:"
-                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0D47A1;"/>
+                <!-- Filtro de fechas -->
+                <VBox spacing="12" alignment="CENTER">
+                    <Label text="Filtro de Fechas (Opcional):"
+                           style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #37474F;"/>
+                    
+                    <CheckBox fx:id="usarFiltroFechas" text="Aplicar filtro por rango de fechas"
+                              style="-fx-font-size: 13px; -fx-text-fill: #546E7A;"/>
 
-            <HBox spacing="20" alignment="CENTER">
-                <RadioButton fx:id="excelRadio" text="Excel (.xlsx)" selected="true"/>
-                <RadioButton fx:id="pdfRadio" text="PDF (.pdf)"/>
-            </HBox>
+                    <HBox spacing="15" alignment="CENTER">
+                        <VBox spacing="5">
+                            <Label text="Fecha Inicio:" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                            <DatePicker fx:id="fechaInicio" prefWidth="180"
+                                        style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                               -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                        </VBox>
+                        
+                        <VBox spacing="5">
+                            <Label text="Fecha Fin:" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                            <DatePicker fx:id="fechaFin" prefWidth="180"
+                                        style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                               -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
 
-            <Button text="📁 Generar Reporte" onAction="#handleGenerarReporte"
-                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
-            <Button text="Panel Admin" onAction="#handleVolverAdmin"/>
+                <Separator style="-fx-background-color: #CFD8DC;"/>
 
-            <Label fx:id="mensajeLabel" text="" style="-fx-font-size: 14px; -fx-text-fill: #1976D2;"/>
+                <!-- Formato de salida -->
+                <VBox spacing="12" alignment="CENTER">
+                    <Label text="Seleccione el formato de salida:"
+                           style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #37474F;"/>
+                    
+                    <HBox spacing="30" alignment="CENTER">
+                        <RadioButton fx:id="excelRadio" text="📊 Excel (.xlsx)" selected="true"
+                                     style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
+                        <RadioButton fx:id="pdfRadio" text="📄 PDF (.pdf)"
+                                     style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Botones de acción -->
+                <HBox spacing="15" alignment="CENTER" style="-fx-padding: 15 0 0 0;">
+                    <Button text="📁 Generar Reporte" onAction="#handleGenerarReporte"
+                            style="-fx-background-color: linear-gradient(to right, #43A047, #2E7D32);
+                                   -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;
+                                   -fx-background-radius: 10; -fx-padding: 14 40;
+                                   -fx-effect: dropshadow(gaussian, rgba(46,125,50,0.5), 8, 0, 0, 3);
+                                   -fx-cursor: hand;"/>
+                    
+                    <Button text="↩️ Volver" onAction="#handleVolverAdmin"
+                            style="-fx-background-color: linear-gradient(to right, #757575, #616161);
+                                   -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;
+                                   -fx-background-radius: 10; -fx-padding: 14 40;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+
+                <!-- Mensaje -->
+                <Label fx:id="mensajeLabel" text="" wrapText="true" alignment="CENTER"
+                       style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;"/>
+            </VBox>
         </VBox>
     </center>
 
+    <!-- PIE DE PÁGINA -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 15;">
+            <Label text="© 2025 Plataforma Logística | Generación de Reportes"
+                   style="-fx-text-fill: #B3E5FC; -fx-font-size: 11px; -fx-opacity: 0.8;"/>
+        </HBox>
+    </bottom>
 </BorderPane>
-
