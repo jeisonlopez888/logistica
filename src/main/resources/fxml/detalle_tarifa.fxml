@@ -5,7 +5,7 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="co.edu.uniquindio.logistica.ui.DetalleTarifaController"
-            prefWidth="480" prefHeight="550"
+            prefWidth="500" prefHeight="650"
             style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
 
     <!-- ENCABEZADO -->
@@ -69,6 +69,16 @@
                     <Label text="🛡️ Seguro:" GridPane.rowIndex="5" GridPane.columnIndex="0"
                            style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
                     <Label fx:id="seguroLabel" GridPane.rowIndex="5" GridPane.columnIndex="1"
+                           style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
+
+                    <Label text="⚠️ Frágil:" GridPane.rowIndex="6" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                    <Label fx:id="fragilLabel" GridPane.rowIndex="6" GridPane.columnIndex="1"
+                           style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
+
+                    <Label text="✍️ Firma requerida:" GridPane.rowIndex="7" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                    <Label fx:id="firmaLabel" GridPane.rowIndex="7" GridPane.columnIndex="1"
                            style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
                 </GridPane>
 

@@ -91,8 +91,8 @@ public class DataStore {
         // Usuario regular 1 - Carlos Pérez
         Usuario u1 = new Usuario(nextId(), "Carlos Pérez", "carlos@uniquindio.edu", "3101234567", "12345", false);
         List<Direccion> direccionesU1 = new ArrayList<>();
-        direccionesU1.add(new Direccion(nextId(), "Casa", "Calle 10 # 5-20", "4.5336,-75.6706", "Armenia"));
-        direccionesU1.add(new Direccion(nextId(), "Trabajo", "Cra 14 # 2-30", "4.5378,-75.6656", "Armenia"));
+        direccionesU1.add(new Direccion(nextId(), "Casa", "Calle 10 # 5-20", "Norte", "Armenia"));
+        direccionesU1.add(new Direccion(nextId(), "Trabajo", "Cra 14 # 2-30", "Norte", "Armenia"));
         u1.setDirecciones(direccionesU1);
         u1.agregarMetodoPago(MetodoPago.TARJETA_CREDITO);
         u1.agregarMetodoPago(MetodoPago.PSE);
@@ -101,7 +101,7 @@ public class DataStore {
         // Administrador 1 - Ana López (RF-010)
         Usuario u2 = new Usuario(nextId(), "Ana López", "ana@uniquindio.edu", "3109876543", "admin123", true);
         List<Direccion> direccionesU2 = new ArrayList<>();
-        direccionesU2.add(new Direccion(nextId(), "Oficina Principal", "Carrera 15 # 8-90", "4.5425,-75.6684", "Armenia"));
+        direccionesU2.add(new Direccion(nextId(), "Oficina Principal", "Carrera 15 # 8-90", "Centro", "Armenia"));
         u2.setDirecciones(direccionesU2);
         u2.agregarMetodoPago(MetodoPago.TRANSFERENCIA);
         u2.agregarMetodoPago(MetodoPago.EFECTIVO);
@@ -110,8 +110,8 @@ public class DataStore {
         // Usuario regular 2 - María Gómez
         Usuario u3 = new Usuario(nextId(), "María Gómez", "maria@uniquindio.edu", "3115558899", "maria123", false);
         List<Direccion> direccionesU3 = new ArrayList<>();
-        direccionesU3.add(new Direccion(nextId(), "Apartamento", "Calle 45 # 12-60", "4.5268,-75.6783", "Armenia"));
-        direccionesU3.add(new Direccion(nextId(), "Oficina", "Av. Bolívar # 20-15", "4.5392,-75.6725", "Armenia"));
+        direccionesU3.add(new Direccion(nextId(), "Apartamento", "Calle 45 # 12-60", "Sur", "Armenia"));
+        direccionesU3.add(new Direccion(nextId(), "Oficina", "Av. Bolívar # 20-15", "Centro", "Armenia"));
         u3.setDirecciones(direccionesU3);
         u3.agregarMetodoPago(MetodoPago.EFECTIVO);
         u3.agregarMetodoPago(MetodoPago.PSE);
@@ -120,8 +120,8 @@ public class DataStore {
         // Administrador 2 - Pedro Sánchez (RF-010)
         Usuario u4 = new Usuario(nextId(), "Pedro Sánchez", "pedro@uniquindio.edu", "3124445566", "admin456", true);
         List<Direccion> direccionesU4 = new ArrayList<>();
-        direccionesU4.add(new Direccion(nextId(), "Casa", "Carrera 7 # 30-20", "4.5289,-75.6812", "Armenia"));
-        direccionesU4.add(new Direccion(nextId(), "Tienda", "Calle 23 # 15-40", "4.5401,-75.6695", "Armenia"));
+        direccionesU4.add(new Direccion(nextId(), "Casa", "Carrera 7 # 30-20", "Centro", "Armenia"));
+        direccionesU4.add(new Direccion(nextId(), "Tienda", "Calle 23 # 15-40", "Centro", "Armenia"));
         u4.setDirecciones(direccionesU4);
         u4.agregarMetodoPago(MetodoPago.TARJETA_CREDITO);
         u4.agregarMetodoPago(MetodoPago.TRANSFERENCIA);
@@ -130,8 +130,8 @@ public class DataStore {
         // Usuario regular 3 - Lucía Ramírez
         Usuario u5 = new Usuario(nextId(), "Lucía Ramírez", "lucia@uniquindio.edu", "3132223344", "lucia789", false);
         List<Direccion> direccionesU5 = new ArrayList<>();
-        direccionesU5.add(new Direccion(nextId(), "Casa", "Calle 12 # 18-45", "4.5317,-75.6739", "Armenia"));
-        direccionesU5.add(new Direccion(nextId(), "Trabajo", "Cra 20 # 10-33", "4.5365,-75.6702", "Armenia"));
+        direccionesU5.add(new Direccion(nextId(), "Casa", "Calle 12 # 18-45", "Norte", "Armenia"));
+        direccionesU5.add(new Direccion(nextId(), "Trabajo", "Cra 20 # 10-33", "Norte", "Armenia"));
         u5.setDirecciones(direccionesU5);
         u5.agregarMetodoPago(MetodoPago.TRANSFERENCIA);
         u5.agregarMetodoPago(MetodoPago.EFECTIVO);
@@ -141,8 +141,8 @@ public class DataStore {
         // Usuario regular 4 - Pepito Pérez
         Usuario u6 = new Usuario(nextId(), "Pepito Pérez", "pepito@uniquindio.edu", "3213213211", "pepito123", false);
         List<Direccion> direccionesU6 = new ArrayList<>();
-        direccionesU6.add(new Direccion(nextId(), "Residencia", "Av. 6N # 34-90", "4.5412,-75.6658", "Armenia"));
-        direccionesU6.add(new Direccion(nextId(), "Negocio", "Calle 8 # 18-22", "4.5349,-75.6721", "Armenia"));
+        direccionesU6.add(new Direccion(nextId(), "Residencia", "Av. 6N # 34-90", "Centro", "Armenia"));
+        direccionesU6.add(new Direccion(nextId(), "Negocio", "Calle 8 # 18-22", "Norte", "Armenia"));
         u6.setDirecciones(direccionesU6);
         u6.agregarMetodoPago(MetodoPago.PSE);
         u6.agregarMetodoPago(MetodoPago.TARJETA_CREDITO);
@@ -151,7 +151,7 @@ public class DataStore {
         // Usuario regular 5 - Sofía Torres
         Usuario u7 = new Usuario(nextId(), "Sofía Torres", "sofia@uniquindio.edu", "3145556677", "sofia456", false);
         List<Direccion> direccionesU7 = new ArrayList<>();
-        direccionesU7.add(new Direccion(nextId(), "Hogar", "Cra 18 # 25-50", "4.5382,-75.6698", "Armenia"));
+        direccionesU7.add(new Direccion(nextId(), "Hogar", "Cra 18 # 25-50", "Sur", "Armenia"));
         u7.setDirecciones(direccionesU7);
         u7.agregarMetodoPago(MetodoPago.EFECTIVO);
         usuarios.add(u7);
@@ -182,11 +182,12 @@ public class DataStore {
 
         // ==================== TARIFAS (RF-029 a RF-031) ====================
         
-        Tarifa t1 = new Tarifa(nextId(), "Tarifa Urbana", 5000, 1500);
-        Tarifa t2 = new Tarifa(nextId(), "Tarifa Express", 8000, 2500);
-        Tarifa t3 = new Tarifa(nextId(), "Tarifa Nacional", 12000, 3000);
-        Tarifa t4 = new Tarifa(nextId(), "Tarifa Regional", 7000, 1800);
-        Tarifa t5 = new Tarifa(nextId(), "Tarifa Económica", 4000, 1200);
+        // Tarifas con valores realistas (costoBase, costoPorKilo, costoPorVolumen, recargoSeguro)
+        Tarifa t1 = new Tarifa(nextId(), "Tarifa Urbana", 5000, 3000, 50000, 0.05);
+        Tarifa t2 = new Tarifa(nextId(), "Tarifa Express", 8000, 3500, 60000, 0.06);
+        Tarifa t3 = new Tarifa(nextId(), "Tarifa Nacional", 12000, 4000, 70000, 0.08);
+        Tarifa t4 = new Tarifa(nextId(), "Tarifa Regional", 7000, 2800, 55000, 0.05);
+        Tarifa t5 = new Tarifa(nextId(), "Tarifa Económica", 4000, 2500, 45000, 0.04);
 
         addTarifa(t1);
         addTarifa(t2);

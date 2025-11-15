@@ -17,6 +17,8 @@ public class DetalleTarifaController {
     @FXML private Label zonaLabel;
     @FXML private Label prioridadLabel;
     @FXML private Label seguroLabel;
+    @FXML private Label fragilLabel;
+    @FXML private Label firmaLabel;
     @FXML private Label totalLabel;
 
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
@@ -31,13 +33,19 @@ public class DetalleTarifaController {
         // Obtener desglose usando Facade (trabaja con DTOs)
         co.edu.uniquindio.logistica.service.TarifaService.TarifaDetalle detalle = facade.desglosarTarifa(envioDTO);
 
-        baseLabel.setText(String.format("$ %.2f", detalle.getBase()));
-        pesoLabel.setText(String.format("$ %.2f", detalle.getPorPeso()));
-        volumenLabel.setText(String.format("$ %.2f", detalle.getPorVolumen()));
-        zonaLabel.setText(String.format("$ %.2f", detalle.getRecargoZona()));
-        prioridadLabel.setText(String.format("$ %.2f", detalle.getRecargoPrioridad()));
-        seguroLabel.setText(String.format("$ %.2f", detalle.getRecargoSeguro()));
-        totalLabel.setText(String.format("$ %.2f", detalle.getTotal()));
+        baseLabel.setText(String.format("$ %,.2f", detalle.getBase()));
+        pesoLabel.setText(String.format("$ %,.2f", detalle.getPorPeso()));
+        volumenLabel.setText(String.format("$ %,.2f", detalle.getPorVolumen()));
+        zonaLabel.setText(String.format("$ %,.2f", detalle.getRecargoZona()));
+        prioridadLabel.setText(String.format("$ %,.2f", detalle.getRecargoPrioridad()));
+        seguroLabel.setText(String.format("$ %,.2f", detalle.getRecargoSeguro()));
+        if (fragilLabel != null) {
+            fragilLabel.setText(String.format("$ %,.2f", detalle.getRecargoFragil()));
+        }
+        if (firmaLabel != null) {
+            firmaLabel.setText(String.format("$ %,.2f", detalle.getRecargoFirma()));
+        }
+        totalLabel.setText(String.format("$ %,.2f", detalle.getTotal()));
     }
 
     @FXML

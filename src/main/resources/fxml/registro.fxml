@@ -80,8 +80,8 @@
 
                     <Separator style="-fx-background-color: #CFD8DC;"/>
 
-                    <!-- Dirección de Origen -->
-                    <Label text="Dirección de Origen"
+                    <!-- Dirección de Frecuente -->
+                    <Label text="Dirección de Frecuente"
                            style="-fx-font-size: 16px; -fx-text-fill: #01579B; -fx-font-weight: bold;"/>
 
                     <VBox spacing="6">
@@ -110,8 +110,8 @@
 
                     <Separator style="-fx-background-color: #CFD8DC;"/>
 
-                    <!-- Dirección de Destino (Opcional) -->
-                    <Label text="Dirección de Destino (Opcional)"
+                    <!-- Dirección de Frecuente (Opcional) -->
+                    <Label text="Dirección de Frecuente (Opcional)"
                            style="-fx-font-size: 16px; -fx-text-fill: #01579B; -fx-font-weight: bold;"/>
 
                     <VBox spacing="6">

@@ -21,6 +21,13 @@ public class EnvioService {
         // La conversión de DTO a Entity se hace en la Facade
         // El usuario debe venir ya asignado desde la Facade
 
+        // Si el envío ya existe, actualizarlo en lugar de crear uno nuevo
+        Envio existente = buscarPorId(envio.getId());
+        if (existente != null) {
+            actualizarEnvioCompleto(existente, envio);
+            return;
+        }
+
         if (envio.getEstado() == null)
             envio.setEstado(Envio.EstadoEnvio.SOLICITADO);
 
@@ -30,9 +37,38 @@ public class EnvioService {
         if (envio.getCostoEstimado() == 0.0)
             envio.setCostoEstimado(tarifaService.calcularTarifa(envio));
 
-        // evitar duplicados
-        if (buscarPorId(envio.getId()) == null)
-            store.addEnvio(envio);
+        store.addEnvio(envio);
+    }
+    
+    // 🔹 Actualizar completamente un envío existente
+    private void actualizarEnvioCompleto(Envio existente, Envio actualizado) {
+        existente.setOrigen(actualizado.getOrigen());
+        existente.setDestino(actualizado.getDestino());
+        existente.setPeso(actualizado.getPeso());
+        existente.setVolumen(actualizado.getVolumen());
+        existente.setPrioridad(actualizado.isPrioridad());
+        existente.setSeguro(actualizado.isSeguro());
+        existente.setFragil(actualizado.isFragil());
+        existente.setFirmaRequerida(actualizado.isFirmaRequerida());
+        existente.setCostoEstimado(actualizado.getCostoEstimado());
+        
+        if (actualizado.getEstado() != null) {
+            existente.setEstado(actualizado.getEstado());
+        }
+        
+        if (actualizado.getRepartidor() != null) {
+            existente.setRepartidor(actualizado.getRepartidor());
+        }
+        
+        if (actualizado.getUsuario() != null) {
+            existente.setUsuario(actualizado.getUsuario());
+        }
+        
+        existente.setFechaConfirmacion(actualizado.getFechaConfirmacion());
+        existente.setFechaEntrega(actualizado.getFechaEntrega());
+        existente.setFechaEntregaEstimada(actualizado.getFechaEntregaEstimada());
+        existente.setFechaIncidencia(actualizado.getFechaIncidencia());
+        existente.setIncidenciaDescripcion(actualizado.getIncidenciaDescripcion());
     }
 
 
@@ -62,9 +98,15 @@ public class EnvioService {
         envio.setVolumen(actualizado.getVolumen());
         envio.setPrioridad(actualizado.isPrioridad());
         envio.setSeguro(actualizado.isSeguro());
+        envio.setFragil(actualizado.isFragil());
+        envio.setFirmaRequerida(actualizado.isFirmaRequerida());
         envio.setCostoEstimado(actualizado.getCostoEstimado());
         envio.setEstado(actualizado.getEstado());
         envio.setUsuario(usuarioActual);
+        
+        if (actualizado.getRepartidor() != null) {
+            envio.setRepartidor(actualizado.getRepartidor());
+        }
 
         return true;
     }
@@ -91,12 +133,17 @@ public class EnvioService {
         }
     }
 
-    // 🔹 Asignar automáticamente un repartidor disponible según la zona de origen
+    // 🔹 Asignar automáticamente un repartidor disponible según la zona de destino
     public boolean asignarRepartidor(Envio envio) {
-        if (envio == null || envio.getOrigen() == null) return false;
+        if (envio == null || envio.getDestino() == null) return false;
 
-        String zona = envio.getOrigen().getCoordenadas();
-        if (zona == null || zona.isBlank()) return false;
+        // Usar ciudad (zona: Norte, Centro, Sur) en lugar de coordenadas
+        String zona = envio.getDestino().getCiudad();
+        if (zona == null || zona.isBlank()) {
+            // Si ciudad está vacía, intentar con coordenadas como fallback
+            zona = envio.getDestino().getCoordenadas();
+            if (zona == null || zona.isBlank()) return false;
+        }
 
         // Buscar repartidor disponible en esa zona
         Repartidor elegido = repartidorService.buscarDisponiblePorZona(zona);

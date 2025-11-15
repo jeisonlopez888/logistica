@@ -100,11 +100,11 @@ public abstract class CrearEnvioController {
                 return;
             }
 
-            // Crear DTOs de direcciones
+            // Crear DTOs de direcciones (nombre, calle, ciudad, coordenadas)
             DireccionDTO origenDTO = facade.crearDireccion("Origen",
-                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), zonaOrigenCombo.getValue());
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), "");
             DireccionDTO destinoDTO = facade.crearDireccion("Destino",
-                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), zonaDestinoCombo.getValue());
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), "");
 
             // Crear DTO de envío temporal para cálculo
             EnvioDTO envioTempDTO = new EnvioDTO();
@@ -174,11 +174,11 @@ public abstract class CrearEnvioController {
             double peso = Double.parseDouble(pesoField.getText());
             double volumen = calcularVolumen();
 
-            // Crear DTOs
+            // Crear DTOs (nombre, calle, ciudad, coordenadas)
             DireccionDTO origenDTO = facade.crearDireccion("Origen",
-                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), zonaOrigenCombo.getValue());
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), "");
             DireccionDTO destinoDTO = facade.crearDireccion("Destino",
-                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), zonaDestinoCombo.getValue());
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), "");
 
             // Crear envío usando Facade con el usuario actual (trabaja con DTOs)
             EnvioDTO envioDTO = facade.crearEnvio(usuarioActual, origenDTO, destinoDTO, peso);
@@ -226,11 +226,11 @@ public abstract class CrearEnvioController {
             double peso = Double.parseDouble(pesoField.getText());
             double volumen = calcularVolumen();
 
-            // Crear DTOs
+            // Crear DTOs (nombre, calle, ciudad, coordenadas)
             DireccionDTO origenDTO = facade.crearDireccion("Origen",
-                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), zonaOrigenCombo.getValue());
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), "");
             DireccionDTO destinoDTO = facade.crearDireccion("Destino",
-                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), zonaDestinoCombo.getValue());
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), "");
 
             // Crear envío usando Facade con el usuario actual (trabaja con DTOs)
             EnvioDTO envioDTO = facade.crearEnvio(usuarioActual, origenDTO, destinoDTO, peso);
@@ -293,11 +293,11 @@ public abstract class CrearEnvioController {
             double peso = Double.parseDouble(pesoField.getText());
             double volumen = calcularVolumen();
 
-            // Crear DTOs
+            // Crear DTOs (nombre, calle, ciudad, coordenadas)
             DireccionDTO origenDTO = facade.crearDireccion("Origen",
-                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), zonaOrigenCombo.getValue());
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), "");
             DireccionDTO destinoDTO = facade.crearDireccion("Destino",
-                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), zonaDestinoCombo.getValue());
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), "");
 
             // Crear DTO temporal
             EnvioDTO envioTempDTO = new EnvioDTO();

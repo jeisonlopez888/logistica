@@ -115,21 +115,23 @@ public class EditarUsuarioAdminController {
             String zonaDestino = zonaDestinoCombo.getValue();
 
             if (zonaOrigen != null && !ValidacionUtil.isEmpty(detalle1Field.getText())) {
+                // crearDireccion(String nombre, String calle, String ciudad, String coordenadas)
                 DireccionDTO d1 = facade.crearDireccion(
                         alias1Field.getText().isEmpty() ? "Origen" : alias1Field.getText(),
                         detalle1Field.getText(),
-                        "",
-                        zonaOrigen
+                        zonaOrigen,
+                        ""
                 );
                 direccionesDTO.add(d1);
             }
 
             if (zonaDestino != null && !ValidacionUtil.isEmpty(detalle2Field.getText())) {
+                // crearDireccion(String nombre, String calle, String ciudad, String coordenadas)
                 DireccionDTO d2 = facade.crearDireccion(
                         alias2Field.getText().isEmpty() ? "Destino" : alias2Field.getText(),
                         detalle2Field.getText(),
-                        "",
-                        zonaDestino
+                        zonaDestino,
+                        ""
                 );
                 direccionesDTO.add(d2);
             }

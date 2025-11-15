@@ -90,28 +90,32 @@ public abstract class CrearUsuarioController {
             String zonaDestino = zonaDestinoCombo != null ? zonaDestinoCombo.getValue() : null;
 
             if (zonaOrigen != null && !ValidacionUtil.isEmpty(detalle1Field.getText())) {
+                // crearDireccion(String nombre, String calle, String ciudad, String coordenadas)
                 co.edu.uniquindio.logistica.model.DTO.DireccionDTO d1 = facade.crearDireccion(
                         alias1Field.getText().isEmpty() ? "Origen" : alias1Field.getText(),
                         detalle1Field.getText(),
-                        "",
-                        zonaOrigen
+                        zonaOrigen,
+                        ""
                 );
                 direccionesDTO.add(d1);
             }
 
             if (zonaDestino != null && !ValidacionUtil.isEmpty(detalle2Field.getText())) {
+                // crearDireccion(String nombre, String calle, String ciudad, String coordenadas)
                 co.edu.uniquindio.logistica.model.DTO.DireccionDTO d2 = facade.crearDireccion(
                         alias2Field.getText().isEmpty() ? "Destino" : alias2Field.getText(),
                         detalle2Field.getText(),
-                        "",
-                        zonaDestino
+                        zonaDestino,
+                        ""
                 );
                 direccionesDTO.add(d2);
             }
 
-            // Actualizar usuario con direcciones
-            nuevoDTO.setDirecciones(direccionesDTO);
-            facade.registrarUsuario(nuevoDTO);
+            // Actualizar usuario con direcciones (si hay alguna)
+            if (!direccionesDTO.isEmpty()) {
+                nuevoDTO.setDirecciones(direccionesDTO);
+                facade.actualizarUsuario(nuevoDTO);
+            }
             mostrarMensaje("✅ Usuario creado correctamente", "green");
 
             limpiarCampos();

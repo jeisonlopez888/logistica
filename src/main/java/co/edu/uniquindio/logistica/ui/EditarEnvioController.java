@@ -75,11 +75,11 @@ public class EditarEnvioController extends CrearEnvioController {
 
             double volumen = calcularVolumen();
 
-            // Actualizar direcciones
+            // Actualizar direcciones (nombre, calle, ciudad, coordenadas)
             DireccionDTO origenDTO = facade.crearDireccion("Origen",
-                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), zonaOrigenCombo.getValue());
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), "");
             DireccionDTO destinoDTO = facade.crearDireccion("Destino",
-                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), zonaDestinoCombo.getValue());
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), "");
 
             envioEditadoDTO.setOrigen(origenDTO);
             envioEditadoDTO.setDestino(destinoDTO);

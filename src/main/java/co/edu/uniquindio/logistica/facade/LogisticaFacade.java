@@ -84,6 +84,11 @@ public class LogisticaFacade {
         return UsuarioMapper.toDTO(usuario);
     }
 
+    public void actualizarUsuario(UsuarioDTO usuarioDTO) {
+        Usuario usuario = UsuarioMapper.toEntity(usuarioDTO);
+        usuarioService.actualizarUsuario(usuario);
+    }
+
     // ========== ENVÍOS ==========
     
     public void registrarEnvio(EnvioDTO envioDTO) {
@@ -310,8 +315,9 @@ public class LogisticaFacade {
 
     // ========== UTILIDADES ==========
     
-    public DireccionDTO crearDireccion(String nombre, String calle, String coordenadas, String ciudad) {
-        Direccion direccion = new Direccion(DataStore.getInstance().nextId(), nombre, calle, coordenadas, ciudad);
+    public DireccionDTO crearDireccion(String nombre, String calle, String ciudad, String coordenadas) {
+        // Constructor: Direccion(Long id, String alias, String calle, String ciudad, String coordenadas)
+        Direccion direccion = new Direccion(DataStore.getInstance().nextId(), nombre, calle, ciudad, coordenadas != null ? coordenadas : "");
         return DireccionMapper.toDTO(direccion);
     }
 
