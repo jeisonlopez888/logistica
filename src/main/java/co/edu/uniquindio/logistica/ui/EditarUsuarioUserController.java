@@ -3,10 +3,14 @@ package co.edu.uniquindio.logistica.ui;
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.DTO.DireccionDTO;
 import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
+import co.edu.uniquindio.logistica.util.Sesion;
 import co.edu.uniquindio.logistica.util.ValidacionUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
@@ -23,6 +27,8 @@ public class EditarUsuarioUserController {
     @FXML private TextField emailField;
     @FXML private TextField telefonoField;
     @FXML private PasswordField passwordField;
+    @FXML private TextField passwordVisibleField;
+    @FXML private Button togglePasswordButton;
     @FXML private Label mensajeLabel;
 
     @FXML private TextField alias1Field;
@@ -43,7 +49,9 @@ public class EditarUsuarioUserController {
             nombreField.setText(usuarioDTO.getNombre());
             emailField.setText(usuarioDTO.getEmail());
             telefonoField.setText(usuarioDTO.getTelefono());
+            // Sincronizar contraseña en ambos campos
             passwordField.setText(usuarioDTO.getPassword());
+            passwordVisibleField.setText(usuarioDTO.getPassword());
 
             if (!usuarioDTO.getDirecciones().isEmpty()) {
                 // Cargar hasta 2 direcciones (si existen)
@@ -81,11 +89,16 @@ public class EditarUsuarioUserController {
                 return;
             }
 
+            // Obtener la contraseña del campo visible
+            String password = passwordField.isVisible() ? 
+                (passwordField.getText() != null ? passwordField.getText() : "") :
+                (passwordVisibleField.getText() != null ? passwordVisibleField.getText() : "");
+            
             // Validación
             if (ValidacionUtil.isEmpty(nombreField.getText()) ||
                     ValidacionUtil.isEmpty(emailField.getText()) ||
                     ValidacionUtil.isEmpty(telefonoField.getText()) ||
-                    ValidacionUtil.isEmpty(passwordField.getText())) {
+                    ValidacionUtil.isEmpty(password)) {
                 mostrarMensaje("⚠️ Todos los campos son obligatorios", "orange");
                 return;
             }
@@ -104,7 +117,7 @@ public class EditarUsuarioUserController {
             usuarioDTO.setNombre(nombreField.getText().trim());
             usuarioDTO.setEmail(ValidacionUtil.validarYLimpiarEmail(emailField.getText()));
             usuarioDTO.setTelefono(telefonoField.getText().trim());
-            usuarioDTO.setPassword(passwordField.getText());
+            usuarioDTO.setPassword(password);
 
             // Actualizar direcciones
             List<DireccionDTO> direccionesDTO = new ArrayList<>();
@@ -135,8 +148,8 @@ public class EditarUsuarioUserController {
 
             usuarioDTO.setDirecciones(direccionesDTO);
 
-            // Registrar cambios usando Facade (trabaja con DTOs)
-            facade.registrarUsuario(usuarioDTO);
+            // Actualizar usuario usando Facade (trabaja con DTOs)
+            facade.actualizarUsuario(usuarioDTO);
 
             mostrarMensaje("✅ Usuario actualizado correctamente", "green");
 
@@ -154,8 +167,45 @@ public class EditarUsuarioUserController {
 
     @FXML
     private void handleVolver(ActionEvent event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.close();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/User.fxml"));
+            Parent root = loader.load();
+            UserController userController = loader.getController();
+            userController.setUsuario(Sesion.getUsuarioActual());
+            
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Panel de Usuario");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.close();
+        }
+    }
+
+    /**
+     * Alterna entre mostrar y ocultar la contraseña.
+     */
+    @FXML
+    private void togglePasswordVisibility() {
+        if (passwordField.isVisible()) {
+            // Cambiar a mostrar contraseña
+            passwordVisibleField.setText(passwordField.getText());
+            passwordVisibleField.setVisible(true);
+            passwordVisibleField.setManaged(true);
+            passwordField.setVisible(false);
+            passwordField.setManaged(false);
+            togglePasswordButton.setText("🙈");
+        } else {
+            // Cambiar a ocultar contraseña
+            passwordField.setText(passwordVisibleField.getText());
+            passwordField.setVisible(true);
+            passwordField.setManaged(true);
+            passwordVisibleField.setVisible(false);
+            passwordVisibleField.setManaged(false);
+            togglePasswordButton.setText("👁");
+        }
     }
 
     private void mostrarMensaje(String texto, String color) {

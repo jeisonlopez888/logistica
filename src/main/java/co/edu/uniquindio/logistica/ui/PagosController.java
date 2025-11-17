@@ -90,8 +90,14 @@ public class PagosController {
                     return;
                 }
 
+                // Mostrar diálogo para elegir método de pago
+                MetodoPago metodoSeleccionado = mostrarDialogoMetodoPago("Seleccione el método de pago");
+                if (metodoSeleccionado == null) {
+                    return; // Usuario canceló
+                }
+
                 // Registrar pago usando Facade (con DTOs)
-                PagoDTO pagoDTO = facade.registrarPagoSimulado(envioId, montoPagado, MetodoPago.TRANSFERENCIA);
+                PagoDTO pagoDTO = facade.registrarPagoSimulado(envioId, montoPagado, metodoSeleccionado);
 
                 if (pagoDTO != null) {
                     cargarPagos();
@@ -153,9 +159,55 @@ public class PagosController {
             return;
         }
 
+        // Mostrar diálogo para elegir método de pago
+        MetodoPago metodoSeleccionado = mostrarDialogoMetodoPago("Seleccione el método de pago para confirmar");
+        if (metodoSeleccionado == null) {
+            return; // Usuario canceló
+        }
+
+        // Actualizar método de pago si es diferente
+        if (seleccionado.getMetodo() != metodoSeleccionado) {
+            facade.actualizarMetodoPago(seleccionado.getId(), metodoSeleccionado);
+        }
+
         String resultado = facade.confirmarPago(seleccionado.getId());
         cargarPagos();
         mostrarMensaje(resultado, resultado.contains("✅") ? "green" : "red");
+    }
+
+    /**
+     * Muestra un diálogo para seleccionar el método de pago
+     * @param mensaje Mensaje a mostrar en el diálogo
+     * @return MetodoPago seleccionado o null si se canceló
+     */
+    private MetodoPago mostrarDialogoMetodoPago(String mensaje) {
+        Alert metodoPagoDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        metodoPagoDialog.setTitle("Método de Pago");
+        metodoPagoDialog.setHeaderText(mensaje);
+        metodoPagoDialog.getButtonTypes().setAll(
+                new ButtonType("Tarjeta Crédito"),
+                new ButtonType("Efectivo"),
+                new ButtonType("PSE"),
+                new ButtonType("Transferencia"),
+                ButtonType.CANCEL
+        );
+
+        final MetodoPago[] metodoSeleccionado = {null};
+        metodoPagoDialog.showAndWait().ifPresent(opcion -> {
+            if (opcion == ButtonType.CANCEL) {
+                metodoSeleccionado[0] = null;
+                return;
+            }
+
+            metodoSeleccionado[0] = switch (opcion.getText()) {
+                case "Efectivo" -> MetodoPago.EFECTIVO;
+                case "PSE" -> MetodoPago.PSE;
+                case "Transferencia" -> MetodoPago.TRANSFERENCIA;
+                default -> MetodoPago.TARJETA_CREDITO;
+            };
+        });
+
+        return metodoSeleccionado[0];
     }
 
     @FXML

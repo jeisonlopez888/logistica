@@ -18,6 +18,8 @@ public abstract class CrearUsuarioController {
     @FXML protected TextField emailField;
     @FXML protected TextField telefonoField;
     @FXML protected PasswordField passwordField;
+    @FXML protected TextField passwordVisibleField;
+    @FXML protected Button togglePasswordButton;
     @FXML protected Label mensajeLabel;
 
     // Campos opcionales (direcciones)
@@ -54,7 +56,10 @@ public abstract class CrearUsuarioController {
             String nombre = nombreField.getText().trim();
             String email = emailField.getText().trim();
             String telefono = telefonoField.getText().trim();
-            String password = passwordField.getText();
+            // Obtener la contraseña del campo visible (puede ser passwordField o passwordVisibleField)
+            String password = passwordField != null && passwordField.isVisible() ? 
+                (passwordField.getText() != null ? passwordField.getText() : "") :
+                (passwordVisibleField != null && passwordVisibleField.getText() != null ? passwordVisibleField.getText() : "");
 
             // cada subclase decide si puede o no marcar admin
             boolean admin = getAdminFlag();
@@ -141,12 +146,39 @@ public abstract class CrearUsuarioController {
         mensajeLabel.setStyle("-fx-text-fill: " + color + ";");
     }
 
+    /**
+     * Alterna entre mostrar y ocultar la contraseña.
+     */
+    @FXML
+    protected void togglePasswordVisibility() {
+        if (passwordField != null && passwordVisibleField != null && togglePasswordButton != null) {
+            if (passwordField.isVisible()) {
+                // Cambiar a mostrar contraseña
+                passwordVisibleField.setText(passwordField.getText());
+                passwordVisibleField.setVisible(true);
+                passwordVisibleField.setManaged(true);
+                passwordField.setVisible(false);
+                passwordField.setManaged(false);
+                togglePasswordButton.setText("🙈");
+            } else {
+                // Cambiar a ocultar contraseña
+                passwordField.setText(passwordVisibleField.getText());
+                passwordField.setVisible(true);
+                passwordField.setManaged(true);
+                passwordVisibleField.setVisible(false);
+                passwordVisibleField.setManaged(false);
+                togglePasswordButton.setText("👁");
+            }
+        }
+    }
+
     protected void limpiarCampos() {
         idField.clear();
         nombreField.clear();
         emailField.clear();
         telefonoField.clear();
-        passwordField.clear();
+        if (passwordField != null) passwordField.clear();
+        if (passwordVisibleField != null) passwordVisibleField.clear();
         if (adminCheck != null) adminCheck.setSelected(false);
         if (alias1Field != null) alias1Field.clear();
         if (detalle1Field != null) detalle1Field.clear();

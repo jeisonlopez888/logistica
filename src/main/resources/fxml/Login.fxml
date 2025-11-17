@@ -5,26 +5,26 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="co.edu.uniquindio.logistica.ui.LoginController"
-            prefWidth="500" prefHeight="650"
+            prefWidth="450" prefHeight="580"
             style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
 
     <!-- ENCABEZADO -->
     <top>
-        <VBox alignment="CENTER" spacing="15" style="-fx-padding: 40 20 20 20;">
+        <VBox alignment="CENTER" spacing="10" style="-fx-padding: 30 20 15 20;">
             <Label text="🚚 Sistema Logístico"
-                   style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 2px;"/>
+                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 2px;"/>
             <Label text="Plataforma de Envíos y Entregas"
-                   style="-fx-font-size: 14px; -fx-text-fill: #80DEEA; -fx-opacity: 0.9;"/>
+                   style="-fx-font-size: 12px; -fx-text-fill: #80DEEA; -fx-opacity: 0.9;"/>
         </VBox>
     </top>
 
     <!-- FORMULARIO CENTRAL -->
     <center>
-        <VBox alignment="CENTER" spacing="20" style="-fx-padding: 30;">
+        <VBox alignment="CENTER" spacing="15" style="-fx-padding: 20;">
             <!-- Contenedor del formulario con estilo de tarjeta -->
-            <VBox alignment="CENTER" spacing="18" style="-fx-background-color: rgba(255,255,255,0.95);
+            <VBox alignment="CENTER" spacing="15" style="-fx-background-color: rgba(255,255,255,0.95);
                                                            -fx-background-radius: 20;
-                                                           -fx-padding: 40 50;
+                                                           -fx-padding: 30 40;
                                                            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0, 0, 5);"
                   maxWidth="350">
                 
@@ -46,11 +46,27 @@
                 <VBox spacing="8">
                     <Label text="🔒 Contraseña"
                            style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
-                    <PasswordField fx:id="passwordField" promptText="••••••••"
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <PasswordField fx:id="passwordField" promptText="••••••••"
+                                       style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                              -fx-border-radius: 8; -fx-background-radius: 8;
+                                              -fx-padding: 12; -fx-font-size: 14px;"
+                                       HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="passwordVisibleField" promptText="••••••••"
                                    style="-fx-background-color: white; -fx-border-color: #B0BEC5;
                                           -fx-border-radius: 8; -fx-background-radius: 8;
                                           -fx-padding: 12; -fx-font-size: 14px;"
-                                   prefWidth="250"/>
+                                   visible="false" managed="false"/>
+                        <Button fx:id="togglePasswordButton" text="👁" 
+                                onAction="#togglePasswordVisibility"
+                                style="-fx-background-color: transparent; -fx-text-fill: #546E7A;
+                                       -fx-font-size: 18px; -fx-padding: 8 12; -fx-cursor: hand;
+                                       -fx-background-radius: 8;">
+                            <tooltip>
+                                <Tooltip text="Mostrar/Ocultar contraseña"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
                 </VBox>
 
                 <!-- Botón Entrar -->

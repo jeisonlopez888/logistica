@@ -50,6 +50,8 @@ public class DetalleTarifaController {
 
     @FXML
     private void handleCerrar() {
-        if (stage != null) stage.close();
+        // Cerrar la ventana modal (se abre desde crear_envio)
+        Stage stage = (Stage) baseLabel.getScene().getWindow();
+        stage.close();
     }
 }

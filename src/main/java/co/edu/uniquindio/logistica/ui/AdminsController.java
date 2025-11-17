@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -37,11 +36,12 @@ public class AdminsController {
 
     @FXML
     private void initialize() {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        nombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
-        telefonoCol.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-        passwordCol.setCellValueFactory(new PropertyValueFactory<>("password"));
+        // Usar lambdas en lugar de PropertyValueFactory para evitar problemas de módulos
+        idCol.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getId()));
+        nombreCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombre()));
+        emailCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getEmail()));
+        telefonoCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getTelefono()));
+        passwordCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getPassword()));
         rolCol.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleStringProperty(cellData.getValue().isAdmin() ? "Administrador" : "Usuario"));
         direccionesCol.setCellValueFactory(cellData -> {
@@ -126,23 +126,18 @@ public class AdminsController {
         }
     }
 
-    /** Volver al login */
+    /** Volver al panel de administración */
     @FXML
-    private void handleVolver() {
+    private void handleVolver(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/admin.fxml"));
-            Parent root = loader.load();
-            Stage stage = new Stage();
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/admin.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Inicio de Sesión");
+            stage.setTitle("Panel de Administración");
             stage.show();
-
-            Stage current = (Stage) usuarioTableView.getScene().getWindow();
-            current.close();
-
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarMensaje("❌ Error al volver al Admin", "red");
+            mostrarMensaje("❌ Error al volver al panel de administración", "red");
         }
     }
 

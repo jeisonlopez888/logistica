@@ -69,14 +69,14 @@ public class UserAdminController {
     @FXML
     private void handleVolverAdmin(ActionEvent event) {
         try {
-            Sesion.cerrarSesion();
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/Login.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/admin.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
+            stage.setTitle("Panel de Administración");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarAlerta("Error", "No se pudo volver al login.");
+            mostrarAlerta("Error", "No se pudo volver al panel de administración.");
         }
     }
 

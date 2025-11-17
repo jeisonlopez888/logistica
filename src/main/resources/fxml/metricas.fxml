@@ -117,9 +117,9 @@
                     <VBox GridPane.columnIndex="0" GridPane.rowIndex="0"
                           style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
-                        <LineChart fx:id="tiemposChart" title="Tiempos de Entrega" prefHeight="250" prefWidth="650">
-                            <xAxis><CategoryAxis label="Mes"/></xAxis>
-                            <yAxis><NumberAxis label="Horas"/></yAxis>
+                        <LineChart fx:id="tiemposChart" title="Tiempos Promedio de Entrega por Zona" prefHeight="250" prefWidth="650">
+                            <xAxis><CategoryAxis label="Zona"/></xAxis>
+                            <yAxis><NumberAxis label="Días"/></yAxis>
                         </LineChart>
                     </VBox>
 

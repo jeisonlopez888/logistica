@@ -66,10 +66,27 @@
 
                     <VBox spacing="6">
                         <Label text="Contraseña *" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
-                        <PasswordField fx:id="passwordField" promptText="Contraseña"
+                        <HBox spacing="5" alignment="CENTER_LEFT">
+                            <PasswordField fx:id="passwordField" promptText="Contraseña"
+                                           style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                                  -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 10; -fx-font-size: 13px;"
+                                           HBox.hgrow="ALWAYS"/>
+                            <TextField fx:id="passwordVisibleField" promptText="Contraseña"
                                        style="-fx-background-color: white; -fx-border-color: #B0BEC5;
                                               -fx-border-radius: 8; -fx-background-radius: 8;
-                                              -fx-padding: 10; -fx-font-size: 13px;"/>
+                                              -fx-padding: 10; -fx-font-size: 13px;"
+                                       visible="false" managed="false"/>
+                            <Button fx:id="togglePasswordButton" text="👁" 
+                                    onAction="#togglePasswordVisibility"
+                                    style="-fx-background-color: transparent; -fx-text-fill: #546E7A;
+                                           -fx-font-size: 16px; -fx-padding: 6 10; -fx-cursor: hand;
+                                           -fx-background-radius: 8;">
+                                <tooltip>
+                                    <Tooltip text="Mostrar/Ocultar contraseña"/>
+                                </tooltip>
+                            </Button>
+                        </HBox>
                     </VBox>
 
                     <Separator style="-fx-background-color: #CFD8DC;"/>

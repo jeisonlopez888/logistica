@@ -210,6 +210,10 @@ public class LogisticaFacade {
         return pagoService.confirmarPago(pagoId);
     }
 
+    public void actualizarMetodoPago(Long pagoId, MetodoPago metodo) {
+        pagoService.actualizarMetodoPago(pagoId, metodo);
+    }
+
     // ========== TARIFAS ==========
     
     public void addTarifa(TarifaDTO tarifaDTO) {

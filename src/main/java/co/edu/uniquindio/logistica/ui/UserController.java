@@ -61,7 +61,7 @@ public class UserController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarAlerta("❌ Error al abrir la ventana de edición de usuario.", "red");
+            mostrarAlerta("Error", "❌ Error al abrir la ventana de edición de usuario.");
         }
     }
 

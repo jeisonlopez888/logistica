@@ -5,28 +5,28 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="co.edu.uniquindio.logistica.ui.EditarUsuarioAdminController"
-            prefWidth="550" prefHeight="750"
+            prefWidth="520" prefHeight="680"
             style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
 
     <!-- ENCABEZADO -->
     <top>
         <HBox alignment="CENTER" spacing="15"
               style="-fx-background-color: linear-gradient(to right, #42A5F5, #1E88E5);
-                     -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
+                     -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
             <Label text="✏️ Editar Usuario"
-                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
         </HBox>
     </top>
 
     <!-- FORMULARIO CENTRAL -->
     <center>
         <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
-            <VBox alignment="CENTER" spacing="20" style="-fx-padding: 30;">
+            <VBox alignment="CENTER" spacing="15" style="-fx-padding: 20;">
                 
                 <!-- Tarjeta de formulario -->
-                <VBox spacing="16" style="-fx-background-color: rgba(255,255,255,0.95);
+                <VBox spacing="12" style="-fx-background-color: rgba(255,255,255,0.95);
                                            -fx-background-radius: 15;
-                                           -fx-padding: 35;
+                                           -fx-padding: 25;
                                            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0, 0, 5);"
                       maxWidth="450">
                     
@@ -65,10 +65,27 @@
 
                     <VBox spacing="6">
                         <Label text="Contraseña *" style="-fx-font-size: 12px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
-                        <PasswordField fx:id="passwordField" promptText="Contraseña"
+                        <HBox spacing="5" alignment="CENTER_LEFT">
+                            <PasswordField fx:id="passwordField" promptText="Contraseña"
+                                           style="-fx-background-color: white; -fx-border-color: #B0BEC5;
+                                                  -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 10; -fx-font-size: 13px;"
+                                           HBox.hgrow="ALWAYS"/>
+                            <TextField fx:id="passwordVisibleField" promptText="Contraseña"
                                        style="-fx-background-color: white; -fx-border-color: #B0BEC5;
                                               -fx-border-radius: 8; -fx-background-radius: 8;
-                                              -fx-padding: 10; -fx-font-size: 13px;"/>
+                                              -fx-padding: 10; -fx-font-size: 13px;"
+                                       visible="false" managed="false"/>
+                            <Button fx:id="togglePasswordButton" text="👁" 
+                                    onAction="#togglePasswordVisibility"
+                                    style="-fx-background-color: transparent; -fx-text-fill: #546E7A;
+                                           -fx-font-size: 16px; -fx-padding: 6 10; -fx-cursor: hand;
+                                           -fx-background-radius: 8;">
+                                <tooltip>
+                                    <Tooltip text="Mostrar/Ocultar contraseña"/>
+                                </tooltip>
+                            </Button>
+                        </HBox>
                     </VBox>
 
                     <CheckBox fx:id="adminCheck" text="¿Administrador?"

@@ -54,4 +54,11 @@ public class PagoService {
         return "⚠️ El pago no tiene envío asociado.";
     }
 
+    public void actualizarMetodoPago(Long pagoId, MetodoPago metodo) {
+        Pago pago = buscarPagoPorId(pagoId);
+        if (pago != null) {
+            pago.setMetodo(metodo);
+        }
+    }
+
 }

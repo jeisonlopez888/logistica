@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import java.util.stream.Collectors;
 
@@ -35,11 +34,12 @@ public class UsuariosController {
 
     @FXML
     private void initialize() {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        nombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
-        telefonoCol.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-        passwordCol.setCellValueFactory(new PropertyValueFactory<>("password"));
+        // Usar lambdas en lugar de PropertyValueFactory para evitar problemas de módulos
+        idCol.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getId()));
+        nombreCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombre()));
+        emailCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getEmail()));
+        telefonoCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getTelefono()));
+        passwordCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getPassword()));
         rolCol.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleStringProperty(cellData.getValue().isAdmin() ? "Administrador" : "Usuario"));
         direccionesCol.setCellValueFactory(cellData -> {

@@ -424,44 +424,52 @@ public class DataStore {
 
         // ==================== PAGOS (RF-032 a RF-035) ====================
         
-        // Pago del envío 1 (Entregado) - TARJETA_CREDITO
+        // Pago del envío 1 (Entregado) - TARJETA_CREDITO - CONFIRMADO
         Pago p1 = new Pago(nextId(), e1, e1.getCostoEstimado(), MetodoPago.TARJETA_CREDITO);
         p1.setFechaPago(e1.getFechaCreacion().plusHours(1));
+        p1.setConfirmado(true);
         addPago(p1);
 
-        // Pago del envío 2 (Solicitado - pendiente) - PSE
+        // Pago del envío 2 (Solicitado - pendiente) - PSE - CONFIRMADO
         Pago p2 = new Pago(nextId(), e2, e2.getCostoEstimado() * 0.8, MetodoPago.PSE);
         p2.setFechaPago(e2.getFechaCreacion().plusMinutes(30));
+        p2.setConfirmado(true);
         addPago(p2);
 
-        // Pago del envío 3 (En ruta) - EFECTIVO
+        // Pago del envío 3 (En ruta) - EFECTIVO - CONFIRMADO
         Pago p3 = new Pago(nextId(), e3, e3.getCostoEstimado(), MetodoPago.EFECTIVO);
         p3.setFechaPago(e3.getFechaCreacion().plusHours(2));
+        p3.setConfirmado(true);
         addPago(p3);
 
-        // Pago del envío 4 (Asignado) - TRANSFERENCIA
+        // Pago del envío 4 (Asignado) - TRANSFERENCIA - CONFIRMADO
         Pago p4 = new Pago(nextId(), e4, e4.getCostoEstimado(), MetodoPago.TRANSFERENCIA);
         p4.setFechaPago(e4.getFechaCreacion().plusMinutes(45));
+        p4.setConfirmado(true);
         addPago(p4);
 
-        // Pago del envío 5 (Incidencia) - TARJETA_CREDITO
+        // Pago del envío 5 (Incidencia) - TARJETA_CREDITO - CONFIRMADO
         Pago p5 = new Pago(nextId(), e5, e5.getCostoEstimado(), MetodoPago.TARJETA_CREDITO);
         p5.setFechaPago(e5.getFechaCreacion().plusHours(1));
+        p5.setConfirmado(true);
         addPago(p5);
 
-        // Pago del envío 6 (Confirmado) - PSE
+        // Pago del envío 6 (Confirmado) - PSE - CONFIRMADO
         Pago p6 = new Pago(nextId(), e6, e6.getCostoEstimado(), MetodoPago.PSE);
         p6.setFechaPago(e6.getFechaCreacion().plusMinutes(20));
+        p6.setConfirmado(true);
         addPago(p6);
 
-        // Pago del envío 9 (En ruta) - TRANSFERENCIA
+        // Pago del envío 9 (En ruta) - TRANSFERENCIA - CONFIRMADO
         Pago p9 = new Pago(nextId(), e9, e9.getCostoEstimado(), MetodoPago.TRANSFERENCIA);
         p9.setFechaPago(e9.getFechaCreacion().plusHours(1));
+        p9.setConfirmado(true);
         addPago(p9);
 
-        // Pago del envío 10 (Entregado) - EFECTIVO
+        // Pago del envío 10 (Entregado) - EFECTIVO - CONFIRMADO
         Pago p10 = new Pago(nextId(), e10, e10.getCostoEstimado(), MetodoPago.EFECTIVO);
         p10.setFechaPago(e10.getFechaCreacion().plusMinutes(40));
+        p10.setConfirmado(true);
         addPago(p10);
 
         System.out.println("✅ Pagos cargados: " + pagos.size());
