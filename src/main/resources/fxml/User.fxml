@@ -34,6 +34,7 @@
                 <rowConstraints>
                     <RowConstraints vgrow="ALWAYS"/>
                     <RowConstraints vgrow="ALWAYS"/>
+                    <RowConstraints vgrow="ALWAYS"/>
                 </rowConstraints>
 
                 <!-- Fila 1 -->
@@ -65,8 +66,18 @@
                                -fx-cursor: hand;"
                         prefWidth="280" prefHeight="100"/>
 
-                <Button text="↩️ Volver al Login" onAction="#handleVolver"
+                <Button text="🔍 Rastrear Envío" onAction="#handleRastrearEnvio"
                         GridPane.columnIndex="1" GridPane.rowIndex="1"
+                        style="-fx-background-color: linear-gradient(to bottom right, #FF6F00, #FF8F00);
+                               -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
+                               -fx-background-radius: 14; -fx-padding: 35 50;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);
+                               -fx-cursor: hand;"
+                        prefWidth="280" prefHeight="100"/>
+
+                <!-- Fila 3 -->
+                <Button text="↩️ Volver al Login" onAction="#handleVolver"
+                        GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="2"
                         style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);
                                -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
                                -fx-background-radius: 14; -fx-padding: 35 50;
