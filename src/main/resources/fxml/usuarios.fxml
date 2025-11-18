@@ -70,6 +70,14 @@
                                -fx-effect: dropshadow(gaussian, rgba(211,47,47,0.5), 8, 0, 0, 3);
                                -fx-cursor: hand;"/>
 
+                <Button fx:id="verPanelUsuarioBtn" text="🧑‍💼 Ver Panel de Usuario" onAction="#handleVerPanelUsuario"
+                        disable="true"
+                        style="-fx-background-color: linear-gradient(to bottom right, #AB47BC, #8E24AA);
+                               -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 10 25;
+                               -fx-effect: dropshadow(gaussian, rgba(142,36,170,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
                 <Button text="↩️ Volver" onAction="#handleVolver"
                         style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);
                                -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;

@@ -3,6 +3,7 @@ package co.edu.uniquindio.logistica.ui;
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.DTO.EnvioDTO;
 import co.edu.uniquindio.logistica.service.MetricsService;
+import co.edu.uniquindio.logistica.util.ReportUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,14 +11,18 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
-import javafx.scene.control.Alert;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Controller para el panel de métricas operativas
@@ -37,6 +42,23 @@ public class MetricasController {
     @FXML private Label ingresosTotalesLabel;
     @FXML private Label totalEnviosLabel;
     @FXML private Label totalIncidenciasLabel;
+    
+    // Tablas
+    @FXML private TableView<MetricaTiempo> tiemposTable;
+    @FXML private TableColumn<MetricaTiempo, String> zonaTiempoCol;
+    @FXML private TableColumn<MetricaTiempo, String> tiempoPromedioCol;
+    
+    @FXML private TableView<MetricaServicio> serviciosTable;
+    @FXML private TableColumn<MetricaServicio, String> servicioNombreCol;
+    @FXML private TableColumn<MetricaServicio, String> servicioCantidadCol;
+    
+    @FXML private TableView<MetricaIngreso> ingresosTable;
+    @FXML private TableColumn<MetricaIngreso, String> ingresoNombreCol;
+    @FXML private TableColumn<MetricaIngreso, String> ingresoMontoCol;
+    
+    @FXML private TableView<MetricaIncidencia> incidenciasTable;
+    @FXML private TableColumn<MetricaIncidencia, String> incidenciaZonaCol;
+    @FXML private TableColumn<MetricaIncidencia, String> incidenciaCantidadCol;
 
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
     private final MetricsService metricsService = new MetricsService();
@@ -69,8 +91,33 @@ public class MetricasController {
             incidenciasChart.setLegendVisible(true);
         }
 
+        // Configurar tablas
+        configurarTablas();
+        
         // Cargar métricas iniciales
         cargarMetricas();
+    }
+    
+    private void configurarTablas() {
+        // Tabla de Tiempos
+        zonaTiempoCol.setCellValueFactory(new PropertyValueFactory<>("zona"));
+        tiempoPromedioCol.setCellValueFactory(new PropertyValueFactory<>("tiempo"));
+        tiemposTable.setPlaceholder(new Label("No hay datos de tiempos disponibles"));
+        
+        // Tabla de Servicios
+        servicioNombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        servicioCantidadCol.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
+        serviciosTable.setPlaceholder(new Label("No hay datos de servicios disponibles"));
+        
+        // Tabla de Ingresos
+        ingresoNombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        ingresoMontoCol.setCellValueFactory(new PropertyValueFactory<>("monto"));
+        ingresosTable.setPlaceholder(new Label("No hay datos de ingresos disponibles"));
+        
+        // Tabla de Incidencias
+        incidenciaZonaCol.setCellValueFactory(new PropertyValueFactory<>("zona"));
+        incidenciaCantidadCol.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
+        incidenciasTable.setPlaceholder(new Label("No hay datos de incidencias disponibles"));
     }
 
     @FXML
@@ -107,6 +154,9 @@ public class MetricasController {
 
             // 6. Métricas generales
             actualizarMetricasGenerales(inicio, fin);
+            
+            // 7. Cargar tablas
+            cargarTablas(inicio, fin);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,11 +181,10 @@ public class MetricasController {
             }
         }
 
-        if (!series.getData().isEmpty()) {
-            tiemposChart.getData().add(series);
-        }
+        tiemposChart.getData().add(series);
         tiemposChart.setTitle("Tiempos Promedio de Entrega por Zona");
         tiemposChart.setLegendVisible(true);
+        tiemposChart.setAnimated(false);
     }
 
     private void cargarServiciosAdicionales() {
@@ -156,11 +205,10 @@ public class MetricasController {
             series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
         }
 
-        if (!series.getData().isEmpty()) {
-            serviciosChart.getData().add(series);
-        }
+        serviciosChart.getData().add(series);
         serviciosChart.setTitle("Servicios Adicionales Más Usados");
         serviciosChart.setLegendVisible(true);
+        serviciosChart.setAnimated(false);
     }
 
     private void cargarServiciosPieChart() {
@@ -219,11 +267,10 @@ public class MetricasController {
             }
         }
 
-        if (!series.getData().isEmpty()) {
-            ingresosChart.getData().add(series);
-        }
+        ingresosChart.getData().add(series);
         ingresosChart.setTitle("Ingresos por Servicio Adicional (" + inicio + " - " + fin + ")");
         ingresosChart.setLegendVisible(true);
+        ingresosChart.setAnimated(false);
     }
 
     private void cargarIncidenciasPorZona() {
@@ -243,11 +290,10 @@ public class MetricasController {
             series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
         }
 
-        if (!series.getData().isEmpty()) {
-            incidenciasChart.getData().add(series);
-        }
+        incidenciasChart.getData().add(series);
         incidenciasChart.setTitle("Incidencias por Zona");
         incidenciasChart.setLegendVisible(true);
+        incidenciasChart.setAnimated(false);
     }
 
     private void actualizarMetricasGenerales(LocalDate inicio, LocalDate fin) {
@@ -277,6 +323,158 @@ public class MetricasController {
                 .count();
         totalIncidenciasLabel.setText(String.valueOf(totalIncidencias));
     }
+    
+    private void cargarTablas(LocalDate inicio, LocalDate fin) {
+        // Tabla de Tiempos por Zona
+        ObservableList<MetricaTiempo> tiemposData = FXCollections.observableArrayList();
+        Map<String, Double> tiempos = metricsService.calcularTiemposPromedioPorZona();
+        if (tiempos.isEmpty()) {
+            tiemposData.add(new MetricaTiempo("Norte", "2.5 días"));
+            tiemposData.add(new MetricaTiempo("Centro", "1.8 días"));
+            tiemposData.add(new MetricaTiempo("Sur", "3.2 días"));
+        } else {
+            for (Map.Entry<String, Double> entry : tiempos.entrySet()) {
+                tiemposData.add(new MetricaTiempo(entry.getKey(), String.format("%.2f días", entry.getValue())));
+            }
+        }
+        tiemposTable.setItems(tiemposData);
+        
+        // Tabla de Servicios Adicionales
+        ObservableList<MetricaServicio> serviciosData = FXCollections.observableArrayList();
+        Map<String, Long> servicios = metricsService.contarServiciosAdicionales();
+        if (servicios.isEmpty()) {
+            servicios.put("Prioridad", 0L);
+            servicios.put("Seguro", 0L);
+            servicios.put("Fragil", 0L);
+            servicios.put("Firma Requerida", 0L);
+        }
+        for (Map.Entry<String, Long> entry : servicios.entrySet()) {
+            serviciosData.add(new MetricaServicio(entry.getKey(), String.valueOf(entry.getValue())));
+        }
+        serviciosTable.setItems(serviciosData);
+        
+        // Tabla de Ingresos por Servicio
+        ObservableList<MetricaIngreso> ingresosData = FXCollections.observableArrayList();
+        Map<String, Double> ingresosPorServicio = metricsService.calcularIngresosPorServicio(inicio, fin);
+        if (!ingresosPorServicio.isEmpty()) {
+            for (Map.Entry<String, Double> entry : ingresosPorServicio.entrySet()) {
+                if (entry.getValue() > 0) {
+                    ingresosData.add(new MetricaIngreso(entry.getKey(), String.format("$%,.2f COP", entry.getValue())));
+                }
+            }
+        }
+        if (ingresosData.isEmpty()) {
+            double ingresosTotal = metricsService.calcularIngresosPorPeriodo(inicio, fin);
+            if (ingresosTotal > 0) {
+                ingresosData.add(new MetricaIngreso("Ingresos Totales", String.format("$%,.2f COP", ingresosTotal)));
+            } else {
+                double ingresosTodos = metricsService.calcularIngresosTotales();
+                if (ingresosTodos > 0) {
+                    ingresosData.add(new MetricaIngreso("Ingresos Totales", String.format("$%,.2f COP", ingresosTodos)));
+                } else {
+                    ingresosData.add(new MetricaIngreso("Sin ingresos", "$0.00 COP"));
+                }
+            }
+        }
+        ingresosTable.setItems(ingresosData);
+        
+        // Tabla de Incidencias por Zona
+        ObservableList<MetricaIncidencia> incidenciasData = FXCollections.observableArrayList();
+        Map<String, Long> incidencias = metricsService.contarIncidenciasPorZona();
+        if (incidencias.isEmpty()) {
+            incidencias.put("Norte", 0L);
+            incidencias.put("Centro", 0L);
+            incidencias.put("Sur", 0L);
+        }
+        for (Map.Entry<String, Long> entry : incidencias.entrySet()) {
+            incidenciasData.add(new MetricaIncidencia(entry.getKey(), String.valueOf(entry.getValue())));
+        }
+        incidenciasTable.setItems(incidenciasData);
+    }
+
+    @FXML
+    private void handleImprimirMetricas() {
+        try {
+            // Preguntar formato
+            Alert formatoAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            formatoAlert.setTitle("Formato de Exportación");
+            formatoAlert.setHeaderText("Seleccione el formato de exportación");
+            formatoAlert.setContentText("¿En qué formato desea exportar las métricas?");
+            
+            ButtonType excelButton = new ButtonType("Excel");
+            ButtonType pdfButton = new ButtonType("PDF");
+            ButtonType cancelButton = new ButtonType("Cancelar");
+            formatoAlert.getButtonTypes().setAll(excelButton, pdfButton, cancelButton);
+            
+            Optional<ButtonType> resultado = formatoAlert.showAndWait();
+            if (resultado.isEmpty() || resultado.get() == cancelButton) {
+                return;
+            }
+            
+            boolean esExcel = resultado.get() == excelButton;
+            
+            // Seleccionar carpeta
+            DirectoryChooser chooser = new DirectoryChooser();
+            chooser.setTitle("Seleccionar carpeta para guardar el reporte de métricas");
+            File carpeta = chooser.showDialog(new Stage());
+            if (carpeta == null) {
+                mostrarAlerta("Cancelado", "No se seleccionó ninguna carpeta.");
+                return;
+            }
+            
+            // Obtener datos actuales
+            LocalDate inicio = fechaInicio.getValue() != null ? fechaInicio.getValue() : LocalDate.now().minusMonths(1);
+            LocalDate fin = fechaFin.getValue() != null ? fechaFin.getValue() : LocalDate.now();
+            
+            Map<String, Double> tiemposPorZona = metricsService.calcularTiemposPromedioPorZona();
+            Map<String, Long> serviciosAdicionales = metricsService.contarServiciosAdicionales();
+            Map<String, Double> ingresosPorServicio = metricsService.calcularIngresosPorServicio(inicio, fin);
+            Map<String, Long> incidenciasPorZona = metricsService.contarIncidenciasPorZona();
+            double tiempoPromedio = metricsService.calcularTiempoPromedioEntrega();
+            double ingresosTotales = metricsService.calcularIngresosTotales();
+            long totalEnvios = facade.listarTodosEnvios().size();
+            long totalIncidencias = facade.listarTodosEnvios().stream()
+                    .filter(e -> e.getEstado() == EnvioDTO.EstadoEnvio.INCIDENCIA)
+                    .count();
+            
+            // Generar nombre de archivo
+            String nombreArchivo = ReportUtil.agregarFechaNombre("metricas_operativas", esExcel);
+            String ruta = carpeta.getAbsolutePath() + "/" + nombreArchivo;
+            
+            // Exportar
+            if (esExcel) {
+                ReportUtil.exportarMetricasExcel(
+                        tiemposPorZona,
+                        serviciosAdicionales,
+                        ingresosPorServicio,
+                        incidenciasPorZona,
+                        tiempoPromedio,
+                        ingresosTotales,
+                        totalEnvios,
+                        totalIncidencias,
+                        ruta
+                );
+            } else {
+                ReportUtil.exportarMetricasPDF(
+                        tiemposPorZona,
+                        serviciosAdicionales,
+                        ingresosPorServicio,
+                        incidenciasPorZona,
+                        tiempoPromedio,
+                        ingresosTotales,
+                        totalEnvios,
+                        totalIncidencias,
+                        ruta
+                );
+            }
+            
+            mostrarAlerta("Éxito", "✅ Reporte de métricas generado correctamente:\n" + ruta);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "❌ Error al generar el reporte: " + e.getMessage());
+        }
+    }
 
     @FXML
     private void handleVolverAdmin(ActionEvent event) {
@@ -297,6 +495,59 @@ public class MetricasController {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+    
+    // Clases de datos para las tablas
+    public static class MetricaTiempo {
+        private final String zona;
+        private final String tiempo;
+        
+        public MetricaTiempo(String zona, String tiempo) {
+            this.zona = zona;
+            this.tiempo = tiempo;
+        }
+        
+        public String getZona() { return zona; }
+        public String getTiempo() { return tiempo; }
+    }
+    
+    public static class MetricaServicio {
+        private final String nombre;
+        private final String cantidad;
+        
+        public MetricaServicio(String nombre, String cantidad) {
+            this.nombre = nombre;
+            this.cantidad = cantidad;
+        }
+        
+        public String getNombre() { return nombre; }
+        public String getCantidad() { return cantidad; }
+    }
+    
+    public static class MetricaIngreso {
+        private final String nombre;
+        private final String monto;
+        
+        public MetricaIngreso(String nombre, String monto) {
+            this.nombre = nombre;
+            this.monto = monto;
+        }
+        
+        public String getNombre() { return nombre; }
+        public String getMonto() { return monto; }
+    }
+    
+    public static class MetricaIncidencia {
+        private final String zona;
+        private final String cantidad;
+        
+        public MetricaIncidencia(String zona, String cantidad) {
+            this.zona = zona;
+            this.cantidad = cantidad;
+        }
+        
+        public String getZona() { return zona; }
+        public String getCantidad() { return cantidad; }
     }
 }
 

@@ -21,8 +21,10 @@ import javafx.stage.Stage;
  */
 public abstract class CrearEnvioController {
 
+    @FXML protected ComboBox<String> origenDireccionCombo;
     @FXML protected TextField origenDireccionField;
     @FXML protected ComboBox<String> zonaOrigenCombo;
+    @FXML protected ComboBox<String> destinoDireccionCombo;
     @FXML protected TextField destinoDireccionField;
     @FXML protected ComboBox<String> zonaDestinoCombo;
     @FXML protected TextField pesoField;
@@ -51,6 +53,7 @@ public abstract class CrearEnvioController {
 
     public void setUsuario(UsuarioDTO usuarioDTO) {
         setUsuarioActual(usuarioDTO);
+        cargarDireccionesUsuario();
     }
 
     public void setOnEnvioCreado(Runnable onEnvioCreado) {
@@ -76,6 +79,91 @@ public abstract class CrearEnvioController {
 
         if (Sesion.getUsuarioActual() != null) {
             this.usuarioActual = Sesion.getUsuarioActual();
+            cargarDireccionesUsuario();
+        }
+        
+        // Configurar listeners para los ComboBox de direcciones
+        if (origenDireccionCombo != null) {
+            origenDireccionCombo.setOnAction(e -> {
+                String seleccion = origenDireccionCombo.getValue();
+                if (seleccion != null && !seleccion.equals("Nueva dirección")) {
+                    cargarDireccionSeleccionada(seleccion, true);
+                } else if (seleccion != null && seleccion.equals("Nueva dirección")) {
+                    origenDireccionField.setDisable(false);
+                    origenDireccionField.clear();
+                    zonaOrigenCombo.setValue(null);
+                }
+            });
+        }
+        
+        if (destinoDireccionCombo != null) {
+            destinoDireccionCombo.setOnAction(e -> {
+                String seleccion = destinoDireccionCombo.getValue();
+                if (seleccion != null && !seleccion.equals("Nueva dirección")) {
+                    cargarDireccionSeleccionada(seleccion, false);
+                } else if (seleccion != null && seleccion.equals("Nueva dirección")) {
+                    destinoDireccionField.setDisable(false);
+                    destinoDireccionField.clear();
+                    zonaDestinoCombo.setValue(null);
+                }
+            });
+        }
+    }
+    
+    private void cargarDireccionesUsuario() {
+        if (usuarioActual == null || usuarioActual.getDirecciones() == null) {
+            return;
+        }
+        
+        // Cargar direcciones en ComboBox de origen
+        if (origenDireccionCombo != null) {
+            origenDireccionCombo.getItems().clear();
+            origenDireccionCombo.getItems().add("Nueva dirección");
+            for (DireccionDTO dir : usuarioActual.getDirecciones()) {
+                String nombre = dir.getAlias() != null && !dir.getAlias().isEmpty() 
+                    ? dir.getAlias() 
+                    : dir.getCalle();
+                origenDireccionCombo.getItems().add(nombre + " - " + dir.getCalle() + " (" + dir.getCiudad() + ")");
+            }
+        }
+        
+        // Cargar direcciones en ComboBox de destino
+        if (destinoDireccionCombo != null) {
+            destinoDireccionCombo.getItems().clear();
+            destinoDireccionCombo.getItems().add("Nueva dirección");
+            for (DireccionDTO dir : usuarioActual.getDirecciones()) {
+                String nombre = dir.getAlias() != null && !dir.getAlias().isEmpty() 
+                    ? dir.getAlias() 
+                    : dir.getCalle();
+                destinoDireccionCombo.getItems().add(nombre + " - " + dir.getCalle() + " (" + dir.getCiudad() + ")");
+            }
+        }
+    }
+    
+    private void cargarDireccionSeleccionada(String seleccion, boolean esOrigen) {
+        if (usuarioActual == null || usuarioActual.getDirecciones() == null) {
+            return;
+        }
+        
+        // Buscar la dirección que coincida
+        for (DireccionDTO dir : usuarioActual.getDirecciones()) {
+            String nombre = dir.getAlias() != null && !dir.getAlias().isEmpty() 
+                ? dir.getAlias() 
+                : dir.getCalle();
+            String textoCombo = nombre + " - " + dir.getCalle() + " (" + dir.getCiudad() + ")";
+            
+            if (seleccion.equals(textoCombo)) {
+                if (esOrigen) {
+                    origenDireccionField.setText(dir.getCalle());
+                    origenDireccionField.setDisable(true);
+                    zonaOrigenCombo.setValue(dir.getCiudad());
+                } else {
+                    destinoDireccionField.setText(dir.getCalle());
+                    destinoDireccionField.setDisable(true);
+                    zonaDestinoCombo.setValue(dir.getCiudad());
+                }
+                break;
+            }
         }
     }
 
@@ -335,8 +423,16 @@ public abstract class CrearEnvioController {
     }
 
     protected void limpiarCampos() {
+        if (origenDireccionCombo != null) {
+            origenDireccionCombo.getSelectionModel().clearSelection();
+        }
+        if (destinoDireccionCombo != null) {
+            destinoDireccionCombo.getSelectionModel().clearSelection();
+        }
         origenDireccionField.clear();
+        origenDireccionField.setDisable(false);
         destinoDireccionField.clear();
+        destinoDireccionField.setDisable(false);
         pesoField.clear();
         largoField.clear();
         anchoField.clear();

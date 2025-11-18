@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 public class ReportUtil {
 
@@ -54,7 +55,12 @@ public class ReportUtil {
         header.createCell(2).setCellValue("Email");
         header.createCell(3).setCellValue("Teléfono");
         header.createCell(4).setCellValue("Administrador");
-        header.createCell(5).setCellValue("Fecha Exportación");
+        header.createCell(5).setCellValue("Dirección 1 (Calle)");
+        header.createCell(6).setCellValue("Zona 1");
+        header.createCell(7).setCellValue("Dirección 2 (Calle)");
+        header.createCell(8).setCellValue("Zona 2");
+        header.createCell(9).setCellValue("Métodos de Pago");
+        header.createCell(10).setCellValue("Fecha Exportación");
 
         int rowIndex = 1;
         for (Usuario u : usuarios) {
@@ -64,7 +70,38 @@ public class ReportUtil {
             row.createCell(2).setCellValue(safe(u.getEmail()));
             row.createCell(3).setCellValue(safe(u.getTelefono()));
             row.createCell(4).setCellValue(u.isAdmin() ? "Sí" : "No");
-            row.createCell(5).setCellValue(LocalDateTime.now().format(DATE_FORMAT));
+            
+            // Direcciones
+            String dir1Calle = "";
+            String dir1Zona = "";
+            String dir2Calle = "";
+            String dir2Zona = "";
+            if (u.getDirecciones() != null && !u.getDirecciones().isEmpty()) {
+                if (u.getDirecciones().size() > 0) {
+                    Direccion d1 = u.getDirecciones().get(0);
+                    dir1Calle = safe(d1.getCalle());
+                    dir1Zona = safe(d1.getCiudad());
+                }
+                if (u.getDirecciones().size() > 1) {
+                    Direccion d2 = u.getDirecciones().get(1);
+                    dir2Calle = safe(d2.getCalle());
+                    dir2Zona = safe(d2.getCiudad());
+                }
+            }
+            row.createCell(5).setCellValue(dir1Calle);
+            row.createCell(6).setCellValue(dir1Zona);
+            row.createCell(7).setCellValue(dir2Calle);
+            row.createCell(8).setCellValue(dir2Zona);
+            
+            // Métodos de pago
+            String metodosPago = "";
+            if (u.getMetodosPago() != null && !u.getMetodosPago().isEmpty()) {
+                metodosPago = u.getMetodosPago().stream()
+                        .map(Enum::name)
+                        .collect(java.util.stream.Collectors.joining(", "));
+            }
+            row.createCell(9).setCellValue(metodosPago);
+            row.createCell(10).setCellValue(LocalDateTime.now().format(DATE_FORMAT));
         }
 
         try (FileOutputStream fos = new FileOutputStream(rutaArchivo)) {
@@ -81,24 +118,55 @@ public class ReportUtil {
         Row header = sheet.createRow(0);
         header.createCell(0).setCellValue("ID");
         header.createCell(1).setCellValue("Usuario");
-        header.createCell(2).setCellValue("Origen");
-        header.createCell(3).setCellValue("Destino");
-        header.createCell(4).setCellValue("Peso (Kg)");
-        header.createCell(5).setCellValue("Estado");
-        header.createCell(6).setCellValue("Fecha Creación");
-        header.createCell(7).setCellValue("Fecha Entrega");
+        header.createCell(2).setCellValue("Origen (Calle)");
+        header.createCell(3).setCellValue("Zona Origen");
+        header.createCell(4).setCellValue("Destino (Calle)");
+        header.createCell(5).setCellValue("Zona Destino");
+        header.createCell(6).setCellValue("Peso (Kg)");
+        header.createCell(7).setCellValue("Volumen (m³)");
+        header.createCell(8).setCellValue("Prioridad");
+        header.createCell(9).setCellValue("Seguro");
+        header.createCell(10).setCellValue("Frágil");
+        header.createCell(11).setCellValue("Firma Requerida");
+        header.createCell(12).setCellValue("Costo Estimado");
+        header.createCell(13).setCellValue("Estado");
+        header.createCell(14).setCellValue("Repartidor");
+        header.createCell(15).setCellValue("Fecha Creación");
+        header.createCell(16).setCellValue("Fecha Confirmación");
+        header.createCell(17).setCellValue("Fecha Entrega");
+        header.createCell(18).setCellValue("Incidencia");
 
         int rowIndex = 1;
         for (Envio e : envios) {
             Row row = sheet.createRow(rowIndex++);
             row.createCell(0).setCellValue(e.getId() != null ? e.getId() : 0);
             row.createCell(1).setCellValue(e.getUsuario() != null ? safe(e.getUsuario().getNombre()) : "");
-            row.createCell(2).setCellValue(e.getOrigen() != null ? safe(e.getOrigen().toString()) : "");
-            row.createCell(3).setCellValue(e.getDestino() != null ? safe(e.getDestino().toString()) : "");
-            row.createCell(4).setCellValue(e.getPeso());
-            row.createCell(5).setCellValue(e.getEstado() != null ? e.getEstado().name() : "");
-            row.createCell(6).setCellValue(e.getFechaCreacionStr());
-            row.createCell(7).setCellValue(e.getFechaEntregaStr());
+            
+            // Origen
+            String origenCalle = e.getOrigen() != null ? safe(e.getOrigen().getCalle()) : "";
+            String origenZona = e.getOrigen() != null ? safe(e.getOrigen().getCiudad()) : "";
+            row.createCell(2).setCellValue(origenCalle);
+            row.createCell(3).setCellValue(origenZona);
+            
+            // Destino
+            String destinoCalle = e.getDestino() != null ? safe(e.getDestino().getCalle()) : "";
+            String destinoZona = e.getDestino() != null ? safe(e.getDestino().getCiudad()) : "";
+            row.createCell(4).setCellValue(destinoCalle);
+            row.createCell(5).setCellValue(destinoZona);
+            
+            row.createCell(6).setCellValue(e.getPeso());
+            row.createCell(7).setCellValue(e.getVolumen());
+            row.createCell(8).setCellValue(e.isPrioridad() ? "Sí" : "No");
+            row.createCell(9).setCellValue(e.isSeguro() ? "Sí" : "No");
+            row.createCell(10).setCellValue(e.isFragil() ? "Sí" : "No");
+            row.createCell(11).setCellValue(e.isFirmaRequerida() ? "Sí" : "No");
+            row.createCell(12).setCellValue(e.getCostoEstimado());
+            row.createCell(13).setCellValue(e.getEstado() != null ? e.getEstado().name() : "");
+            row.createCell(14).setCellValue(e.getRepartidor() != null ? safe(e.getRepartidor().getNombre()) : "");
+            row.createCell(15).setCellValue(e.getFechaCreacionStr());
+            row.createCell(16).setCellValue(e.getFechaConfirmacionStr());
+            row.createCell(17).setCellValue(e.getFechaEntregaStr());
+            row.createCell(18).setCellValue(safe(e.getIncidenciaDescripcion()));
         }
 
         try (FileOutputStream fos = new FileOutputStream(rutaArchivo)) {
@@ -115,18 +183,31 @@ public class ReportUtil {
         Row header = sheet.createRow(0);
         header.createCell(0).setCellValue("ID");
         header.createCell(1).setCellValue("ID Envío");
-        header.createCell(2).setCellValue("Monto Pagado");
-        header.createCell(3).setCellValue("Completado");
-        header.createCell(4).setCellValue("Fecha Pago");
+        header.createCell(2).setCellValue("Usuario");
+        header.createCell(3).setCellValue("Monto Pagado");
+        header.createCell(4).setCellValue("Método de Pago");
+        header.createCell(5).setCellValue("Completado");
+        header.createCell(6).setCellValue("Fecha Pago");
+        header.createCell(7).setCellValue("Peso (Kg)");
+        header.createCell(8).setCellValue("Volumen (m³)");
+        header.createCell(9).setCellValue("Costo Base");
+        header.createCell(10).setCellValue("Costo Final");
 
         int rowIndex = 1;
         for (Pago p : pagos) {
             Row row = sheet.createRow(rowIndex++);
             row.createCell(0).setCellValue(p.getId() != null ? p.getId() : 0);
             row.createCell(1).setCellValue(p.getEnvio() != null && p.getEnvio().getId() != null ? p.getEnvio().getId() : 0);
-            row.createCell(2).setCellValue(p.getMontoPagado());
-            row.createCell(3).setCellValue(p.isConfirmado() ? "Sí" : "No");
-            row.createCell(4).setCellValue(p.getFecha() != null ? p.getFecha().format(String.valueOf(DATE_FORMAT)) : "");
+            row.createCell(2).setCellValue(p.getEnvio() != null && p.getEnvio().getUsuario() != null 
+                    ? safe(p.getEnvio().getUsuario().getNombre()) : "");
+            row.createCell(3).setCellValue(p.getMontoPagado());
+            row.createCell(4).setCellValue(p.getMetodo() != null ? p.getMetodo().name() : "");
+            row.createCell(5).setCellValue(p.isConfirmado() ? "Sí" : "No");
+            row.createCell(6).setCellValue(p.getFechaPago() != null ? DATE_FORMAT.format(p.getFechaPago()) : "");
+            row.createCell(7).setCellValue(p.getPeso());
+            row.createCell(8).setCellValue(p.getVolumen());
+            row.createCell(9).setCellValue(p.getCostoBase());
+            row.createCell(10).setCellValue(p.getCostoFinal());
         }
 
         try (FileOutputStream fos = new FileOutputStream(rutaArchivo)) {
@@ -195,6 +276,11 @@ public class ReportUtil {
         h.createCell(2).setCellValue("Email");
         h.createCell(3).setCellValue("Teléfono");
         h.createCell(4).setCellValue("Admin");
+        h.createCell(5).setCellValue("Dirección 1 (Calle)");
+        h.createCell(6).setCellValue("Zona 1");
+        h.createCell(7).setCellValue("Dirección 2 (Calle)");
+        h.createCell(8).setCellValue("Zona 2");
+        h.createCell(9).setCellValue("Métodos de Pago");
 
         int ri = 1;
         for (Usuario u : usuarios) {
@@ -204,6 +290,37 @@ public class ReportUtil {
             r.createCell(2).setCellValue(safe(u.getEmail()));
             r.createCell(3).setCellValue(safe(u.getTelefono()));
             r.createCell(4).setCellValue(u.isAdmin() ? "Sí" : "No");
+            
+            // Direcciones
+            String dir1Calle = "";
+            String dir1Zona = "";
+            String dir2Calle = "";
+            String dir2Zona = "";
+            if (u.getDirecciones() != null && !u.getDirecciones().isEmpty()) {
+                if (u.getDirecciones().size() > 0) {
+                    Direccion d1 = u.getDirecciones().get(0);
+                    dir1Calle = safe(d1.getCalle());
+                    dir1Zona = safe(d1.getCiudad());
+                }
+                if (u.getDirecciones().size() > 1) {
+                    Direccion d2 = u.getDirecciones().get(1);
+                    dir2Calle = safe(d2.getCalle());
+                    dir2Zona = safe(d2.getCiudad());
+                }
+            }
+            r.createCell(5).setCellValue(dir1Calle);
+            r.createCell(6).setCellValue(dir1Zona);
+            r.createCell(7).setCellValue(dir2Calle);
+            r.createCell(8).setCellValue(dir2Zona);
+            
+            // Métodos de pago
+            String metodosPago = "";
+            if (u.getMetodosPago() != null && !u.getMetodosPago().isEmpty()) {
+                metodosPago = u.getMetodosPago().stream()
+                        .map(Enum::name)
+                        .collect(java.util.stream.Collectors.joining(", "));
+            }
+            r.createCell(9).setCellValue(metodosPago);
         }
     }
 
@@ -212,19 +329,55 @@ public class ReportUtil {
         Row h = s.createRow(0);
         h.createCell(0).setCellValue("ID");
         h.createCell(1).setCellValue("Usuario");
-        h.createCell(2).setCellValue("Peso");
-        h.createCell(3).setCellValue("Estado");
-        h.createCell(4).setCellValue("Fecha Creación");
-        h.createCell(5).setCellValue("Fecha Entrega");
+        h.createCell(2).setCellValue("Origen (Calle)");
+        h.createCell(3).setCellValue("Zona Origen");
+        h.createCell(4).setCellValue("Destino (Calle)");
+        h.createCell(5).setCellValue("Zona Destino");
+        h.createCell(6).setCellValue("Peso (Kg)");
+        h.createCell(7).setCellValue("Volumen (m³)");
+        h.createCell(8).setCellValue("Prioridad");
+        h.createCell(9).setCellValue("Seguro");
+        h.createCell(10).setCellValue("Frágil");
+        h.createCell(11).setCellValue("Firma Requerida");
+        h.createCell(12).setCellValue("Costo Estimado");
+        h.createCell(13).setCellValue("Estado");
+        h.createCell(14).setCellValue("Repartidor");
+        h.createCell(15).setCellValue("Fecha Creación");
+        h.createCell(16).setCellValue("Fecha Confirmación");
+        h.createCell(17).setCellValue("Fecha Entrega");
+        h.createCell(18).setCellValue("Incidencia");
+        
         int ri = 1;
         for (Envio e : envios) {
             Row r = s.createRow(ri++);
             r.createCell(0).setCellValue(e.getId() != null ? e.getId() : 0);
             r.createCell(1).setCellValue(e.getUsuario() != null ? safe(e.getUsuario().getNombre()) : "");
-            r.createCell(2).setCellValue(e.getPeso());
-            r.createCell(3).setCellValue(e.getEstado() != null ? e.getEstado().name() : "");
-            r.createCell(4).setCellValue(e.getFechaCreacionStr());
-            r.createCell(5).setCellValue(e.getFechaEntregaStr());
+            
+            // Origen
+            String origenCalle = e.getOrigen() != null ? safe(e.getOrigen().getCalle()) : "";
+            String origenZona = e.getOrigen() != null ? safe(e.getOrigen().getCiudad()) : "";
+            r.createCell(2).setCellValue(origenCalle);
+            r.createCell(3).setCellValue(origenZona);
+            
+            // Destino
+            String destinoCalle = e.getDestino() != null ? safe(e.getDestino().getCalle()) : "";
+            String destinoZona = e.getDestino() != null ? safe(e.getDestino().getCiudad()) : "";
+            r.createCell(4).setCellValue(destinoCalle);
+            r.createCell(5).setCellValue(destinoZona);
+            
+            r.createCell(6).setCellValue(e.getPeso());
+            r.createCell(7).setCellValue(e.getVolumen());
+            r.createCell(8).setCellValue(e.isPrioridad() ? "Sí" : "No");
+            r.createCell(9).setCellValue(e.isSeguro() ? "Sí" : "No");
+            r.createCell(10).setCellValue(e.isFragil() ? "Sí" : "No");
+            r.createCell(11).setCellValue(e.isFirmaRequerida() ? "Sí" : "No");
+            r.createCell(12).setCellValue(e.getCostoEstimado());
+            r.createCell(13).setCellValue(e.getEstado() != null ? e.getEstado().name() : "");
+            r.createCell(14).setCellValue(e.getRepartidor() != null ? safe(e.getRepartidor().getNombre()) : "");
+            r.createCell(15).setCellValue(e.getFechaCreacionStr());
+            r.createCell(16).setCellValue(e.getFechaConfirmacionStr());
+            r.createCell(17).setCellValue(e.getFechaEntregaStr());
+            r.createCell(18).setCellValue(safe(e.getIncidenciaDescripcion()));
         }
     }
 
@@ -232,18 +385,32 @@ public class ReportUtil {
         Sheet s = workbook.createSheet("Pagos");
         Row h = s.createRow(0);
         h.createCell(0).setCellValue("ID");
-        h.createCell(1).setCellValue("Envío");
-        h.createCell(2).setCellValue("Monto Pagado");
-        h.createCell(3).setCellValue("Completado");
-        h.createCell(4).setCellValue("Fecha");
+        h.createCell(1).setCellValue("ID Envío");
+        h.createCell(2).setCellValue("Usuario");
+        h.createCell(3).setCellValue("Monto Pagado");
+        h.createCell(4).setCellValue("Método de Pago");
+        h.createCell(5).setCellValue("Completado");
+        h.createCell(6).setCellValue("Fecha Pago");
+        h.createCell(7).setCellValue("Peso (Kg)");
+        h.createCell(8).setCellValue("Volumen (m³)");
+        h.createCell(9).setCellValue("Costo Base");
+        h.createCell(10).setCellValue("Costo Final");
+        
         int ri = 1;
         for (Pago p : pagos) {
             Row r = s.createRow(ri++);
             r.createCell(0).setCellValue(p.getId() != null ? p.getId() : 0);
             r.createCell(1).setCellValue(p.getEnvio() != null && p.getEnvio().getId() != null ? p.getEnvio().getId() : 0);
-            r.createCell(2).setCellValue(p.getMontoPagado());
-            r.createCell(3).setCellValue(p.isConfirmado() ? "Sí" : "No");
-            r.createCell(4).setCellValue(p.getFecha() != null ? p.getFecha().format(String.valueOf(DATE_FORMAT)) : "");
+            r.createCell(2).setCellValue(p.getEnvio() != null && p.getEnvio().getUsuario() != null 
+                    ? safe(p.getEnvio().getUsuario().getNombre()) : "");
+            r.createCell(3).setCellValue(p.getMontoPagado());
+            r.createCell(4).setCellValue(p.getMetodo() != null ? p.getMetodo().name() : "");
+            r.createCell(5).setCellValue(p.isConfirmado() ? "Sí" : "No");
+            r.createCell(6).setCellValue(p.getFechaPago() != null ? DATE_FORMAT.format(p.getFechaPago()) : "");
+            r.createCell(7).setCellValue(p.getPeso());
+            r.createCell(8).setCellValue(p.getVolumen());
+            r.createCell(9).setCellValue(p.getCostoBase());
+            r.createCell(10).setCellValue(p.getCostoFinal());
         }
     }
 
@@ -275,8 +442,10 @@ public class ReportUtil {
         content.beginText();
         content.newLineAtOffset(50, 750);
         content.showText(titulo + " - " + LocalDateTime.now().format(DATE_FORMAT));
-        content.newLineAtOffset(0, -25);
+        content.endText();
         content.setFont(PDType1Font.HELVETICA, 10);
+        content.beginText();
+        content.newLineAtOffset(50, 725);
     }
 
     public static void exportarUsuariosPDF(List<Usuario> usuarios, String rutaArchivo) throws IOException {
@@ -287,12 +456,55 @@ public class ReportUtil {
             PDPageContentStream content = new PDPageContentStream(doc, page);
             iniciarPDFCabecera(content, "Reporte de Usuarios");
 
+            float yPos = 700;
             for (Usuario u : usuarios) {
-                content.showText("ID: " + u.getId() + " | " + safe(u.getNombre()) + " | " + safe(u.getEmail()));
-                content.newLineAtOffset(0, -15);
+                if (yPos < 50) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    iniciarPDFCabecera(content, "Reporte de Usuarios (cont.)");
+                    yPos = 700;
+                }
+                
+                content.setFont(PDType1Font.HELVETICA_BOLD, 11);
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                content.showText("ID: " + u.getId() + " | " + safe(u.getNombre()) + " | " + safe(u.getEmail()) + " | Tel: " + safe(u.getTelefono()));
+                content.endText();
+                yPos -= 15;
+                
+                content.setFont(PDType1Font.HELVETICA, 10);
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                
+                // Direcciones
+                String dirInfo = "Admin: " + (u.isAdmin() ? "Sí" : "No");
+                if (u.getDirecciones() != null && !u.getDirecciones().isEmpty()) {
+                    if (u.getDirecciones().size() > 0) {
+                        Direccion d1 = u.getDirecciones().get(0);
+                        dirInfo += " | Dir1: " + safe(d1.getCalle()) + " (Zona: " + safe(d1.getCiudad()) + ")";
+                    }
+                    if (u.getDirecciones().size() > 1) {
+                        Direccion d2 = u.getDirecciones().get(1);
+                        dirInfo += " | Dir2: " + safe(d2.getCalle()) + " (Zona: " + safe(d2.getCiudad()) + ")";
+                    }
+                }
+                
+                // Métodos de pago
+                if (u.getMetodosPago() != null && !u.getMetodosPago().isEmpty()) {
+                    String metodos = u.getMetodosPago().stream()
+                            .map(Enum::name)
+                            .collect(java.util.stream.Collectors.joining(", "));
+                    dirInfo += " | Métodos: " + metodos;
+                }
+                
+                content.showText(dirInfo);
+                content.endText();
+                yPos -= 20;
             }
 
-            content.endText();
             content.close();
             doc.save(rutaArchivo);
         }
@@ -306,14 +518,71 @@ public class ReportUtil {
             PDPageContentStream content = new PDPageContentStream(doc, page);
             iniciarPDFCabecera(content, "Reporte de Envíos");
 
+            float yPos = 700;
             for (Envio e : envios) {
-                content.showText("ID: " + e.getId() + " | Usuario: " +
+                if (yPos < 50) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    iniciarPDFCabecera(content, "Reporte de Envíos (cont.)");
+                    yPos = 700;
+                }
+                
+                content.setFont(PDType1Font.HELVETICA_BOLD, 11);
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                content.showText("ID: " + e.getId() + " | Usuario: " + 
                         (e.getUsuario() != null ? safe(e.getUsuario().getNombre()) : "") +
                         " | Estado: " + (e.getEstado() != null ? e.getEstado().name() : ""));
-                content.newLineAtOffset(0, -15);
+                content.endText();
+                yPos -= 15;
+                
+                content.setFont(PDType1Font.HELVETICA, 10);
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                
+                // Origen y destino
+                String origenCalle = e.getOrigen() != null ? safe(e.getOrigen().getCalle()) : "";
+                String origenZona = e.getOrigen() != null ? safe(e.getOrigen().getCiudad()) : "";
+                String destinoCalle = e.getDestino() != null ? safe(e.getDestino().getCalle()) : "";
+                String destinoZona = e.getDestino() != null ? safe(e.getDestino().getCiudad()) : "";
+                
+                String detalles = "Origen: " + origenCalle + " (Zona: " + origenZona + ") | " +
+                                 "Destino: " + destinoCalle + " (Zona: " + destinoZona + ")";
+                content.showText(detalles);
+                content.endText();
+                yPos -= 15;
+                
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                String extras = "Peso: " + e.getPeso() + "kg | Volumen: " + e.getVolumen() + "m³ | " +
+                               "Prioridad: " + (e.isPrioridad() ? "Sí" : "No") + " | " +
+                               "Seguro: " + (e.isSeguro() ? "Sí" : "No") + " | " +
+                               "Frágil: " + (e.isFragil() ? "Sí" : "No") + " | " +
+                               "Firma: " + (e.isFirmaRequerida() ? "Sí" : "No") + " | " +
+                               "Costo: $" + e.getCostoEstimado();
+                content.showText(extras);
+                content.endText();
+                yPos -= 15;
+                
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                String fechas = "Creación: " + e.getFechaCreacionStr() + " | " +
+                               "Confirmación: " + e.getFechaConfirmacionStr() + " | " +
+                               "Entrega: " + e.getFechaEntregaStr();
+                if (e.getRepartidor() != null) {
+                    fechas += " | Repartidor: " + safe(e.getRepartidor().getNombre());
+                }
+                if (e.getIncidenciaDescripcion() != null && !e.getIncidenciaDescripcion().isEmpty()) {
+                    fechas += " | Incidencia: " + safe(e.getIncidenciaDescripcion());
+                }
+                content.showText(fechas);
+                content.endText();
+                yPos -= 25;
             }
 
-            content.endText();
             content.close();
             doc.save(rutaArchivo);
         }
@@ -327,13 +596,48 @@ public class ReportUtil {
             PDPageContentStream content = new PDPageContentStream(doc, page);
             iniciarPDFCabecera(content, "Reporte de Pagos");
 
+            float yPos = 700;
             for (Pago p : pagos) {
-                content.showText("ID: " + p.getId() + " | Monto: " + p.getMontoPagado() +
-                        " | Fecha: " + (p.getFecha() != null ? p.getFecha().format(String.valueOf(DATE_FORMAT)) : ""));
-                content.newLineAtOffset(0, -15);
+                if (yPos < 50) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    iniciarPDFCabecera(content, "Reporte de Pagos (cont.)");
+                    yPos = 700;
+                }
+                
+                content.setFont(PDType1Font.HELVETICA_BOLD, 11);
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                String usuario = p.getEnvio() != null && p.getEnvio().getUsuario() != null 
+                        ? safe(p.getEnvio().getUsuario().getNombre()) : "N/A";
+                content.showText("ID: " + p.getId() + " | Envío: " + 
+                        (p.getEnvio() != null && p.getEnvio().getId() != null ? p.getEnvio().getId() : "N/A") +
+                        " | Usuario: " + usuario + " | Monto: $" + p.getMontoPagado());
+                content.endText();
+                yPos -= 15;
+                
+                content.setFont(PDType1Font.HELVETICA, 10);
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                String detalles = "Método: " + (p.getMetodo() != null ? p.getMetodo().name() : "N/A") +
+                                " | Completado: " + (p.isConfirmado() ? "Sí" : "No") +
+                                " | Fecha: " + (p.getFechaPago() != null ? DATE_FORMAT.format(p.getFechaPago()) : "N/A");
+                content.showText(detalles);
+                content.endText();
+                yPos -= 15;
+                
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                String costos = "Peso: " + p.getPeso() + "kg | Volumen: " + p.getVolumen() + "m³ | " +
+                               "Costo Base: $" + p.getCostoBase() + " | Costo Final: $" + p.getCostoFinal();
+                content.showText(costos);
+                content.endText();
+                yPos -= 25;
             }
 
-            content.endText();
             content.close();
             doc.save(rutaArchivo);
         }
@@ -347,14 +651,29 @@ public class ReportUtil {
             PDPageContentStream content = new PDPageContentStream(doc, page);
             iniciarPDFCabecera(content, "Reporte de Repartidores");
 
+            float yPos = 700;
             for (Repartidor r : repartidores) {
+                if (yPos < 50) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    iniciarPDFCabecera(content, "Reporte de Repartidores (cont.)");
+                    yPos = 700;
+                }
+                
+                content.setFont(PDType1Font.HELVETICA_BOLD, 11);
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
                 content.showText("ID: " + r.getId() + " | " + safe(r.getNombre()) +
+                        " | Tel: " + safe(r.getTelefono()) +
                         " | Zona: " + safe(r.getZona()) +
                         " | Disponible: " + (r.isDisponible() ? "Sí" : "No"));
-                content.newLineAtOffset(0, -15);
+                content.endText();
+                yPos -= 20;
             }
 
-            content.endText();
             content.close();
             doc.save(rutaArchivo);
         }
@@ -390,10 +709,18 @@ public class ReportUtil {
         // ----- Usuarios -----
         content.setFont(PDType1Font.HELVETICA_BOLD, 12);
         content.showText("Usuarios:");
-        content.setFont(PDType1Font.HELVETICA, 11);
+        content.setFont(PDType1Font.HELVETICA, 10);
         content.newLineAtOffset(0, -15);
         for (Usuario u : usuarios) {
-            content.showText("Usuario: " + safe(u.getNombre()));
+            String userInfo = "ID: " + u.getId() + " | " + safe(u.getNombre()) + " | " + safe(u.getEmail()) + 
+                            " | Tel: " + safe(u.getTelefono()) + " | Admin: " + (u.isAdmin() ? "Sí" : "No");
+            if (u.getDirecciones() != null && !u.getDirecciones().isEmpty()) {
+                if (u.getDirecciones().size() > 0) {
+                    Direccion d1 = u.getDirecciones().get(0);
+                    userInfo += " | Dir1: " + safe(d1.getCalle()) + " (Zona: " + safe(d1.getCiudad()) + ")";
+                }
+            }
+            content.showText(userInfo);
             content.newLineAtOffset(0, -15);
         }
 
@@ -401,10 +728,21 @@ public class ReportUtil {
         content.newLineAtOffset(0, -10);
         content.setFont(PDType1Font.HELVETICA_BOLD, 12);
         content.showText("Envíos:");
-        content.setFont(PDType1Font.HELVETICA, 11);
+        content.setFont(PDType1Font.HELVETICA, 10);
         content.newLineAtOffset(0, -15);
         for (Envio e : envios) {
-            content.showText("Envio: #" + e.getId() + " - " + e.getEstado());
+            String origenCalle = e.getOrigen() != null ? safe(e.getOrigen().getCalle()) : "";
+            String origenZona = e.getOrigen() != null ? safe(e.getOrigen().getCiudad()) : "";
+            String destinoCalle = e.getDestino() != null ? safe(e.getDestino().getCalle()) : "";
+            String destinoZona = e.getDestino() != null ? safe(e.getDestino().getCiudad()) : "";
+            
+            String envioInfo = "ID: " + e.getId() + " | Usuario: " + 
+                    (e.getUsuario() != null ? safe(e.getUsuario().getNombre()) : "N/A") +
+                    " | Origen: " + origenCalle + " (Zona: " + origenZona + ")" +
+                    " | Destino: " + destinoCalle + " (Zona: " + destinoZona + ")" +
+                    " | Estado: " + (e.getEstado() != null ? e.getEstado().name() : "N/A") +
+                    " | Peso: " + e.getPeso() + "kg | Costo: $" + e.getCostoEstimado();
+            content.showText(envioInfo);
             content.newLineAtOffset(0, -15);
         }
 
@@ -418,7 +756,7 @@ public class ReportUtil {
             String pagoStr = "Pago #" + (p.getId() != null ? p.getId() : "") +
                     " | Envío: " + (p.getEnvio() != null && p.getEnvio().getId() != null ? p.getEnvio().getId() : "N/A") +
                     " | Monto: $" + p.getMontoPagado() +
-                    " | Fecha: " + (p.getFecha() != null ? p.getFecha().toString() : "N/A") +
+                    " | Fecha: " + (p.getFechaPago() != null ? DATE_FORMAT.format(p.getFechaPago()) : "N/A") +
                     " | Estado: " + (p.isConfirmado() ? "Completado" : "Pendiente");
             content.showText(pagoStr);
             content.newLineAtOffset(0, -15);
@@ -440,6 +778,264 @@ public class ReportUtil {
         content.close();
         doc.save(rutaArchivo);
         doc.close();
+    }
+
+    // ------------------------------------------------------------
+    // -------------------- EXPORTAR MÉTRICAS --------------------
+    // ------------------------------------------------------------
+
+    public static void exportarMetricasExcel(
+            Map<String, Double> tiemposPorZona,
+            Map<String, Long> serviciosAdicionales,
+            Map<String, Double> ingresosPorServicio,
+            Map<String, Long> incidenciasPorZona,
+            double tiempoPromedio,
+            double ingresosTotales,
+            long totalEnvios,
+            long totalIncidencias,
+            String rutaArchivo) throws IOException {
+        
+        ensureParentDir(rutaArchivo);
+        Workbook workbook = new XSSFWorkbook();
+        
+        // Hoja 1: Métricas Generales
+        Sheet sheetGeneral = workbook.createSheet("Métricas Generales");
+        Row h1 = sheetGeneral.createRow(0);
+        h1.createCell(0).setCellValue("Métrica");
+        h1.createCell(1).setCellValue("Valor");
+        
+        int rowIndex = 1;
+        sheetGeneral.createRow(rowIndex++).createCell(0).setCellValue("Tiempo Promedio de Entrega (días)");
+        sheetGeneral.getRow(rowIndex - 1).createCell(1).setCellValue(tiempoPromedio);
+        sheetGeneral.createRow(rowIndex++).createCell(0).setCellValue("Ingresos Totales (COP)");
+        sheetGeneral.getRow(rowIndex - 1).createCell(1).setCellValue(ingresosTotales);
+        sheetGeneral.createRow(rowIndex++).createCell(0).setCellValue("Total de Envíos");
+        sheetGeneral.getRow(rowIndex - 1).createCell(1).setCellValue(totalEnvios);
+        sheetGeneral.createRow(rowIndex++).createCell(0).setCellValue("Total de Incidencias");
+        sheetGeneral.getRow(rowIndex - 1).createCell(1).setCellValue(totalIncidencias);
+        
+        // Hoja 2: Tiempos por Zona
+        Sheet sheetTiempos = workbook.createSheet("Tiempos por Zona");
+        Row h2 = sheetTiempos.createRow(0);
+        h2.createCell(0).setCellValue("Zona");
+        h2.createCell(1).setCellValue("Tiempo Promedio (días)");
+        rowIndex = 1;
+        for (Map.Entry<String, Double> entry : tiemposPorZona.entrySet()) {
+            Row row = sheetTiempos.createRow(rowIndex++);
+            row.createCell(0).setCellValue(entry.getKey());
+            row.createCell(1).setCellValue(entry.getValue());
+        }
+        
+        // Hoja 3: Servicios Adicionales
+        Sheet sheetServicios = workbook.createSheet("Servicios Adicionales");
+        Row h3 = sheetServicios.createRow(0);
+        h3.createCell(0).setCellValue("Servicio");
+        h3.createCell(1).setCellValue("Cantidad de Usos");
+        rowIndex = 1;
+        for (Map.Entry<String, Long> entry : serviciosAdicionales.entrySet()) {
+            Row row = sheetServicios.createRow(rowIndex++);
+            row.createCell(0).setCellValue(entry.getKey());
+            row.createCell(1).setCellValue(entry.getValue());
+        }
+        
+        // Hoja 4: Ingresos por Servicio
+        Sheet sheetIngresos = workbook.createSheet("Ingresos por Servicio");
+        Row h4 = sheetIngresos.createRow(0);
+        h4.createCell(0).setCellValue("Servicio");
+        h4.createCell(1).setCellValue("Ingresos (COP)");
+        rowIndex = 1;
+        for (Map.Entry<String, Double> entry : ingresosPorServicio.entrySet()) {
+            Row row = sheetIngresos.createRow(rowIndex++);
+            row.createCell(0).setCellValue(entry.getKey());
+            row.createCell(1).setCellValue(entry.getValue());
+        }
+        
+        // Hoja 5: Incidencias por Zona
+        Sheet sheetIncidencias = workbook.createSheet("Incidencias por Zona");
+        Row h5 = sheetIncidencias.createRow(0);
+        h5.createCell(0).setCellValue("Zona");
+        h5.createCell(1).setCellValue("Cantidad de Incidencias");
+        rowIndex = 1;
+        for (Map.Entry<String, Long> entry : incidenciasPorZona.entrySet()) {
+            Row row = sheetIncidencias.createRow(rowIndex++);
+            row.createCell(0).setCellValue(entry.getKey());
+            row.createCell(1).setCellValue(entry.getValue());
+        }
+        
+        try (FileOutputStream fos = new FileOutputStream(rutaArchivo)) {
+            workbook.write(fos);
+        }
+        workbook.close();
+    }
+
+    public static void exportarMetricasPDF(
+            Map<String, Double> tiemposPorZona,
+            Map<String, Long> serviciosAdicionales,
+            Map<String, Double> ingresosPorServicio,
+            Map<String, Long> incidenciasPorZona,
+            double tiempoPromedio,
+            double ingresosTotales,
+            long totalEnvios,
+            long totalIncidencias,
+            String rutaArchivo) throws IOException {
+        
+        ensureParentDir(rutaArchivo);
+        try (PDDocument doc = new PDDocument()) {
+            PDPage page = new PDPage();
+            doc.addPage(page);
+            PDPageContentStream content = new PDPageContentStream(doc, page);
+            
+            content.setFont(PDType1Font.HELVETICA_BOLD, 16);
+            content.beginText();
+            content.newLineAtOffset(50, 750);
+            content.showText("Reporte de Métricas Operativas - " + LocalDateTime.now().format(DATE_FORMAT));
+            content.endText();
+            
+            float yPos = 700;
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(50, yPos);
+            content.showText("Métricas Generales:");
+            content.endText();
+            yPos -= 20;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            content.beginText();
+            content.newLineAtOffset(50, yPos);
+            content.showText("Tiempo Promedio de Entrega: " + String.format("%.2f", tiempoPromedio) + " días");
+            content.endText();
+            yPos -= 15;
+            
+            content.beginText();
+            content.newLineAtOffset(50, yPos);
+            content.showText("Ingresos Totales: $" + String.format("%,.2f", ingresosTotales) + " COP");
+            content.endText();
+            yPos -= 15;
+            
+            content.beginText();
+            content.newLineAtOffset(50, yPos);
+            content.showText("Total de Envíos: " + totalEnvios);
+            content.endText();
+            yPos -= 15;
+            
+            content.beginText();
+            content.newLineAtOffset(50, yPos);
+            content.showText("Total de Incidencias: " + totalIncidencias);
+            content.endText();
+            yPos -= 30;
+            
+            // Tiempos por Zona
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(50, yPos);
+            content.showText("Tiempos Promedio por Zona:");
+            content.endText();
+            yPos -= 20;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            for (Map.Entry<String, Double> entry : tiemposPorZona.entrySet()) {
+                if (yPos < 50) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    yPos = 750;
+                }
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                content.showText(entry.getKey() + ": " + String.format("%.2f", entry.getValue()) + " días");
+                content.endText();
+                yPos -= 15;
+            }
+            yPos -= 10;
+            
+            // Servicios Adicionales
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(50, yPos);
+            content.showText("Servicios Adicionales:");
+            content.endText();
+            yPos -= 20;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            for (Map.Entry<String, Long> entry : serviciosAdicionales.entrySet()) {
+                if (yPos < 50) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    yPos = 750;
+                }
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                content.showText(entry.getKey() + ": " + entry.getValue() + " usos");
+                content.endText();
+                yPos -= 15;
+            }
+            yPos -= 10;
+            
+            // Ingresos por Servicio
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(50, yPos);
+            content.showText("Ingresos por Servicio:");
+            content.endText();
+            yPos -= 20;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            for (Map.Entry<String, Double> entry : ingresosPorServicio.entrySet()) {
+                if (yPos < 50) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    yPos = 750;
+                }
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                content.showText(entry.getKey() + ": $" + String.format("%,.2f", entry.getValue()) + " COP");
+                content.endText();
+                yPos -= 15;
+            }
+            yPos -= 10;
+            
+            // Incidencias por Zona
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(50, yPos);
+            content.showText("Incidencias por Zona:");
+            content.endText();
+            yPos -= 20;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            for (Map.Entry<String, Long> entry : incidenciasPorZona.entrySet()) {
+                if (yPos < 50) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    yPos = 750;
+                }
+                content.beginText();
+                content.newLineAtOffset(50, yPos);
+                content.showText(entry.getKey() + ": " + entry.getValue() + " incidencias");
+                content.endText();
+                yPos -= 15;
+            }
+            
+            // Cerrar el último beginText si quedó abierto
+            try {
+                content.endText();
+            } catch (Exception e) {
+                // Ya estaba cerrado, no hacer nada
+            }
+            content.close();
+            doc.save(rutaArchivo);
+        }
     }
 
 }

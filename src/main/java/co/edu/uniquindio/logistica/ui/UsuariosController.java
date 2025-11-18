@@ -28,6 +28,7 @@ public class UsuariosController {
     @FXML private TableColumn<UsuarioDTO, String> passwordCol;
     @FXML private TableColumn<UsuarioDTO, String> rolCol;
     @FXML private TableColumn<UsuarioDTO, String> direccionesCol;
+    @FXML private Button verPanelUsuarioBtn;
 
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
     private final ObservableList<UsuarioDTO> usuariosList = FXCollections.observableArrayList();
@@ -48,6 +49,13 @@ public class UsuariosController {
                     .map(d -> d.getAlias() + " (" + d.getCoordenadas() + ")")
                     .collect(Collectors.joining(", "));
             return new javafx.beans.property.SimpleStringProperty(direcciones.isEmpty() ? "Sin direcciones" : direcciones);
+        });
+
+        // Habilitar/deshabilitar botón según selección
+        tablaUsuarios.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (verPanelUsuarioBtn != null) {
+                verPanelUsuarioBtn.setDisable(newVal == null);
+            }
         });
 
         cargarUsuarios();
@@ -148,6 +156,32 @@ public class UsuariosController {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void handleVerPanelUsuario(ActionEvent event) {
+        UsuarioDTO seleccionado = tablaUsuarios.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarMensaje("⚠️ Debes seleccionar un usuario para ver su panel", "orange");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/user_admin.fxml"));
+            Parent root = loader.load();
+
+            UserAdminController controller = loader.getController();
+            controller.setUsuario(seleccionado);
+
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.setScene(new Scene(root));
+            currentStage.setTitle("Panel de Usuario - " + seleccionado.getNombre());
+            currentStage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al abrir el panel del usuario", "red");
+        }
     }
 
     private void mostrarMensaje(String texto, String color) {

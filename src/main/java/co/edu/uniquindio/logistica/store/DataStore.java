@@ -102,6 +102,7 @@ public class DataStore {
         Usuario u2 = new Usuario(nextId(), "Ana López", "ana@uniquindio.edu", "3109876543", "admin123", true);
         List<Direccion> direccionesU2 = new ArrayList<>();
         direccionesU2.add(new Direccion(nextId(), "Oficina Principal", "Carrera 15 # 8-90", "Centro", "Armenia"));
+        direccionesU2.add(new Direccion(nextId(), "Casa", "Calle 20 # 5-10", "Centro", "Armenia"));
         u2.setDirecciones(direccionesU2);
         u2.agregarMetodoPago(MetodoPago.TRANSFERENCIA);
         u2.agregarMetodoPago(MetodoPago.EFECTIVO);
@@ -152,6 +153,7 @@ public class DataStore {
         Usuario u7 = new Usuario(nextId(), "Sofía Torres", "sofia@uniquindio.edu", "3145556677", "sofia456", false);
         List<Direccion> direccionesU7 = new ArrayList<>();
         direccionesU7.add(new Direccion(nextId(), "Hogar", "Cra 18 # 25-50", "Sur", "Armenia"));
+        direccionesU7.add(new Direccion(nextId(), "Oficina", "Calle 30 # 10-20", "Sur", "Armenia"));
         u7.setDirecciones(direccionesU7);
         u7.agregarMetodoPago(MetodoPago.EFECTIVO);
         usuarios.add(u7);
@@ -412,6 +414,240 @@ public class DataStore {
                 .build();
         addEnvio(e10);
 
+        // ==================== ENVÍOS ADICIONALES PARA COMPLETAR 3 POR USUARIO ====================
+        
+        // Envío ID:111 - Tercer envío de Carlos (u1)
+        Envio e11 = new EnvioBuilder()
+                .id(111L)
+                .usuario(u1)
+                .origen(direccionesU1.get(0))
+                .destino(direccionesU1.get(1))
+                .peso(2.0)
+                .volumen(0.12)
+                .prioridad(false)
+                .seguro(false)
+                .fragil(false)
+                .firmaRequerida(false)
+                .estado(Envio.EstadoEnvio.SOLICITADO)
+                .costoEstimado(t1.calcularCosto(2.0))
+                .fechaCreacion(LocalDateTime.now().minusHours(2))
+                .incidenciaDescripcion("Envío estándar en proceso.")
+                .build();
+        addEnvio(e11);
+
+        // Envío ID:112 - Primer envío de Ana (u2)
+        Envio e12 = new EnvioBuilder()
+                .id(112L)
+                .usuario(u2)
+                .origen(direccionesU2.get(0))
+                .destino(direccionesU2.get(1))
+                .peso(1.8)
+                .volumen(0.10)
+                .prioridad(true)
+                .seguro(true)
+                .fragil(false)
+                .firmaRequerida(true)
+                .estado(Envio.EstadoEnvio.CONFIRMADO)
+                .costoEstimado(t2.calcularCosto(1.8) + 2000)
+                .fechaCreacion(LocalDateTime.now().minusDays(1))
+                .fechaConfirmacion(LocalDateTime.now().minusHours(12))
+                .fechaEntregaEstimada(LocalDateTime.now().plusDays(2))
+                .incidenciaDescripcion("Envío administrativo confirmado.")
+                .build();
+        addEnvio(e12);
+
+        // Envío ID:113 - Segundo envío de Ana (u2)
+        Envio e13 = new EnvioBuilder()
+                .id(113L)
+                .usuario(u2)
+                .origen(direccionesU2.get(1))
+                .destino(direccionesU1.get(0))
+                .peso(0.7)
+                .volumen(0.04)
+                .prioridad(false)
+                .seguro(false)
+                .fragil(false)
+                .firmaRequerida(false)
+                .estado(Envio.EstadoEnvio.ASIGNADO)
+                .costoEstimado(t5.calcularCosto(0.7))
+                .repartidor(r2)
+                .fechaCreacion(LocalDateTime.now().minusDays(2))
+                .fechaConfirmacion(LocalDateTime.now().minusDays(1))
+                .fechaEntregaEstimada(LocalDateTime.now().plusDays(1))
+                .incidenciaDescripcion("Asignado a repartidor.")
+                .build();
+        addEnvio(e13);
+
+        // Envío ID:114 - Tercer envío de Ana (u2)
+        Envio e14 = new EnvioBuilder()
+                .id(114L)
+                .usuario(u2)
+                .origen(direccionesU2.get(0))
+                .destino(direccionesU3.get(0))
+                .peso(3.2)
+                .volumen(0.20)
+                .prioridad(false)
+                .seguro(true)
+                .fragil(true)
+                .firmaRequerida(true)
+                .estado(Envio.EstadoEnvio.EN_RUTA)
+                .costoEstimado(t3.calcularCosto(3.2) + 3000)
+                .repartidor(r3)
+                .fechaCreacion(LocalDateTime.now().minusDays(3))
+                .fechaConfirmacion(LocalDateTime.now().minusDays(2))
+                .fechaEntregaEstimada(LocalDateTime.now().plusHours(8))
+                .incidenciaDescripcion("En ruta - Paquete frágil.")
+                .build();
+        addEnvio(e14);
+
+        // Envío ID:115 - Tercer envío de María (u3)
+        Envio e15 = new EnvioBuilder()
+                .id(115L)
+                .usuario(u3)
+                .origen(direccionesU3.get(1))
+                .destino(direccionesU3.get(0))
+                .peso(1.0)
+                .volumen(0.06)
+                .prioridad(false)
+                .seguro(false)
+                .fragil(false)
+                .firmaRequerida(false)
+                .estado(Envio.EstadoEnvio.SOLICITADO)
+                .costoEstimado(t5.calcularCosto(1.0))
+                .fechaCreacion(LocalDateTime.now().minusHours(5))
+                .incidenciaDescripcion("Envío simple solicitado.")
+                .build();
+        addEnvio(e15);
+
+        // Envío ID:116 - Segundo envío de Pedro (u4)
+        Envio e16 = new EnvioBuilder()
+                .id(116L)
+                .usuario(u4)
+                .origen(direccionesU4.get(1))
+                .destino(direccionesU4.get(0))
+                .peso(2.5)
+                .volumen(0.15)
+                .prioridad(true)
+                .seguro(false)
+                .fragil(false)
+                .firmaRequerida(false)
+                .estado(Envio.EstadoEnvio.CONFIRMADO)
+                .costoEstimado(t2.calcularCosto(2.5) + 2500)
+                .fechaCreacion(LocalDateTime.now().minusHours(10))
+                .fechaConfirmacion(LocalDateTime.now().minusHours(8))
+                .fechaEntregaEstimada(LocalDateTime.now().plusDays(1))
+                .incidenciaDescripcion("Envío prioritario confirmado.")
+                .build();
+        addEnvio(e16);
+
+        // Envío ID:117 - Tercer envío de Pedro (u4)
+        Envio e17 = new EnvioBuilder()
+                .id(117L)
+                .usuario(u4)
+                .origen(direccionesU4.get(0))
+                .destino(direccionesU5.get(1))
+                .peso(1.5)
+                .volumen(0.09)
+                .prioridad(false)
+                .seguro(true)
+                .fragil(false)
+                .firmaRequerida(true)
+                .estado(Envio.EstadoEnvio.ENTREGADO)
+                .costoEstimado(t1.calcularCosto(1.5) + 1800)
+                .repartidor(r1)
+                .fechaCreacion(LocalDateTime.now().minusDays(4))
+                .fechaConfirmacion(LocalDateTime.now().minusDays(3))
+                .fechaEntregaEstimada(LocalDateTime.now().minusDays(1))
+                .fechaEntrega(LocalDateTime.now().minusHours(12))
+                .incidenciaDescripcion("Entregado con éxito.")
+                .build();
+        addEnvio(e17);
+
+        // Envío ID:118 - Tercer envío de Lucía (u5)
+        Envio e18 = new EnvioBuilder()
+                .id(118L)
+                .usuario(u5)
+                .origen(direccionesU5.get(0))
+                .destino(direccionesU5.get(1))
+                .peso(0.6)
+                .volumen(0.03)
+                .prioridad(false)
+                .seguro(false)
+                .fragil(false)
+                .firmaRequerida(false)
+                .estado(Envio.EstadoEnvio.SOLICITADO)
+                .costoEstimado(t5.calcularCosto(0.6))
+                .fechaCreacion(LocalDateTime.now().minusHours(1))
+                .incidenciaDescripcion("Envío ligero solicitado.")
+                .build();
+        addEnvio(e18);
+
+        // Envío ID:119 - Tercer envío de Pepito (u6)
+        Envio e19 = new EnvioBuilder()
+                .id(119L)
+                .usuario(u6)
+                .origen(direccionesU6.get(0))
+                .destino(direccionesU6.get(1))
+                .peso(1.4)
+                .volumen(0.08)
+                .prioridad(false)
+                .seguro(true)
+                .fragil(false)
+                .firmaRequerida(false)
+                .estado(Envio.EstadoEnvio.CONFIRMADO)
+                .costoEstimado(t1.calcularCosto(1.4) + 1200)
+                .fechaCreacion(LocalDateTime.now().minusHours(6))
+                .fechaConfirmacion(LocalDateTime.now().minusHours(4))
+                .fechaEntregaEstimada(LocalDateTime.now().plusDays(2))
+                .incidenciaDescripcion("Envío confirmado con seguro.")
+                .build();
+        addEnvio(e19);
+
+        // Envío ID:120 - Segundo envío de Sofía (u7)
+        Envio e20 = new EnvioBuilder()
+                .id(120L)
+                .usuario(u7)
+                .origen(direccionesU7.get(1))
+                .destino(direccionesU7.get(0))
+                .peso(2.2)
+                .volumen(0.13)
+                .prioridad(true)
+                .seguro(false)
+                .fragil(true)
+                .firmaRequerida(true)
+                .estado(Envio.EstadoEnvio.ASIGNADO)
+                .costoEstimado(t2.calcularCosto(2.2) + 2800)
+                .repartidor(r4)
+                .fechaCreacion(LocalDateTime.now().minusDays(1))
+                .fechaConfirmacion(LocalDateTime.now().minusHours(18))
+                .fechaEntregaEstimada(LocalDateTime.now().plusDays(1))
+                .incidenciaDescripcion("Asignado - Paquete frágil prioritario.")
+                .build();
+        addEnvio(e20);
+
+        // Envío ID:121 - Tercer envío de Sofía (u7)
+        Envio e21 = new EnvioBuilder()
+                .id(121L)
+                .usuario(u7)
+                .origen(direccionesU7.get(0))
+                .destino(direccionesU2.get(0))
+                .peso(0.9)
+                .volumen(0.05)
+                .prioridad(false)
+                .seguro(false)
+                .fragil(false)
+                .firmaRequerida(false)
+                .estado(Envio.EstadoEnvio.ENTREGADO)
+                .costoEstimado(t5.calcularCosto(0.9))
+                .repartidor(r5)
+                .fechaCreacion(LocalDateTime.now().minusDays(5))
+                .fechaConfirmacion(LocalDateTime.now().minusDays(4))
+                .fechaEntregaEstimada(LocalDateTime.now().minusDays(2))
+                .fechaEntrega(LocalDateTime.now().minusDays(1))
+                .incidenciaDescripcion("Entregado correctamente.")
+                .build();
+        addEnvio(e21);
+
         System.out.println("✅ Envíos cargados: " + envios.size());
         System.out.println("   Estados: " + 
                          envios.stream().filter(e -> e.getEstado() == Envio.EstadoEnvio.SOLICITADO).count() + " SOLICITADOS, " +
@@ -471,6 +707,62 @@ public class DataStore {
         p10.setFechaPago(e10.getFechaCreacion().plusMinutes(40));
         p10.setConfirmado(true);
         addPago(p10);
+
+        // Pagos de los envíos adicionales
+        Pago p11 = new Pago(nextId(), e11, e11.getCostoEstimado(), MetodoPago.PSE);
+        p11.setFechaPago(e11.getFechaCreacion().plusMinutes(15));
+        p11.setConfirmado(true);
+        addPago(p11);
+
+        Pago p12 = new Pago(nextId(), e12, e12.getCostoEstimado(), MetodoPago.TRANSFERENCIA);
+        p12.setFechaPago(e12.getFechaCreacion().plusHours(1));
+        p12.setConfirmado(true);
+        addPago(p12);
+
+        Pago p13 = new Pago(nextId(), e13, e13.getCostoEstimado(), MetodoPago.EFECTIVO);
+        p13.setFechaPago(e13.getFechaCreacion().plusMinutes(30));
+        p13.setConfirmado(true);
+        addPago(p13);
+
+        Pago p14 = new Pago(nextId(), e14, e14.getCostoEstimado(), MetodoPago.TRANSFERENCIA);
+        p14.setFechaPago(e14.getFechaCreacion().plusHours(2));
+        p14.setConfirmado(true);
+        addPago(p14);
+
+        Pago p15 = new Pago(nextId(), e15, e15.getCostoEstimado(), MetodoPago.PSE);
+        p15.setFechaPago(e15.getFechaCreacion().plusMinutes(20));
+        p15.setConfirmado(true);
+        addPago(p15);
+
+        Pago p16 = new Pago(nextId(), e16, e16.getCostoEstimado(), MetodoPago.TARJETA_CREDITO);
+        p16.setFechaPago(e16.getFechaCreacion().plusHours(1));
+        p16.setConfirmado(true);
+        addPago(p16);
+
+        Pago p17 = new Pago(nextId(), e17, e17.getCostoEstimado(), MetodoPago.TARJETA_CREDITO);
+        p17.setFechaPago(e17.getFechaCreacion().plusHours(1));
+        p17.setConfirmado(true);
+        addPago(p17);
+
+        Pago p18 = new Pago(nextId(), e18, e18.getCostoEstimado(), MetodoPago.EFECTIVO);
+        p18.setFechaPago(e18.getFechaCreacion().plusMinutes(10));
+        p18.setConfirmado(true);
+        addPago(p18);
+
+        Pago p19 = new Pago(nextId(), e19, e19.getCostoEstimado(), MetodoPago.PSE);
+        p19.setFechaPago(e19.getFechaCreacion().plusMinutes(25));
+        p19.setConfirmado(true);
+        addPago(p19);
+
+        Pago p20 = new Pago(nextId(), e20, e20.getCostoEstimado(), MetodoPago.TRANSFERENCIA);
+        p20.setFechaPago(e20.getFechaCreacion().plusHours(1));
+        p20.setConfirmado(true);
+        addPago(p20);
+
+        Pago p21 = new Pago(nextId(), e21, e21.getCostoEstimado(), MetodoPago.EFECTIVO);
+        p21.setFechaPago(e21.getFechaCreacion().plusMinutes(35));
+        p21.setConfirmado(true);
+        addPago(p21);
 
         System.out.println("✅ Pagos cargados: " + pagos.size());
         System.out.println("   Confirmados: " + pagos.stream().filter(Pago::isConfirmado).count());

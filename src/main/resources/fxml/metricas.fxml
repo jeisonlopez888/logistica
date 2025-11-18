@@ -23,6 +23,11 @@
                                -fx-text-fill: white; -fx-font-weight: bold;
                                -fx-background-radius: 8; -fx-padding: 10 20;
                                -fx-cursor: hand;"/>
+                <Button text="🖨️ Imprimir Métricas" onAction="#handleImprimirMetricas"
+                        style="-fx-background-color: linear-gradient(to right, #42A5F5, #1E88E5);
+                               -fx-text-fill: white; -fx-font-weight: bold;
+                               -fx-background-radius: 8; -fx-padding: 10 20;
+                               -fx-cursor: hand;"/>
                 <Button text="↩️ Volver" onAction="#handleVolverAdmin"
                         style="-fx-background-color: linear-gradient(to right, #757575, #616161);
                                -fx-text-fill: white; -fx-font-weight: bold;
@@ -45,10 +50,13 @@
     <!-- CONTENIDO CENTRAL -->
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background: transparent; -fx-background-color: transparent;">
-            <VBox spacing="20" style="-fx-padding: 20;">
+            <VBox spacing="15" style="-fx-padding: 15;">
 
                 <!-- Métricas Generales -->
-                <GridPane hgap="25" vgap="25" alignment="CENTER">
+                <Label text="📊 Métricas Generales" 
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 0 0 10 0;"/>
+                
+                <GridPane hgap="15" vgap="15" alignment="CENTER">
                     <columnConstraints>
                         <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
                         <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
@@ -102,22 +110,29 @@
                 </GridPane>
 
                 <!-- Gráficos -->
-                <GridPane hgap="20" vgap="20">
+                <Label text="📈 Gráficos de Métricas" 
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 10 0;"/>
+                
+                <GridPane hgap="15" vgap="15">
                     <columnConstraints>
-                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
-                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="600"/>
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="600"/>
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints vgrow="ALWAYS"/>
-                        <RowConstraints vgrow="ALWAYS"/>
-                        <RowConstraints vgrow="ALWAYS"/>
+                        <RowConstraints vgrow="ALWAYS" minHeight="280"/>
+                        <RowConstraints vgrow="ALWAYS" minHeight="280"/>
+                        <RowConstraints vgrow="ALWAYS" minHeight="280"/>
                     </rowConstraints>
 
                     <!-- Gráfico 1: Tiempos de Entrega -->
                     <VBox GridPane.columnIndex="0" GridPane.rowIndex="0"
                           style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
-                        <LineChart fx:id="tiemposChart" title="Tiempos Promedio de Entrega por Zona" prefHeight="250" prefWidth="650">
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);"
+                          minHeight="280" minWidth="600">
+                        <Label text="⏱️ Tiempos Promedio por Zona" 
+                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <LineChart fx:id="tiemposChart" title="Tiempos Promedio de Entrega por Zona" 
+                                   minHeight="250" minWidth="550" prefHeight="250" prefWidth="550">
                             <xAxis><CategoryAxis label="Zona"/></xAxis>
                             <yAxis><NumberAxis label="Días"/></yAxis>
                         </LineChart>
@@ -126,8 +141,12 @@
                     <!-- Gráfico 2: Servicios más usados -->
                     <VBox GridPane.columnIndex="1" GridPane.rowIndex="0"
                           style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
-                        <BarChart fx:id="serviciosChart" title="Servicios Adicionales" prefHeight="250" prefWidth="650">
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);"
+                          minHeight="280" minWidth="600">
+                        <Label text="📦 Servicios Adicionales Más Usados" 
+                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <BarChart fx:id="serviciosChart" title="Servicios Adicionales" 
+                                  minHeight="250" minWidth="550" prefHeight="250" prefWidth="550">
                             <xAxis><CategoryAxis label="Servicio"/></xAxis>
                             <yAxis><NumberAxis label="Cantidad"/></yAxis>
                         </BarChart>
@@ -136,15 +155,23 @@
                     <!-- Gráfico 3: Distribución de Servicios (Pie) -->
                     <VBox GridPane.columnIndex="0" GridPane.rowIndex="1"
                           style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
-                        <PieChart fx:id="serviciosPieChart" title="Distribución de Servicios" prefHeight="250"/>
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);"
+                          minHeight="280" minWidth="600">
+                        <Label text="🥧 Distribución de Servicios Adicionales" 
+                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <PieChart fx:id="serviciosPieChart" title="Distribución de Servicios" 
+                                  minHeight="250" minWidth="550" prefHeight="250" prefWidth="550"/>
                     </VBox>
 
                     <!-- Gráfico 4: Ingresos -->
                     <VBox GridPane.columnIndex="1" GridPane.rowIndex="1"
                           style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
-                        <BarChart fx:id="ingresosChart" title="Ingresos por Período" prefHeight="250" prefWidth="650">
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);"
+                          minHeight="280" minWidth="600">
+                        <Label text="💰 Ingresos por Servicio Adicional" 
+                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <BarChart fx:id="ingresosChart" title="Ingresos por Período" 
+                                  minHeight="250" minWidth="550" prefHeight="250" prefWidth="550">
                             <xAxis><CategoryAxis label="Período"/></xAxis>
                             <yAxis><NumberAxis label="Ingresos ($)"/></yAxis>
                         </BarChart>
@@ -153,11 +180,90 @@
                     <!-- Gráfico 5: Incidencias por Zona -->
                     <VBox GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"
                           style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
-                        <BarChart fx:id="incidenciasChart" title="Incidencias por Zona" prefHeight="250">
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);"
+                          minHeight="280" minWidth="1200">
+                        <Label text="⚠️ Incidencias por Zona" 
+                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <BarChart fx:id="incidenciasChart" title="Incidencias por Zona" 
+                                  minHeight="250" minWidth="1150" prefHeight="250" prefWidth="1150">
                             <xAxis><CategoryAxis label="Zona"/></xAxis>
                             <yAxis><NumberAxis label="Número de Incidencias"/></yAxis>
                         </BarChart>
+                    </VBox>
+                </GridPane>
+                
+                <!-- Tablas de Datos -->
+                <Label text="📋 Tablas de Datos Detallados" 
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 10 0;"/>
+                
+                <GridPane hgap="15" vgap="15">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="600"/>
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="600"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints vgrow="ALWAYS" minHeight="250"/>
+                        <RowConstraints vgrow="ALWAYS" minHeight="250"/>
+                    </rowConstraints>
+                    
+                    <!-- Tabla 1: Tiempos por Zona -->
+                    <VBox GridPane.columnIndex="0" GridPane.rowIndex="0"
+                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);"
+                          minHeight="250" minWidth="600">
+                        <Label text="⏱️ Tiempos Promedio por Zona" 
+                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 10 0; -fx-text-fill: #1E88E5;"/>
+                        <TableView fx:id="tiemposTable" minHeight="200" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="zonaTiempoCol" text="Zona" prefWidth="200" style="-fx-font-weight: bold;"/>
+                                <TableColumn fx:id="tiempoPromedioCol" text="Tiempo Promedio" prefWidth="350" style="-fx-font-weight: bold;"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+                    
+                    <!-- Tabla 2: Servicios Adicionales -->
+                    <VBox GridPane.columnIndex="1" GridPane.rowIndex="0"
+                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);"
+                          minHeight="250" minWidth="600">
+                        <Label text="📦 Servicios Adicionales" 
+                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 10 0; -fx-text-fill: #43A047;"/>
+                        <TableView fx:id="serviciosTable" minHeight="200" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="servicioNombreCol" text="Servicio" prefWidth="300" style="-fx-font-weight: bold;"/>
+                                <TableColumn fx:id="servicioCantidadCol" text="Cantidad de Usos" prefWidth="250" style="-fx-font-weight: bold;"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+                    
+                    <!-- Tabla 3: Ingresos por Servicio -->
+                    <VBox GridPane.columnIndex="0" GridPane.rowIndex="1"
+                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);"
+                          minHeight="250" minWidth="600">
+                        <Label text="💰 Ingresos por Servicio" 
+                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 10 0; -fx-text-fill: #F57C00;"/>
+                        <TableView fx:id="ingresosTable" minHeight="200" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="ingresoNombreCol" text="Servicio/Concepto" prefWidth="300" style="-fx-font-weight: bold;"/>
+                                <TableColumn fx:id="ingresoMontoCol" text="Monto" prefWidth="250" style="-fx-font-weight: bold;"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+                    
+                    <!-- Tabla 4: Incidencias por Zona -->
+                    <VBox GridPane.columnIndex="1" GridPane.rowIndex="1"
+                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);"
+                          minHeight="250" minWidth="600">
+                        <Label text="⚠️ Incidencias por Zona" 
+                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 10 0; -fx-text-fill: #D32F2F;"/>
+                        <TableView fx:id="incidenciasTable" minHeight="200" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="incidenciaZonaCol" text="Zona" prefWidth="200" style="-fx-font-weight: bold;"/>
+                                <TableColumn fx:id="incidenciaCantidadCol" text="Cantidad" prefWidth="350" style="-fx-font-weight: bold;"/>
+                            </columns>
+                        </TableView>
                     </VBox>
                 </GridPane>
             </VBox>

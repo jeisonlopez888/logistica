@@ -184,20 +184,6 @@ public class AdminController {
         }
     }
 
-    @FXML
-    private void handleVerUserAdmin(ActionEvent event) {
-        try {
-            Sesion.cerrarSesion();
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/user_admin.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarAlerta("Error", "No se pudo ver user.");
-        }
-    }
-
     // ---------------- UTIL ----------------
     private void mostrarMensaje(String texto, String color) {
         mensajeLabel.setText(texto);

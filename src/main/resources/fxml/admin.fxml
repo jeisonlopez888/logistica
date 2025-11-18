@@ -48,17 +48,17 @@
                                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
                                -fx-cursor: hand;"/>
 
-                <Button text="🧑‍💼 Panel de Usuario" onAction="#handleVerUserAdmin"
+                <Button text="✏️ Lista de Administradores" onAction="#handleVerAdministradores"
                         GridPane.columnIndex="1" GridPane.rowIndex="0"
-                        style="-fx-background-color: linear-gradient(to bottom right, #AB47BC, #8E24AA);
+                        style="-fx-background-color: linear-gradient(to bottom right, #FFB300, #F57C00);
                                -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
                                -fx-background-radius: 14; -fx-padding: 25 35;
                                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
                                -fx-cursor: hand;"/>
 
-                <Button text="✏️ Lista de Administradores" onAction="#handleVerAdministradores"
+                <Button text="📦 Ver Todos los Envíos" onAction="#handleVerTodosLosEnvios"
                         GridPane.columnIndex="2" GridPane.rowIndex="0"
-                        style="-fx-background-color: linear-gradient(to bottom right, #FFB300, #F57C00);
+                        style="-fx-background-color: linear-gradient(to bottom right, #9C27B0, #7B1FA2);
                                -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
                                -fx-background-radius: 14; -fx-padding: 25 35;
                                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
@@ -101,14 +101,6 @@
                 <Button text="📊 Métricas" onAction="#handleVerMetricas"
                         GridPane.columnIndex="1" GridPane.rowIndex="2"
                         style="-fx-background-color: linear-gradient(to bottom right, #FF7043, #E64A19);
-                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
-                               -fx-background-radius: 14; -fx-padding: 25 35;
-                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
-                               -fx-cursor: hand;"/>
-
-                <Button text="📦 Ver Todos los Envíos" onAction="#handleVerTodosLosEnvios"
-                        GridPane.columnIndex="2" GridPane.rowIndex="2"
-                        style="-fx-background-color: linear-gradient(to bottom right, #9C27B0, #7B1FA2);
                                -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
                                -fx-background-radius: 14; -fx-padding: 25 35;
                                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
