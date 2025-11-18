@@ -38,23 +38,35 @@ public abstract class HistorialEnviosController {
     @FXML protected TableColumn<EnvioDTO, String> colFechaEntrega;
     @FXML protected TableColumn<EnvioDTO, String> colFechaEntregaEstimada;
     @FXML protected TableColumn<EnvioDTO, String> colRepartidor;
+    
+    // Filtros
+    @FXML protected javafx.scene.control.DatePicker fechaInicioFilter;
+    @FXML protected javafx.scene.control.DatePicker fechaFinFilter;
+    @FXML protected javafx.scene.control.ComboBox<String> estadoFilter;
+    
+    // Lista completa de envíos (sin filtrar)
+    private java.util.List<EnvioDTO> enviosCompletos;
 
     protected final LogisticaFacade facade = LogisticaFacade.getInstance();
     protected UsuarioDTO usuario;
 
     @FXML
     protected void initialize() {
+        // Inicializar filtros
+        if (estadoFilter != null) {
+            estadoFilter.getItems().addAll("SOLICITADO", "CONFIRMADO", "ASIGNADO", "EN_RUTA", "ENTREGADO", "CANCELADO", "INCIDENCIA");
+        }
+        
+        if (fechaFinFilter != null) {
+            fechaFinFilter.setValue(java.time.LocalDate.now());
+        }
         // ID
         colId.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getId()));
         
         // Mostrar nombre del usuario, no solo ID
         colUsuario.setCellValueFactory(c -> {
             if (c.getValue().getIdUsuario() != null) {
-                UsuarioDTO usuarioDTO = facade.listarUsuarios().stream()
-                        .filter(u -> u.getId().equals(c.getValue().getIdUsuario()))
-                        .findFirst()
-                        .orElse(null);
-                String nombre = usuarioDTO != null ? usuarioDTO.getNombre() : "Usuario #" + c.getValue().getIdUsuario();
+                String nombre = facade.obtenerNombreUsuario(c.getValue().getIdUsuario());
                 return new javafx.beans.property.SimpleStringProperty(nombre);
             }
             return new javafx.beans.property.SimpleStringProperty("");
@@ -110,11 +122,7 @@ public abstract class HistorialEnviosController {
         // Mostrar nombre del repartidor, no solo ID
         colRepartidor.setCellValueFactory(c -> {
             if (c.getValue().getIdRepartidor() != null) {
-                co.edu.uniquindio.logistica.model.DTO.RepartidorDTO repartidorDTO = facade.listarRepartidores().stream()
-                        .filter(r -> r.getId().equals(c.getValue().getIdRepartidor()))
-                        .findFirst()
-                        .orElse(null);
-                String nombre = repartidorDTO != null ? repartidorDTO.getNombre() : "Repartidor #" + c.getValue().getIdRepartidor();
+                String nombre = facade.obtenerNombreRepartidor(c.getValue().getIdRepartidor());
                 return new javafx.beans.property.SimpleStringProperty(nombre);
             }
             return new javafx.beans.property.SimpleStringProperty("Sin asignar");
@@ -135,8 +143,39 @@ public abstract class HistorialEnviosController {
                 ? facade.listarTodosEnvios()
                 : facade.listarEnviosPorUsuario(usuario.getId());
 
+        enviosCompletos = new java.util.ArrayList<>(lista);
         tablaEnvios.setItems(FXCollections.observableArrayList(lista));
         tablaEnvios.refresh();
+    }
+    
+    @FXML
+    protected void aplicarFiltros(ActionEvent event) {
+        // Obtener valores de los filtros
+        java.time.LocalDate fechaInicio = fechaInicioFilter != null ? fechaInicioFilter.getValue() : null;
+        java.time.LocalDate fechaFin = fechaFinFilter != null ? fechaFinFilter.getValue() : null;
+        EnvioDTO.EstadoEnvio estado = null;
+        if (estadoFilter != null && estadoFilter.getValue() != null && !estadoFilter.getValue().isEmpty()) {
+            try {
+                estado = EnvioDTO.EstadoEnvio.valueOf(estadoFilter.getValue());
+            } catch (IllegalArgumentException e) {
+                // Estado inválido, ignorar
+            }
+        }
+        
+        // Usar la fachada para filtrar (delega al servicio)
+        Long idUsuario = usuario != null ? usuario.getId() : null;
+        java.util.List<EnvioDTO> filtrados = facade.filtrarEnvios(idUsuario, fechaInicio, fechaFin, estado);
+        
+        tablaEnvios.setItems(FXCollections.observableArrayList(filtrados));
+        tablaEnvios.refresh();
+    }
+    
+    @FXML
+    protected void limpiarFiltros(ActionEvent event) {
+        if (fechaInicioFilter != null) fechaInicioFilter.setValue(null);
+        if (fechaFinFilter != null) fechaFinFilter.setValue(null);
+        if (estadoFilter != null) estadoFilter.setValue(null);
+        cargarHistorial();
     }
 
     protected void abrirEditorPara(EnvioDTO envioDTO, String fxmlPath) {

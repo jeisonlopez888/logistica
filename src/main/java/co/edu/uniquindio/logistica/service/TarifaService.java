@@ -32,7 +32,14 @@ public class TarifaService {
     }
 
     public TarifaDetalle desglosarTarifa(Envio envio) {
-        Tarifa t = store.getTarifas().isEmpty() ? null : store.getTarifas().get(0);
+        // Buscar tarifa según el tipo especificado en el envío, o usar la primera disponible
+        Tarifa t = null;
+        if (envio.getTipoTarifa() != null && !envio.getTipoTarifa().isEmpty()) {
+            t = obtenerTarifaPorDescripcion(envio.getTipoTarifa());
+        }
+        if (t == null) {
+            t = store.getTarifas().isEmpty() ? null : store.getTarifas().get(0);
+        }
 
         // Valores por defecto realistas si no hay tarifa configurada
         double base = (t != null && t.getCostoBase() > 0) ? t.getCostoBase() : 5000.0; // Mínimo 5,000 COP

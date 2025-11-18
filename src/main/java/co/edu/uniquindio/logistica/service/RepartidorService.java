@@ -84,7 +84,16 @@ public class RepartidorService {
                 .findFirst()
                 .orElse(null);
     }
-
-
+    
+    /**
+     * Busca un repartidor por su ID
+     */
+    public Repartidor buscarPorId(Long id) {
+        if (id == null) return null;
+        return store.getRepartidores().stream()
+                .filter(r -> r.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
 
 }

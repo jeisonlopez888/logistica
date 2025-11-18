@@ -53,6 +53,13 @@
                                -fx-effect: dropshadow(gaussian, rgba(0,151,167,0.5), 8, 0, 0, 3);
                                -fx-cursor: hand;"/>
 
+                <Button text="✏️ Editar Tarifa" onAction="#handleEditar"
+                        style="-fx-background-color: linear-gradient(to bottom right, #42A5F5, #1E88E5);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 30;
+                               -fx-effect: dropshadow(gaussian, rgba(30,136,229,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
                 <Button text="🗑️ Eliminar Tarifa" onAction="#handleEliminar"
                         style="-fx-background-color: linear-gradient(to bottom right, #EF5350, #D32F2F);
                                -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;

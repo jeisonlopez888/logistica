@@ -87,5 +87,16 @@ public class UsuarioService {
                 u.getId().equals(usuarioActualizado.getId()) ? usuarioActualizado : u
         );
     }
+    
+    /**
+     * Busca un usuario por su ID
+     */
+    public Usuario buscarPorId(Long id) {
+        if (id == null) return null;
+        return store.getUsuarios().stream()
+                .filter(u -> Objects.equals(u.getId(), id))
+                .findFirst()
+                .orElse(null);
+    }
 
 }

@@ -184,18 +184,12 @@ public class DataStore {
 
         // ==================== TARIFAS (RF-029 a RF-031) ====================
         
-        // Tarifas con valores realistas (costoBase, costoPorKilo, costoPorVolumen, recargoSeguro)
-        Tarifa t1 = new Tarifa(nextId(), "Tarifa Urbana", 5000, 3000, 50000, 0.05);
-        Tarifa t2 = new Tarifa(nextId(), "Tarifa Express", 8000, 3500, 60000, 0.06);
-        Tarifa t3 = new Tarifa(nextId(), "Tarifa Nacional", 12000, 4000, 70000, 0.08);
-        Tarifa t4 = new Tarifa(nextId(), "Tarifa Regional", 7000, 2800, 55000, 0.05);
-        Tarifa t5 = new Tarifa(nextId(), "Tarifa Económica", 4000, 2500, 45000, 0.04);
+        // Solo dos tarifas: Normal y Express
+        Tarifa t1 = new Tarifa(nextId(), "Normal", 5000, 3000, 50000, 0.05);
+        Tarifa t2 = new Tarifa(nextId(), "Express", 8000, 3500, 60000, 0.06);
 
         addTarifa(t1);
         addTarifa(t2);
-        addTarifa(t3);
-        addTarifa(t4);
-        addTarifa(t5);
 
         System.out.println("✅ Tarifas cargadas: " + tarifas.size());
 
@@ -256,7 +250,7 @@ public class DataStore {
                 .fragil(false)
                 .firmaRequerida(false)
                 .estado(Envio.EstadoEnvio.EN_RUTA)
-                .costoEstimado(t3.calcularCosto(3.8) + 4000)
+                .costoEstimado(t2.calcularCosto(3.8) + 4000)
                 .repartidor(r3)
                 .fechaCreacion(LocalDateTime.now().minusDays(3))
                 .fechaConfirmacion(LocalDateTime.now().minusDays(2))
@@ -278,7 +272,7 @@ public class DataStore {
                 .fragil(false)
                 .firmaRequerida(false)
                 .estado(Envio.EstadoEnvio.ASIGNADO)
-                .costoEstimado(t4.calcularCosto(0.9))
+                .costoEstimado(t1.calcularCosto(0.9))
                 .repartidor(r2)
                 .fechaCreacion(LocalDateTime.now().minusDays(1))
                 .fechaConfirmacion(LocalDateTime.now())
@@ -300,7 +294,7 @@ public class DataStore {
                 .fragil(true)
                 .firmaRequerida(true)
                 .estado(Envio.EstadoEnvio.INCIDENCIA)
-                .costoEstimado(t5.calcularCosto(5.4) + 5000)
+                .costoEstimado(t1.calcularCosto(5.4) + 5000)
                 .repartidor(r4)
                 .fechaCreacion(LocalDateTime.now().minusDays(6))
                 .fechaConfirmacion(LocalDateTime.now().minusDays(5))
@@ -344,7 +338,7 @@ public class DataStore {
                 .fragil(false)
                 .firmaRequerida(false)
                 .estado(Envio.EstadoEnvio.CANCELADO)
-                .costoEstimado(t5.calcularCosto(0.5))
+                .costoEstimado(t1.calcularCosto(0.5))
                 .fechaCreacion(LocalDateTime.now().minusDays(4))
                 .incidenciaDescripcion("Cancelado por el usuario antes de la asignación.")
                 .build();
@@ -363,7 +357,7 @@ public class DataStore {
                 .fragil(false)
                 .firmaRequerida(false)
                 .estado(Envio.EstadoEnvio.SOLICITADO)
-                .costoEstimado(t5.calcularCosto(0.8))
+                .costoEstimado(t1.calcularCosto(0.8))
                 .fechaCreacion(LocalDateTime.now().minusHours(3))
                 .incidenciaDescripcion("Envío económico estándar.")
                 .build();
@@ -382,7 +376,7 @@ public class DataStore {
                 .fragil(false)
                 .firmaRequerida(true)
                 .estado(Envio.EstadoEnvio.EN_RUTA)
-                .costoEstimado(t4.calcularCosto(2.0) + 2500)
+                .costoEstimado(t1.calcularCosto(2.0) + 2500)
                 .repartidor(r6)
                 .fechaCreacion(LocalDateTime.now().minusDays(1))
                 .fechaConfirmacion(LocalDateTime.now().minusHours(20))
@@ -469,7 +463,7 @@ public class DataStore {
                 .fragil(false)
                 .firmaRequerida(false)
                 .estado(Envio.EstadoEnvio.ASIGNADO)
-                .costoEstimado(t5.calcularCosto(0.7))
+                .costoEstimado(t1.calcularCosto(0.7))
                 .repartidor(r2)
                 .fechaCreacion(LocalDateTime.now().minusDays(2))
                 .fechaConfirmacion(LocalDateTime.now().minusDays(1))
@@ -491,7 +485,7 @@ public class DataStore {
                 .fragil(true)
                 .firmaRequerida(true)
                 .estado(Envio.EstadoEnvio.EN_RUTA)
-                .costoEstimado(t3.calcularCosto(3.2) + 3000)
+                .costoEstimado(t2.calcularCosto(3.2) + 3000)
                 .repartidor(r3)
                 .fechaCreacion(LocalDateTime.now().minusDays(3))
                 .fechaConfirmacion(LocalDateTime.now().minusDays(2))
@@ -513,7 +507,7 @@ public class DataStore {
                 .fragil(false)
                 .firmaRequerida(false)
                 .estado(Envio.EstadoEnvio.SOLICITADO)
-                .costoEstimado(t5.calcularCosto(1.0))
+                .costoEstimado(t1.calcularCosto(1.0))
                 .fechaCreacion(LocalDateTime.now().minusHours(5))
                 .incidenciaDescripcion("Envío simple solicitado.")
                 .build();
@@ -576,7 +570,7 @@ public class DataStore {
                 .fragil(false)
                 .firmaRequerida(false)
                 .estado(Envio.EstadoEnvio.SOLICITADO)
-                .costoEstimado(t5.calcularCosto(0.6))
+                .costoEstimado(t1.calcularCosto(0.6))
                 .fechaCreacion(LocalDateTime.now().minusHours(1))
                 .incidenciaDescripcion("Envío ligero solicitado.")
                 .build();
@@ -638,7 +632,7 @@ public class DataStore {
                 .fragil(false)
                 .firmaRequerida(false)
                 .estado(Envio.EstadoEnvio.ENTREGADO)
-                .costoEstimado(t5.calcularCosto(0.9))
+                .costoEstimado(t1.calcularCosto(0.9))
                 .repartidor(r5)
                 .fechaCreacion(LocalDateTime.now().minusDays(5))
                 .fechaConfirmacion(LocalDateTime.now().minusDays(4))

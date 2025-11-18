@@ -1,84 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="co.edu.uniquindio.logistica.ui.RastreoController"
-            prefWidth="600" prefHeight="450"
-            style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);">
+<BorderPane prefHeight="700" prefWidth="500" style="-fx-background-color: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="co.edu.uniquindio.logistica.ui.RastreoController">
 
     <!-- ENCABEZADO -->
     <top>
-        <HBox alignment="CENTER" spacing="15"
-              style="-fx-background-color: linear-gradient(to right, #FF6F00, #FF8F00);
-                     -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
-            <Label text="🔍 Rastrear Envío"
-                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;"/>
+        <HBox alignment="CENTER" spacing="15" style="-fx-background-color: linear-gradient(to right, #FF6F00, #FF8F00);                      -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);">
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white; -fx-letter-spacing: 1px;" text="🔍 Rastrear Envío" />
         </HBox>
     </top>
 
     <!-- CONTENIDO CENTRAL -->
     <center>
-        <VBox alignment="CENTER" spacing="25" style="-fx-padding: 40;">
-            
-            <!-- Tarjeta de búsqueda -->
-            <VBox alignment="CENTER" spacing="20"
-                  style="-fx-background-color: rgba(255,255,255,0.95);
-                         -fx-background-radius: 15;
-                         -fx-padding: 40;
-                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0, 0, 5);"
-                  maxWidth="450">
-                
-                <Label text="Ingrese el ID de su envío"
-                       style="-fx-font-size: 16px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+        <HBox spacing="20" style="-fx-padding: 20;">
+            <!-- Columna izquierda: Búsqueda -->
+            <VBox alignment="TOP_CENTER" prefWidth="350" spacing="15">
+                <VBox alignment="CENTER" spacing="15" style="-fx-background-color: rgba(255,255,255,0.95);                              -fx-background-radius: 15;                              -fx-padding: 25;                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0, 0, 5);">
 
-                <!-- Campo de búsqueda -->
-                <HBox spacing="12" alignment="CENTER">
-                    <TextField fx:id="idEnvioField" promptText="ID del Envío"
-                               style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                      -fx-border-radius: 8; -fx-background-radius: 8;
-                                      -fx-padding: 12; -fx-font-size: 14px;"
-                               prefWidth="250"/>
-                    
-                    <Button text="🔍 Buscar" onAction="#handleBuscar"
-                            style="-fx-background-color: linear-gradient(to right, #FF6F00, #FF8F00);
-                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
-                                   -fx-background-radius: 8; -fx-padding: 12 25;
-                                   -fx-effect: dropshadow(gaussian, rgba(255,111,0,0.5), 8, 0, 0, 3);
-                                   -fx-cursor: hand;"/>
-                </HBox>
+                    <Label style="-fx-font-size: 16px; -fx-text-fill: #37474F; -fx-font-weight: bold;" text="Ingrese el ID de su envío" />
 
-                <!-- Resultado -->
-                <Separator prefWidth="350" style="-fx-background-color: #CFD8DC;"/>
-                
-                <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20 0 0 0;">
-                    <Label text="Resultado de la búsqueda:"
-                           style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
-                    
-                    <Label fx:id="resultadoLabel" text="Ingrese un ID para rastrear"
-                           wrapText="true" alignment="CENTER"
-                           style="-fx-font-size: 14px; -fx-text-fill: #37474F;
-                                  -fx-background-color: #ECEFF1; -fx-padding: 15;
-                                  -fx-background-radius: 8;"
-                           prefWidth="350" minHeight="80"/>
+                    <!-- Campo de búsqueda -->
+                    <HBox alignment="CENTER" spacing="10">
+                        <TextField fx:id="idEnvioField" prefWidth="200" promptText="ID del Envío" style="-fx-background-color: white; -fx-border-color: #B0BEC5;                                           -fx-border-radius: 8; -fx-background-radius: 8;                                           -fx-padding: 10; -fx-font-size: 14px;" />
+
+                        <Button onAction="#handleBuscar" style="-fx-background-color: linear-gradient(to right, #FF6F00, #FF8F00);                                        -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;                                        -fx-background-radius: 8; -fx-padding: 10 20;                                        -fx-effect: dropshadow(gaussian, rgba(255,111,0,0.5), 8, 0, 0, 3);                                        -fx-cursor: hand;" text="🔍 Buscar" />
+                    </HBox>
+                </VBox>
+                <VBox fx:id="infoContainer" spacing="15" style="-fx-background-color: rgba(255,255,255,0.95);                              -fx-background-radius: 15;                              -fx-padding: 20;                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0, 0, 5);" VBox.vgrow="ALWAYS">
+
+                    <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #37474F;" text="Información del Envío" />
+
+                    <ScrollPane fitToWidth="true" prefHeight="303.0" prefWidth="186.0" style="-fx-background: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="detalleContainer" spacing="15">
+                            <Label fx:id="resultadoLabel" style="-fx-font-size: 13px; -fx-text-fill: #546E7A;                                           -fx-padding: 10;" text="Ingrese un ID para rastrear" wrapText="true" />
+                        </VBox>
+                    </ScrollPane>
                 </VBox>
             </VBox>
 
-            <!-- Botón volver -->
-            <Button text="↩️ Volver al Login" onAction="#handleVolverLogin"
-                    style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);
-                           -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
-                           -fx-background-radius: 10; -fx-padding: 12 30;
-                           -fx-cursor: hand;"/>
-        </VBox>
+            <!-- Columna derecha: Información del envío -->
+            <VBox spacing="15" VBox.vgrow="ALWAYS" />
+        </HBox>
     </center>
 
     <!-- PIE DE PÁGINA -->
     <bottom>
-        <HBox alignment="CENTER" style="-fx-padding: 15;">
-            <Label text="© 2025 Plataforma Logística | Rastreo en Tiempo Real"
-                   style="-fx-text-fill: #B3E5FC; -fx-font-size: 11px; -fx-opacity: 0.8;"/>
+        <HBox alignment="CENTER" spacing="15" style="-fx-padding: 10;">
+            <Button onAction="#handleVolverLogin" style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);                            -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;                            -fx-background-radius: 10; -fx-padding: 10 25;                            -fx-cursor: hand;" text="↩️ Volver" />
+            <Label style="-fx-text-fill: #B3E5FC; -fx-font-size: 10px; -fx-opacity: 0.8;" text="© 2025 Plataforma Logística | Rastreo en Tiempo Real" />
         </HBox>
     </bottom>
 </BorderPane>

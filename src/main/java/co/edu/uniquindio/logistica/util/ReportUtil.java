@@ -443,9 +443,6 @@ public class ReportUtil {
         content.newLineAtOffset(50, 750);
         content.showText(titulo + " - " + LocalDateTime.now().format(DATE_FORMAT));
         content.endText();
-        content.setFont(PDType1Font.HELVETICA, 10);
-        content.beginText();
-        content.newLineAtOffset(50, 725);
     }
 
     public static void exportarUsuariosPDF(List<Usuario> usuarios, String rutaArchivo) throws IOException {
@@ -459,7 +456,12 @@ public class ReportUtil {
             float yPos = 700;
             for (Usuario u : usuarios) {
                 if (yPos < 50) {
-                    content.endText();
+                    // Cerrar bloque de texto si está abierto
+                    try {
+                        content.endText();
+                    } catch (Exception e) {
+                        // No hay bloque abierto, continuar
+                    }
                     content.close();
                     page = new PDPage();
                     doc.addPage(page);
@@ -505,6 +507,12 @@ public class ReportUtil {
                 yPos -= 20;
             }
 
+            // Cerrar cualquier bloque de texto abierto antes de cerrar el content stream
+            try {
+                content.endText();
+            } catch (Exception e) {
+                // Ignorar si ya está cerrado
+            }
             content.close();
             doc.save(rutaArchivo);
         }
@@ -521,7 +529,12 @@ public class ReportUtil {
             float yPos = 700;
             for (Envio e : envios) {
                 if (yPos < 50) {
-                    content.endText();
+                    // Cerrar bloque de texto si está abierto
+                    try {
+                        content.endText();
+                    } catch (Exception e2) {
+                        // No hay bloque abierto, continuar
+                    }
                     content.close();
                     page = new PDPage();
                     doc.addPage(page);
@@ -583,6 +596,12 @@ public class ReportUtil {
                 yPos -= 25;
             }
 
+            // Cerrar cualquier bloque de texto abierto antes de cerrar el content stream
+            try {
+                content.endText();
+            } catch (Exception e) {
+                // Ignorar si ya está cerrado
+            }
             content.close();
             doc.save(rutaArchivo);
         }
@@ -599,7 +618,12 @@ public class ReportUtil {
             float yPos = 700;
             for (Pago p : pagos) {
                 if (yPos < 50) {
-                    content.endText();
+                    // Cerrar bloque de texto si está abierto
+                    try {
+                        content.endText();
+                    } catch (Exception e) {
+                        // No hay bloque abierto, continuar
+                    }
                     content.close();
                     page = new PDPage();
                     doc.addPage(page);
@@ -638,6 +662,12 @@ public class ReportUtil {
                 yPos -= 25;
             }
 
+            // Cerrar cualquier bloque de texto abierto antes de cerrar el content stream
+            try {
+                content.endText();
+            } catch (Exception e) {
+                // Ignorar si ya está cerrado
+            }
             content.close();
             doc.save(rutaArchivo);
         }
@@ -654,7 +684,12 @@ public class ReportUtil {
             float yPos = 700;
             for (Repartidor r : repartidores) {
                 if (yPos < 50) {
-                    content.endText();
+                    // Cerrar bloque de texto si está abierto
+                    try {
+                        content.endText();
+                    } catch (Exception e) {
+                        // No hay bloque abierto, continuar
+                    }
                     content.close();
                     page = new PDPage();
                     doc.addPage(page);
@@ -674,6 +709,12 @@ public class ReportUtil {
                 yPos -= 20;
             }
 
+            // Cerrar cualquier bloque de texto abierto antes de cerrar el content stream
+            try {
+                content.endText();
+            } catch (Exception e) {
+                // Ignorar si ya está cerrado
+            }
             content.close();
             doc.save(rutaArchivo);
         }
@@ -935,7 +976,12 @@ public class ReportUtil {
             content.setFont(PDType1Font.HELVETICA, 10);
             for (Map.Entry<String, Double> entry : tiemposPorZona.entrySet()) {
                 if (yPos < 50) {
-                    content.endText();
+                    // Cerrar bloque de texto si está abierto
+                    try {
+                        content.endText();
+                    } catch (Exception e) {
+                        // No hay bloque abierto, continuar
+                    }
                     content.close();
                     page = new PDPage();
                     doc.addPage(page);
@@ -961,7 +1007,12 @@ public class ReportUtil {
             content.setFont(PDType1Font.HELVETICA, 10);
             for (Map.Entry<String, Long> entry : serviciosAdicionales.entrySet()) {
                 if (yPos < 50) {
-                    content.endText();
+                    // Cerrar bloque de texto si está abierto
+                    try {
+                        content.endText();
+                    } catch (Exception e) {
+                        // No hay bloque abierto, continuar
+                    }
                     content.close();
                     page = new PDPage();
                     doc.addPage(page);
@@ -987,7 +1038,12 @@ public class ReportUtil {
             content.setFont(PDType1Font.HELVETICA, 10);
             for (Map.Entry<String, Double> entry : ingresosPorServicio.entrySet()) {
                 if (yPos < 50) {
-                    content.endText();
+                    // Cerrar bloque de texto si está abierto
+                    try {
+                        content.endText();
+                    } catch (Exception e) {
+                        // No hay bloque abierto, continuar
+                    }
                     content.close();
                     page = new PDPage();
                     doc.addPage(page);
@@ -1013,7 +1069,12 @@ public class ReportUtil {
             content.setFont(PDType1Font.HELVETICA, 10);
             for (Map.Entry<String, Long> entry : incidenciasPorZona.entrySet()) {
                 if (yPos < 50) {
-                    content.endText();
+                    // Cerrar bloque de texto si está abierto
+                    try {
+                        content.endText();
+                    } catch (Exception e) {
+                        // No hay bloque abierto, continuar
+                    }
                     content.close();
                     page = new PDPage();
                     doc.addPage(page);
@@ -1026,6 +1087,290 @@ public class ReportUtil {
                 content.endText();
                 yPos -= 15;
             }
+            
+            // Cerrar el último beginText si quedó abierto
+            try {
+                content.endText();
+            } catch (Exception e) {
+                // Ya estaba cerrado, no hacer nada
+            }
+            content.close();
+            doc.save(rutaArchivo);
+        }
+    }
+
+    // ========== FACTURA / GUÍA DE ENVÍO ==========
+    
+    /**
+     * Genera una factura o guía de envío en PDF para un envío confirmado
+     */
+    public static void exportarFacturaEnvio(Envio envio, Pago pago, String rutaArchivo) throws IOException {
+        ensureParentDir(rutaArchivo);
+        
+        try (PDDocument doc = new PDDocument()) {
+            PDPage page = new PDPage();
+            doc.addPage(page);
+            PDPageContentStream content = new PDPageContentStream(doc, page);
+            
+            float yPos = 750;
+            float margin = 50;
+            
+            // Título
+            content.setFont(PDType1Font.HELVETICA_BOLD, 20);
+            content.beginText();
+            content.newLineAtOffset(margin, yPos);
+            content.showText("FACTURA / GUÍA DE ENVÍO");
+            content.endText();
+            yPos -= 30;
+            
+            // Línea separadora
+            content.setStrokingColor(0, 0, 0);
+            content.setLineWidth(1);
+            content.moveTo(margin, yPos);
+            content.lineTo(550, yPos);
+            content.stroke();
+            yPos -= 20;
+            
+            // Información del envío
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(margin, yPos);
+            content.showText("INFORMACIÓN DEL ENVÍO");
+            content.endText();
+            yPos -= 25;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            String[] infoEnvio = {
+                "Número de Envío: #" + (envio.getId() != null ? envio.getId() : "N/A"),
+                "Estado: " + (envio.getEstado() != null ? envio.getEstado().name() : "N/A"),
+                "Fecha de Creación: " + (envio.getFechaCreacion() != null ? DATE_FORMAT.format(envio.getFechaCreacion()) : "N/A"),
+                "Fecha de Confirmación: " + (envio.getFechaConfirmacion() != null ? DATE_FORMAT.format(envio.getFechaConfirmacion()) : "N/A"),
+                "Fecha Estimada de Entrega: " + (envio.getFechaEntregaEstimada() != null ? DATE_FORMAT.format(envio.getFechaEntregaEstimada()) : "N/A"),
+                ""
+            };
+            
+            for (String line : infoEnvio) {
+                if (yPos < 100) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    yPos = 750;
+                }
+                content.beginText();
+                content.newLineAtOffset(margin, yPos);
+                content.showText(line);
+                content.endText();
+                yPos -= 15;
+            }
+            
+            // Información del remitente y destinatario
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(margin, yPos);
+            content.showText("ORIGEN (REMITENTE)");
+            content.endText();
+            yPos -= 20;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            String[] origen = {
+                "Usuario: " + (envio.getUsuario() != null ? safe(envio.getUsuario().getNombre()) : "N/A"),
+                "Dirección: " + (envio.getOrigen() != null ? safe(envio.getOrigen().getCalle()) : "N/A"),
+                "Zona: " + (envio.getOrigen() != null ? safe(envio.getOrigen().getCiudad()) : "N/A"),
+                ""
+            };
+            
+            for (String line : origen) {
+                if (yPos < 100) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    yPos = 750;
+                }
+                content.beginText();
+                content.newLineAtOffset(margin, yPos);
+                content.showText(line);
+                content.endText();
+                yPos -= 15;
+            }
+            
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(margin, yPos);
+            content.showText("DESTINO (DESTINATARIO)");
+            content.endText();
+            yPos -= 20;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            String[] destino = {
+                "Dirección: " + (envio.getDestino() != null ? safe(envio.getDestino().getCalle()) : "N/A"),
+                "Zona: " + (envio.getDestino() != null ? safe(envio.getDestino().getCiudad()) : "N/A"),
+                ""
+            };
+            
+            for (String line : destino) {
+                if (yPos < 100) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    yPos = 750;
+                }
+                content.beginText();
+                content.newLineAtOffset(margin, yPos);
+                content.showText(line);
+                content.endText();
+                yPos -= 15;
+            }
+            
+            // Detalles del paquete
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(margin, yPos);
+            content.showText("DETALLES DEL PAQUETE");
+            content.endText();
+            yPos -= 20;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            String[] detalles = {
+                "Peso: " + String.format("%.2f", envio.getPeso()) + " kg",
+                "Volumen: " + String.format("%.4f", envio.getVolumen()) + " m³",
+                "Tipo de Tarifa: " + (envio.getTipoTarifa() != null ? envio.getTipoTarifa() : "Normal"),
+                ""
+            };
+            
+            for (String line : detalles) {
+                if (yPos < 100) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    yPos = 750;
+                }
+                content.beginText();
+                content.newLineAtOffset(margin, yPos);
+                content.showText(line);
+                content.endText();
+                yPos -= 15;
+            }
+            
+            // Servicios adicionales
+            content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            content.beginText();
+            content.newLineAtOffset(margin, yPos);
+            content.showText("SERVICIOS ADICIONALES");
+            content.endText();
+            yPos -= 20;
+            
+            content.setFont(PDType1Font.HELVETICA, 10);
+            java.util.List<String> servicios = new java.util.ArrayList<>();
+            if (envio.isPrioridad()) servicios.add("* Prioridad (Entrega Express)");
+            if (envio.isSeguro()) servicios.add("* Seguro");
+            if (envio.isFragil()) servicios.add("* Fragil");
+            if (envio.isFirmaRequerida()) servicios.add("* Firma Requerida");
+            
+            if (servicios.isEmpty()) {
+                servicios.add("Ninguno");
+            }
+            
+            for (String servicio : servicios) {
+                if (yPos < 100) {
+                    content.endText();
+                    content.close();
+                    page = new PDPage();
+                    doc.addPage(page);
+                    content = new PDPageContentStream(doc, page);
+                    yPos = 750;
+                }
+                content.beginText();
+                content.newLineAtOffset(margin, yPos);
+                content.showText(servicio);
+                content.endText();
+                yPos -= 15;
+            }
+            yPos -= 10;
+            
+            // Repartidor
+            if (envio.getRepartidor() != null) {
+                content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+                content.beginText();
+                content.newLineAtOffset(margin, yPos);
+                content.showText("REPARTIDOR ASIGNADO");
+                content.endText();
+                yPos -= 20;
+                
+                content.setFont(PDType1Font.HELVETICA, 10);
+                String[] repartidor = {
+                    "Nombre: " + safe(envio.getRepartidor().getNombre()),
+                    "Teléfono: " + safe(envio.getRepartidor().getTelefono()),
+                    "Zona: " + safe(envio.getRepartidor().getZona()),
+                    ""
+                };
+                
+                for (String line : repartidor) {
+                    if (yPos < 100) {
+                        content.endText();
+                        content.close();
+                        page = new PDPage();
+                        doc.addPage(page);
+                        content = new PDPageContentStream(doc, page);
+                        yPos = 750;
+                    }
+                    content.beginText();
+                    content.newLineAtOffset(margin, yPos);
+                    content.showText(line);
+                    content.endText();
+                    yPos -= 15;
+                }
+            }
+            
+            // Información de pago
+            if (pago != null) {
+                content.setFont(PDType1Font.HELVETICA_BOLD, 12);
+                content.beginText();
+                content.newLineAtOffset(margin, yPos);
+                content.showText("INFORMACIÓN DE PAGO");
+                content.endText();
+                yPos -= 20;
+                
+                content.setFont(PDType1Font.HELVETICA, 10);
+                String[] pagoInfo = {
+                    "Número de Pago: #" + (pago.getId() != null ? pago.getId() : "N/A"),
+                    "Monto Pagado: $" + String.format("%,.2f", pago.getMontoPagado()) + " COP",
+                    "Método de Pago: " + (pago.getMetodo() != null ? pago.getMetodo().name() : "N/A"),
+                    "Estado: " + (pago.isConfirmado() ? "CONFIRMADO" : "PENDIENTE"),
+                    "Fecha de Pago: " + (pago.getFechaPago() != null ? DATE_FORMAT.format(pago.getFechaPago()) : "N/A"),
+                    ""
+                };
+                
+                for (String line : pagoInfo) {
+                    if (yPos < 100) {
+                        content.endText();
+                        content.close();
+                        page = new PDPage();
+                        doc.addPage(page);
+                        content = new PDPageContentStream(doc, page);
+                        yPos = 750;
+                    }
+                    content.beginText();
+                    content.newLineAtOffset(margin, yPos);
+                    content.showText(line);
+                    content.endText();
+                    yPos -= 15;
+                }
+            }
+            
+            // Total
+            content.setFont(PDType1Font.HELVETICA_BOLD, 14);
+            content.beginText();
+            content.newLineAtOffset(margin, yPos);
+            content.showText("TOTAL: $" + String.format("%,.2f", envio.getCostoEstimado()) + " COP");
+            content.endText();
             
             // Cerrar el último beginText si quedó abierto
             try {

@@ -66,12 +66,95 @@ public class TarifasController {
                 return;
             }
 
+            double porVolumen = pedirNumero("Costo por volumen (m³):");
+            if (porVolumen < 0) {
+                porVolumen = 0;
+            }
+
+            double recargoSeguro = pedirNumero("Recargo por seguro (0-1 para porcentaje, >1 para valor fijo):");
+            if (recargoSeguro < 0) {
+                recargoSeguro = 0;
+            }
+
             // Crear DTO y registrar
-            TarifaDTO nuevaDTO = new TarifaDTO(DataStore.getInstance().nextId(), desc, base, porKilo);
+            TarifaDTO nuevaDTO = new TarifaDTO(DataStore.getInstance().nextId(), desc, base, porKilo, porVolumen, recargoSeguro);
             facade.addTarifa(nuevaDTO);
             cargarTarifas();
-            mostrarMensaje("✅ Tarifa agregada correctamente", "green");
+            mostrarMensaje("✅ Tarifa agregada correctamente. Las ventanas de envío se actualizarán automáticamente.", "green");
         });
+    }
+
+    @FXML
+    private void handleEditar() {
+        TarifaDTO seleccionada = tarifasTable.getSelectionModel().getSelectedItem();
+        if (seleccionada == null) {
+            mostrarMensaje("❌ Seleccione una tarifa para editar", "red");
+            return;
+        }
+
+        // Editar descripción
+        TextInputDialog dialogDesc = new TextInputDialog(seleccionada.getDescripcion());
+        dialogDesc.setHeaderText("Editar descripción de tarifa");
+        dialogDesc.setContentText("Descripción:");
+        dialogDesc.showAndWait().ifPresent(desc -> {
+            if (ValidacionUtil.isEmpty(desc)) {
+                mostrarMensaje("❌ La descripción es requerida", "red");
+                return;
+            }
+
+            // Editar costo base
+            double base = pedirNumeroConValor("Costo base:", seleccionada.getCostoBase());
+            if (base <= 0) {
+                mostrarMensaje("❌ El costo base debe ser mayor a 0", "red");
+                return;
+            }
+
+            // Editar costo por kilo
+            double porKilo = pedirNumeroConValor("Costo por kilo:", seleccionada.getCostoPorKilo());
+            if (porKilo <= 0) {
+                mostrarMensaje("❌ El costo por kilo debe ser mayor a 0", "red");
+                return;
+            }
+
+            // Editar costo por volumen
+            double porVolumen = pedirNumeroConValor("Costo por volumen (m³):", seleccionada.getCostoPorVolumen());
+            if (porVolumen < 0) {
+                porVolumen = 0;
+            }
+
+            // Editar recargo por seguro
+            double recargoSeguro = pedirNumeroConValor("Recargo por seguro (0-1 para porcentaje, >1 para valor fijo):", seleccionada.getRecargoSeguro());
+            if (recargoSeguro < 0) {
+                recargoSeguro = 0;
+            }
+
+            // Actualizar DTO
+            seleccionada.setDescripcion(desc);
+            seleccionada.setCostoBase(base);
+            seleccionada.setCostoPorKilo(porKilo);
+            seleccionada.setCostoPorVolumen(porVolumen);
+            seleccionada.setRecargoSeguro(recargoSeguro);
+
+            // Actualizar en el store
+            facade.actualizarTarifa(seleccionada);
+            cargarTarifas();
+            mostrarMensaje("✅ Tarifa actualizada correctamente. Los cambios se reflejarán en las nuevas cotizaciones.", "green");
+        });
+    }
+
+    private double pedirNumeroConValor(String prompt, double valorActual) {
+        TextInputDialog dialog = new TextInputDialog(String.valueOf(valorActual));
+        dialog.setHeaderText(prompt);
+        dialog.setContentText("Ingrese valor:");
+        return dialog.showAndWait()
+                .map(s -> {
+                    try {
+                        return Double.parseDouble(s);
+                    } catch (NumberFormatException e) {
+                        return valorActual;
+                    }
+                })
+                .orElse(valorActual);
     }
 
     private double pedirNumero(String prompt) {

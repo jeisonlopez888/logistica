@@ -24,6 +24,33 @@
     <center>
         <VBox spacing="15" style="-fx-padding: 20;">
             
+            <!-- Tarjeta de filtros -->
+            <VBox spacing="10" style="-fx-background-color: rgba(255,255,255,0.95);
+                                      -fx-background-radius: 15;
+                                      -fx-padding: 15;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 3);">
+                <Label text="🔍 Filtros de Búsqueda"
+                       style="-fx-font-size: 14px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Fecha Inicio:" style="-fx-font-size: 12px;"/>
+                    <DatePicker fx:id="fechaInicioFilter" style="-fx-font-size: 12px;"/>
+                    <Label text="Fecha Fin:" style="-fx-font-size: 12px;"/>
+                    <DatePicker fx:id="fechaFinFilter" style="-fx-font-size: 12px;"/>
+                    <Label text="Estado:" style="-fx-font-size: 12px;"/>
+                    <ComboBox fx:id="estadoFilter" promptText="Todos" prefWidth="150" style="-fx-font-size: 12px;"/>
+                    <Button text="🔍 Filtrar" onAction="#aplicarFiltros"
+                            style="-fx-background-color: linear-gradient(to right, #66BB6A, #43A047);
+                                   -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;
+                                   -fx-background-radius: 8; -fx-padding: 8 20;
+                                   -fx-cursor: hand;"/>
+                    <Button text="🔄 Limpiar" onAction="#limpiarFiltros"
+                            style="-fx-background-color: linear-gradient(to right, #757575, #424242);
+                                   -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;
+                                   -fx-background-radius: 8; -fx-padding: 8 20;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
+
             <!-- Tarjeta de tabla -->
             <VBox spacing="10" style="-fx-background-color: rgba(255,255,255,0.95);
                                       -fx-background-radius: 15;
@@ -33,7 +60,7 @@
                 <Label text="Mis Envíos Registrados"
                        style="-fx-font-size: 16px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
 
-                <TableView fx:id="tablaEnvios" prefHeight="550" style="-fx-border-radius: 10; -fx-background-radius: 10;">
+                <TableView fx:id="tablaEnvios" prefHeight="500" style="-fx-border-radius: 10; -fx-background-radius: 10;">
                     <columns>
                         <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
                         <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="130"/>
@@ -93,6 +120,13 @@
                                -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
                                -fx-background-radius: 10; -fx-padding: 12 25;
                                -fx-effect: dropshadow(gaussian, rgba(211,47,47,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
+                <Button fx:id="imprimirFacturaBtn" text="🖨️ Imprimir Factura" onAction="#imprimirFactura"
+                        style="-fx-background-color: linear-gradient(to bottom right, #9C27B0, #7B1FA2);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 25;
+                               -fx-effect: dropshadow(gaussian, rgba(156,39,176,0.5), 8, 0, 0, 3);
                                -fx-cursor: hand;"/>
 
                 <Button text="↩️ Volver" onAction="#handleVolver"

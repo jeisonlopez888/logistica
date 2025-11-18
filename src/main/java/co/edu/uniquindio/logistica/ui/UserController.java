@@ -84,6 +84,23 @@ public class UserController {
     }
 
     @FXML
+    private void handleRastrearEnvio(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/rastreo.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Rastrear Envío");
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "❌ Error al abrir rastreo de envío.");
+        }
+    }
+
+    @FXML
     private void handleVolver(ActionEvent event) {
         try {
             Sesion.cerrarSesion();

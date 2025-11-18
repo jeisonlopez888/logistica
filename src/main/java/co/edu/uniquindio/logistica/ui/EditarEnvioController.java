@@ -3,6 +3,7 @@ package co.edu.uniquindio.logistica.ui;
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.DTO.DireccionDTO;
 import co.edu.uniquindio.logistica.model.DTO.EnvioDTO;
+import co.edu.uniquindio.logistica.model.DTO.PagoDTO;
 import co.edu.uniquindio.logistica.model.MetodoPago;
 import co.edu.uniquindio.logistica.util.ValidacionUtil;
 import javafx.event.ActionEvent;
@@ -14,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.stage.FileChooser;
+import java.io.File;
 
 /**
  * Controlador para editar un envío existente - Solo valida y usa DTOs
@@ -33,21 +36,72 @@ public class EditarEnvioController extends CrearEnvioController {
         if (envioDTO == null) return;
         this.envioEditadoDTO = envioDTO;
 
+        // Cargar direcciones del usuario en los ComboBoxes (si ya se estableció el usuario)
+        if (usuarioActual != null) {
+            cargarDireccionesUsuario();
+        }
+
         // Cargar datos del envío seleccionado
         if (envioDTO.getOrigen() != null) {
             origenDireccionField.setText(envioDTO.getOrigen().getCalle());
             zonaOrigenCombo.setValue(envioDTO.getOrigen().getCiudad());
+            
+            // Intentar seleccionar la dirección en el ComboBox si coincide con alguna del usuario
+            // El formato ahora es: "calle (zona)"
+            if (origenDireccionCombo != null && usuarioActual != null && usuarioActual.getDirecciones() != null) {
+                String calleOrigen = envioDTO.getOrigen().getCalle();
+                String ciudadOrigen = envioDTO.getOrigen().getCiudad();
+                for (DireccionDTO dir : usuarioActual.getDirecciones()) {
+                    if (dir.getCalle().equals(calleOrigen) && dir.getCiudad().equals(ciudadOrigen)) {
+                        String calle = dir.getCalle() != null ? dir.getCalle() : "";
+                        String zona = dir.getCiudad() != null ? dir.getCiudad() : "";
+                        String textoCombo = calle + " (" + zona + ")";
+                        origenDireccionCombo.setValue(textoCombo);
+                        break;
+                    }
+                }
+            }
         }
+        
         if (envioDTO.getDestino() != null) {
             destinoDireccionField.setText(envioDTO.getDestino().getCalle());
             zonaDestinoCombo.setValue(envioDTO.getDestino().getCiudad());
+            
+            // Intentar seleccionar la dirección en el ComboBox si coincide con alguna del usuario
+            // El formato ahora es: "calle (zona)"
+            if (destinoDireccionCombo != null && usuarioActual != null && usuarioActual.getDirecciones() != null) {
+                String calleDestino = envioDTO.getDestino().getCalle();
+                String ciudadDestino = envioDTO.getDestino().getCiudad();
+                for (DireccionDTO dir : usuarioActual.getDirecciones()) {
+                    if (dir.getCalle().equals(calleDestino) && dir.getCiudad().equals(ciudadDestino)) {
+                        String calle = dir.getCalle() != null ? dir.getCalle() : "";
+                        String zona = dir.getCiudad() != null ? dir.getCiudad() : "";
+                        String textoCombo = calle + " (" + zona + ")";
+                        destinoDireccionCombo.setValue(textoCombo);
+                        break;
+                    }
+                }
+            }
         }
+        
         pesoField.setText(String.valueOf(envioDTO.getPeso()));
+        
+        // Las dimensiones no se almacenan en EnvioDTO, se calculan del volumen
+        // Si hay volumen, intentar estimar dimensiones (esto es aproximado)
+        // En la práctica, las dimensiones se ingresan manualmente al editar
+        
         prioridadCheck.setSelected(envioDTO.isPrioridad());
         seguroCheck.setSelected(envioDTO.isSeguro());
         if (fragilCheck != null) fragilCheck.setSelected(envioDTO.isFragil());
         if (firmaRequeridaCheck != null) firmaRequeridaCheck.setSelected(envioDTO.isFirmaRequerida());
+        
+        // Cargar tarifa
+        if (tipoTarifaCombo != null) {
+            tipoTarifaCombo.setValue(envioDTO.getTipoTarifa() != null ? envioDTO.getTipoTarifa() : "Normal");
+        }
+        
         costoLabel.setText(String.format("$ %.2f", envioDTO.getCostoEstimado()));
+        costoEstimadoActual = envioDTO.getCostoEstimado();
 
         mostrarMensaje("✏️ Editando envío ID: " + envioDTO.getId(), "blue");
     }
@@ -89,6 +143,8 @@ public class EditarEnvioController extends CrearEnvioController {
             envioEditadoDTO.setSeguro(seguroCheck.isSelected());
             envioEditadoDTO.setFragil(fragilCheck != null && fragilCheck.isSelected());
             envioEditadoDTO.setFirmaRequerida(firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected());
+            envioEditadoDTO.setTipoTarifa(tipoTarifaCombo != null && tipoTarifaCombo.getValue() != null 
+                    ? tipoTarifaCombo.getValue() : "Normal");
 
             // Recalcular costo
             double nuevoCosto = facade.calcularTarifa(envioEditadoDTO);
@@ -164,14 +220,47 @@ public class EditarEnvioController extends CrearEnvioController {
             // Registrar pago usando Facade (trabaja con DTOs)
             facade.registrarPagoSimulado(envioEditadoDTO.getId(), monto, metodo);
 
-            // Confirmar pago
-            facade.confirmarPago(envioEditadoDTO.getId());
-
-            // Actualizar estado del envío
-            envioEditadoDTO.setEstado(EnvioDTO.EstadoEnvio.CONFIRMADO);
+            // Buscar el pago recién creado para confirmarlo
+            PagoDTO pagoDTO = facade.buscarPagoPorEnvio(envioEditadoDTO.getId());
+            if (pagoDTO != null) {
+                // Confirmar pago (esto asignará automáticamente un repartidor si está disponible)
+                facade.confirmarPago(pagoDTO.getId());
+                
+                // Obtener el envío actualizado desde el DataStore para incluir el repartidor asignado
+                EnvioDTO envioActualizado = facade.buscarEnvioPorId(envioEditadoDTO.getId());
+                if (envioActualizado != null) {
+                    // Actualizar el DTO con los datos actualizados (incluyendo repartidor si fue asignado)
+                    envioEditadoDTO.setEstado(envioActualizado.getEstado());
+                    envioEditadoDTO.setIdRepartidor(envioActualizado.getIdRepartidor());
+                    envioEditadoDTO.setFechaConfirmacion(envioActualizado.getFechaConfirmacion());
+                    envioEditadoDTO.setFechaEntregaEstimada(envioActualizado.getFechaEntregaEstimada());
+                } else {
+                    // Fallback si no se puede obtener el envío actualizado
+                    envioEditadoDTO.setEstado(EnvioDTO.EstadoEnvio.CONFIRMADO);
+                    envioEditadoDTO.setFechaConfirmacion(java.time.LocalDateTime.now());
+                }
+            } else {
+                // Si no hay pago, solo actualizar el estado
+                envioEditadoDTO.setEstado(EnvioDTO.EstadoEnvio.CONFIRMADO);
+                envioEditadoDTO.setFechaConfirmacion(java.time.LocalDateTime.now());
+            }
+            
+            // Registrar cambios del envío
             facade.registrarEnvio(envioEditadoDTO);
 
             mostrarMensaje("✅ Pago confirmado. Envío actualizado correctamente.", "green");
+            
+            // Ofrecer imprimir factura
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Factura de Envío");
+            alert.setHeaderText("¿Desea imprimir la factura/guía de envío?");
+            alert.setContentText("El envío ha sido confirmado. Puede generar la factura ahora.");
+            alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+            alert.showAndWait().ifPresent(bt -> {
+                if (bt == ButtonType.YES) {
+                    imprimirFactura(envioEditadoDTO.getId());
+                }
+            });
 
             if (onEnvioCreado != null) onEnvioCreado.run();
 

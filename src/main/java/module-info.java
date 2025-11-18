@@ -19,6 +19,7 @@ module co.edu.uniquindio.logistica {
     opens co.edu.uniquindio.logistica.ui to javafx.fxml;
     opens co.edu.uniquindio.logistica.model to javafx.base, javafx.fxml;
     opens co.edu.uniquindio.logistica.model.DTO to javafx.base, javafx.fxml;
+    opens co.edu.uniquindio.logistica.observer to javafx.base;
 
     // 🔹 agregar esta línea para permitir que JavaFX acceda a tus clases de prueba
     opens co.edu.uniquindio.logistica.test to javafx.graphics;

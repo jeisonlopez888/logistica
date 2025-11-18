@@ -9,8 +9,8 @@ public class DireccionMapper {
         return new DireccionDTO(
                 direccion.getId(),
                 direccion.getAlias(),
-                direccion.getCiudad(),
-                direccion.getCalle(),
+                direccion.getCalle(),    // Corregido: calle va en el tercer parámetro
+                direccion.getCiudad(),   // Corregido: ciudad va en el cuarto parámetro
                 direccion.getCoordenadas()
         );
     }
@@ -20,8 +20,8 @@ public class DireccionMapper {
         return new Direccion(
                 dto.getId(),
                 dto.getAlias(),
-                dto.getCiudad(),
-                dto.getCalle(),
+                dto.getCalle(),    // Corregido: calle va en el tercer parámetro
+                dto.getCiudad(),   // Corregido: ciudad va en el cuarto parámetro
                 dto.getCoordenadas()
         );
     }

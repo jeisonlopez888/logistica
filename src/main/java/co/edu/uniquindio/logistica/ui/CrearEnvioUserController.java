@@ -53,6 +53,9 @@ public class CrearEnvioUserController extends CrearEnvioController {
         seguroCheck.setSelected(envioDTO.isSeguro());
         if (fragilCheck != null) fragilCheck.setSelected(envioDTO.isFragil());
         if (firmaRequeridaCheck != null) firmaRequeridaCheck.setSelected(envioDTO.isFirmaRequerida());
+        if (tipoTarifaCombo != null) {
+            tipoTarifaCombo.setValue(envioDTO.getTipoTarifa() != null ? envioDTO.getTipoTarifa() : "Normal");
+        }
         costoLabel.setText(String.format("$ %.2f", envioDTO.getCostoEstimado()));
     }
 }

@@ -3,6 +3,7 @@ package co.edu.uniquindio.logistica.ui;
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.DTO.DireccionDTO;
 import co.edu.uniquindio.logistica.model.DTO.EnvioDTO;
+import co.edu.uniquindio.logistica.model.DTO.PagoDTO;
 import co.edu.uniquindio.logistica.model.DTO.UsuarioDTO;
 import co.edu.uniquindio.logistica.model.MetodoPago;
 import co.edu.uniquindio.logistica.util.Sesion;
@@ -13,8 +14,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.io.File;
 
 /**
  * Controlador base para crear/editar envíos - Solo valida datos y usa DTOs
@@ -29,6 +33,7 @@ public abstract class CrearEnvioController {
     @FXML protected ComboBox<String> zonaDestinoCombo;
     @FXML protected TextField pesoField;
     @FXML protected ComboBox<String> tipoPaqueteCombo;
+    @FXML protected ComboBox<String> tipoTarifaCombo;
     @FXML protected TextField largoField;
     @FXML protected TextField anchoField;
     @FXML protected TextField altoField;
@@ -40,6 +45,22 @@ public abstract class CrearEnvioController {
     @FXML protected Label mensajeLabel;
     @FXML protected Button crearBtn;
     @FXML protected HBox dimensionesBox;
+    
+    // Labels para valores en tiempo real
+    @FXML protected Label tarifaValorLabel;
+    @FXML protected Label volumenValorLabel;
+    @FXML protected Label prioridadValorLabel;
+    @FXML protected Label seguroValorLabel;
+    @FXML protected Label fragilValorLabel;
+    @FXML protected Label firmaValorLabel;
+    
+    // Labels para desglose
+    @FXML protected Label baseValorLabel;
+    @FXML protected Label pesoValorLabel;
+    @FXML protected Label volumenDesgloseLabel;
+    @FXML protected Label tipoTarifaDesgloseLabel;
+    @FXML protected Label zonaValorLabel;
+    @FXML protected GridPane desgloseContainer;
 
     protected final LogisticaFacade facade = LogisticaFacade.getInstance();
 
@@ -54,6 +75,8 @@ public abstract class CrearEnvioController {
     public void setUsuario(UsuarioDTO usuarioDTO) {
         setUsuarioActual(usuarioDTO);
         cargarDireccionesUsuario();
+        // Refrescar tarifas cuando se establece el usuario (por si cambiaron)
+        cargarTarifasDisponibles();
     }
 
     public void setOnEnvioCreado(Runnable onEnvioCreado) {
@@ -71,7 +94,53 @@ public abstract class CrearEnvioController {
             largoField.setDisable(!esCaja);
             anchoField.setDisable(!esCaja);
             altoField.setDisable(!esCaja);
+            actualizarVolumen();
         });
+
+        // Cargar tipos de tarifa dinámicamente desde el DataStore
+        cargarTarifasDisponibles();
+        
+        // Inicializar valores de tarifa
+        actualizarValorTarifa();
+
+        // Listener para recalcular costo cuando cambie la tarifa
+        if (tipoTarifaCombo != null) {
+            tipoTarifaCombo.setOnAction(e -> {
+                actualizarValorTarifa();
+                // Si ya hay un costo calculado, recalcular con la nueva tarifa
+                if (costoEstimadoActual > 0 && !pesoField.getText().isEmpty()) {
+                    handleCotizar();
+                }
+            });
+        }
+        
+        // Listeners para actualizar valores en tiempo real
+        if (prioridadCheck != null) {
+            prioridadCheck.setOnAction(e -> actualizarValoresOpciones());
+        }
+        if (seguroCheck != null) {
+            seguroCheck.setOnAction(e -> actualizarValoresOpciones());
+        }
+        if (fragilCheck != null) {
+            fragilCheck.setOnAction(e -> actualizarValoresOpciones());
+        }
+        if (firmaRequeridaCheck != null) {
+            firmaRequeridaCheck.setOnAction(e -> actualizarValoresOpciones());
+        }
+        
+        // Listener para actualizar volumen cuando cambien las dimensiones
+        if (largoField != null) {
+            largoField.textProperty().addListener((obs, oldVal, newVal) -> actualizarVolumen());
+        }
+        if (anchoField != null) {
+            anchoField.textProperty().addListener((obs, oldVal, newVal) -> actualizarVolumen());
+        }
+        if (altoField != null) {
+            altoField.textProperty().addListener((obs, oldVal, newVal) -> actualizarVolumen());
+        }
+        if (tipoPaqueteCombo != null) {
+            tipoPaqueteCombo.setOnAction(e -> actualizarVolumen());
+        }
 
         largoField.setDisable(true);
         anchoField.setDisable(true);
@@ -110,32 +179,32 @@ public abstract class CrearEnvioController {
         }
     }
     
-    private void cargarDireccionesUsuario() {
+    void cargarDireccionesUsuario() {
         if (usuarioActual == null || usuarioActual.getDirecciones() == null) {
             return;
         }
         
         // Cargar direcciones en ComboBox de origen
+        // Mostrar solo la calle o carrera (dir.getCalle()) y la zona
         if (origenDireccionCombo != null) {
             origenDireccionCombo.getItems().clear();
             origenDireccionCombo.getItems().add("Nueva dirección");
             for (DireccionDTO dir : usuarioActual.getDirecciones()) {
-                String nombre = dir.getAlias() != null && !dir.getAlias().isEmpty() 
-                    ? dir.getAlias() 
-                    : dir.getCalle();
-                origenDireccionCombo.getItems().add(nombre + " - " + dir.getCalle() + " (" + dir.getCiudad() + ")");
+                String calle = dir.getCalle() != null ? dir.getCalle() : "";
+                String zona = dir.getCiudad() != null ? dir.getCiudad() : "";
+                origenDireccionCombo.getItems().add(calle + " (" + zona + ")");
             }
         }
         
         // Cargar direcciones en ComboBox de destino
+        // Mostrar solo la calle o carrera (dir.getCalle()) y la zona
         if (destinoDireccionCombo != null) {
             destinoDireccionCombo.getItems().clear();
             destinoDireccionCombo.getItems().add("Nueva dirección");
             for (DireccionDTO dir : usuarioActual.getDirecciones()) {
-                String nombre = dir.getAlias() != null && !dir.getAlias().isEmpty() 
-                    ? dir.getAlias() 
-                    : dir.getCalle();
-                destinoDireccionCombo.getItems().add(nombre + " - " + dir.getCalle() + " (" + dir.getCiudad() + ")");
+                String calle = dir.getCalle() != null ? dir.getCalle() : "";
+                String zona = dir.getCiudad() != null ? dir.getCiudad() : "";
+                destinoDireccionCombo.getItems().add(calle + " (" + zona + ")");
             }
         }
     }
@@ -146,11 +215,11 @@ public abstract class CrearEnvioController {
         }
         
         // Buscar la dirección que coincida
+        // El formato ahora es: "calle (zona)"
         for (DireccionDTO dir : usuarioActual.getDirecciones()) {
-            String nombre = dir.getAlias() != null && !dir.getAlias().isEmpty() 
-                ? dir.getAlias() 
-                : dir.getCalle();
-            String textoCombo = nombre + " - " + dir.getCalle() + " (" + dir.getCiudad() + ")";
+            String calle = dir.getCalle() != null ? dir.getCalle() : "";
+            String zona = dir.getCiudad() != null ? dir.getCiudad() : "";
+            String textoCombo = calle + " (" + zona + ")";
             
             if (seleccion.equals(textoCombo)) {
                 if (esOrigen) {
@@ -204,11 +273,19 @@ public abstract class CrearEnvioController {
             envioTempDTO.setSeguro(seguroCheck.isSelected());
             envioTempDTO.setFragil(fragilCheck != null && fragilCheck.isSelected());
             envioTempDTO.setFirmaRequerida(firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected());
+            envioTempDTO.setTipoTarifa(tipoTarifaCombo != null && tipoTarifaCombo.getValue() != null 
+                    ? tipoTarifaCombo.getValue() : "Normal");
 
             // Calcular tarifa usando Facade (trabaja con DTOs)
             double total = facade.calcularTarifa(envioTempDTO);
             costoEstimadoActual = total;
-            costoLabel.setText(String.format("$ %.2f", total));
+            
+            // Obtener desglose detallado
+            co.edu.uniquindio.logistica.service.TarifaService.TarifaDetalle detalle = facade.desglosarTarifa(envioTempDTO);
+            
+            // Actualizar todos los labels con los valores del desglose
+            actualizarDesglose(detalle);
+            
             if (crearBtn != null) crearBtn.setDisable(false);
             mostrarMensaje("💰 Costo estimado calculado correctamente", "green");
 
@@ -231,6 +308,16 @@ public abstract class CrearEnvioController {
                 return;
             }
 
+            // Primero preguntar por el método de notificación
+            co.edu.uniquindio.logistica.service.NotificationService.CanalNotificacion canal = mostrarDialogoCanalNotificacion();
+            if (canal == null) {
+                mostrarMensaje("⚠️ Operación cancelada", "orange");
+                return;
+            }
+            
+            // Establecer el canal de notificación en el servicio
+            facade.setCanalNotificacion(canal);
+            
             Alert pagoDialog = new Alert(Alert.AlertType.CONFIRMATION);
             pagoDialog.setTitle("Confirmar Pago");
             pagoDialog.setHeaderText("Total a pagar: $" + costoEstimadoActual);
@@ -276,6 +363,8 @@ public abstract class CrearEnvioController {
             envioDTO.setSeguro(seguroCheck.isSelected());
             envioDTO.setFragil(fragilCheck != null && fragilCheck.isSelected());
             envioDTO.setFirmaRequerida(firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected());
+            envioDTO.setTipoTarifa(tipoTarifaCombo != null && tipoTarifaCombo.getValue() != null 
+                    ? tipoTarifaCombo.getValue() : "Normal");
             envioDTO.setCostoEstimado(costoEstimadoActual);
 
             // Registrar envío
@@ -291,7 +380,27 @@ public abstract class CrearEnvioController {
             // Registrar pago simulado
             facade.registrarPagoSimulado(envioDTO.getId(), costoEstimadoActual, metodoSeleccionado);
 
-            mostrarMensaje("✅ Envío #" + envioDTO.getId() + " creado para " + usuarioActual.getNombre() + " y repartidor asignado.", "green");
+            // Buscar el pago recién creado y confirmarlo (esto asignará automáticamente un repartidor)
+            PagoDTO pagoDTO = facade.buscarPagoPorEnvio(envioDTO.getId());
+            if (pagoDTO != null) {
+                // Confirmar pago (esto asignará automáticamente un repartidor disponible en la zona de destino)
+                String resultado = facade.confirmarPago(pagoDTO.getId());
+                mostrarMensaje("✅ Envío #" + envioDTO.getId() + " creado para " + usuarioActual.getNombre() + ". " + resultado, "green");
+                
+                // Ofrecer imprimir factura
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Factura de Envío");
+                alert.setHeaderText("¿Desea imprimir la factura/guía de envío?");
+                alert.setContentText("El envío ha sido confirmado. Puede generar la factura ahora.");
+                alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+                alert.showAndWait().ifPresent(bt -> {
+                    if (bt == ButtonType.YES) {
+                        imprimirFactura(envioDTO.getId());
+                    }
+                });
+            } else {
+                mostrarMensaje("✅ Envío #" + envioDTO.getId() + " creado para " + usuarioActual.getNombre() + ". Pago registrado pero no confirmado.", "green");
+            }
             limpiarCampos();
 
             if (onEnvioCreado != null) onEnvioCreado.run();
@@ -335,6 +444,8 @@ public abstract class CrearEnvioController {
             envioDTO.setSeguro(seguroCheck.isSelected());
             envioDTO.setFragil(fragilCheck != null && fragilCheck.isSelected());
             envioDTO.setFirmaRequerida(firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected());
+            envioDTO.setTipoTarifa(tipoTarifaCombo != null && tipoTarifaCombo.getValue() != null 
+                    ? tipoTarifaCombo.getValue() : "Normal");
             envioDTO.setEstado(EnvioDTO.EstadoEnvio.SOLICITADO);
 
             // Registrar envío
@@ -355,7 +466,8 @@ public abstract class CrearEnvioController {
                 ValidacionUtil.isEmpty(pesoField.getText()) ||
                 zonaOrigenCombo.getValue() == null ||
                 zonaDestinoCombo.getValue() == null ||
-                tipoPaqueteCombo.getValue() == null) {
+                tipoPaqueteCombo.getValue() == null ||
+                (tipoTarifaCombo != null && tipoTarifaCombo.getValue() == null)) {
             mostrarMensaje("⚠️ Todos los campos son obligatorios", "orange");
             return false;
         }
@@ -381,44 +493,128 @@ public abstract class CrearEnvioController {
     }
 
     @FXML
-    protected void handleVerDesglose(ActionEvent event) {
+    /**
+     * Actualiza el volumen mostrado cuando cambian las dimensiones
+     */
+    protected void actualizarVolumen() {
+        if (volumenValorLabel == null) return;
         try {
-            if (!validarCampos()) return;
-
-            double peso = Double.parseDouble(pesoField.getText());
             double volumen = calcularVolumen();
-
-            // Crear DTOs (nombre, calle, ciudad, coordenadas)
-            DireccionDTO origenDTO = facade.crearDireccion("Origen",
-                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), "");
-            DireccionDTO destinoDTO = facade.crearDireccion("Destino",
-                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), "");
-
-            // Crear DTO temporal
-            EnvioDTO envioTempDTO = new EnvioDTO();
-            envioTempDTO.setOrigen(origenDTO);
-            envioTempDTO.setDestino(destinoDTO);
-            envioTempDTO.setPeso(peso);
-            envioTempDTO.setVolumen(volumen);
-            envioTempDTO.setPrioridad(prioridadCheck.isSelected());
-            envioTempDTO.setSeguro(seguroCheck.isSelected());
-            envioTempDTO.setCostoEstimado(facade.calcularTarifa(envioTempDTO));
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/detalle_tarifa.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.setTitle("Detalle de Tarifa");
-            stage.setScene(new Scene(root));
-
-            DetalleTarifaController controller = loader.getController();
-            controller.setStage(stage);
-            controller.mostrarDetalle(envioTempDTO);
-
-            stage.show();
+            volumenValorLabel.setText(String.format("Volumen: %.4f m³", volumen));
         } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("❌ Error al abrir el detalle de tarifa.", "red");
+            volumenValorLabel.setText("Volumen: 0.0000 m³");
+        }
+    }
+    
+    /**
+     * Actualiza el valor de la tarifa seleccionada
+     */
+    protected void actualizarValorTarifa() {
+        if (tarifaValorLabel == null || tipoTarifaCombo == null) return;
+        String tarifaSeleccionada = tipoTarifaCombo.getValue();
+        if (tarifaSeleccionada != null) {
+            try {
+                java.util.List<co.edu.uniquindio.logistica.model.DTO.TarifaDTO> tarifas = facade.getTarifas();
+                co.edu.uniquindio.logistica.model.DTO.TarifaDTO tarifa = tarifas.stream()
+                    .filter(t -> t.getDescripcion() != null && t.getDescripcion().equals(tarifaSeleccionada))
+                    .findFirst()
+                    .orElse(null);
+                if (tarifa != null) {
+                    tarifaValorLabel.setText(String.format("$ %.2f", tarifa.getCostoBase()));
+                } else {
+                    tarifaValorLabel.setText("");
+                }
+            } catch (Exception e) {
+                tarifaValorLabel.setText("");
+            }
+        } else {
+            tarifaValorLabel.setText("");
+        }
+    }
+    
+    /**
+     * Actualiza los valores de las opciones cuando se marcan/desmarcan
+     */
+    protected void actualizarValoresOpciones() {
+        // Solo actualizar si ya hay un costo calculado
+        if (costoEstimadoActual > 0 && !pesoField.getText().isEmpty()) {
+            handleCotizar();
+        } else {
+            // Limpiar valores si no hay cálculo
+            if (prioridadValorLabel != null) prioridadValorLabel.setText("");
+            if (seguroValorLabel != null) seguroValorLabel.setText("");
+            if (fragilValorLabel != null) fragilValorLabel.setText("");
+            if (firmaValorLabel != null) firmaValorLabel.setText("");
+        }
+    }
+    
+    /**
+     * Actualiza todos los labels del desglose con los valores calculados
+     */
+    protected void actualizarDesglose(co.edu.uniquindio.logistica.service.TarifaService.TarifaDetalle detalle) {
+        if (detalle == null) return;
+        
+        // Actualizar desglose principal
+        if (baseValorLabel != null) {
+            baseValorLabel.setText(String.format("$ %,.2f", detalle.getBase()));
+        }
+        if (pesoValorLabel != null) {
+            pesoValorLabel.setText(String.format("$ %,.2f", detalle.getPorPeso()));
+        }
+        if (volumenDesgloseLabel != null) {
+            volumenDesgloseLabel.setText(String.format("$ %,.2f", detalle.getPorVolumen()));
+        }
+        if (tipoTarifaDesgloseLabel != null && tipoTarifaCombo != null) {
+            String tarifa = tipoTarifaCombo.getValue() != null ? tipoTarifaCombo.getValue() : "Normal";
+            tipoTarifaDesgloseLabel.setText(tarifa);
+        }
+        if (zonaValorLabel != null) {
+            zonaValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoZona()));
+        }
+        
+        // Actualizar valores de opciones individuales
+        if (prioridadValorLabel != null) {
+            if (prioridadCheck != null && prioridadCheck.isSelected()) {
+                prioridadValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoPrioridad()));
+            } else {
+                prioridadValorLabel.setText("");
+            }
+        }
+        if (seguroValorLabel != null) {
+            if (seguroCheck != null && seguroCheck.isSelected()) {
+                seguroValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoSeguro()));
+            } else {
+                seguroValorLabel.setText("");
+            }
+        }
+        if (fragilValorLabel != null) {
+            if (fragilCheck != null && fragilCheck.isSelected()) {
+                fragilValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoFragil()));
+            } else {
+                fragilValorLabel.setText("");
+            }
+        }
+        if (firmaValorLabel != null) {
+            if (firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected()) {
+                firmaValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoFirma()));
+            } else {
+                firmaValorLabel.setText("");
+            }
+        }
+        
+        // Actualizar total - usar costoLabel si existe, sino buscar costoTotalLabel
+        if (costoLabel != null) {
+            costoLabel.setText(String.format("$ %,.2f", detalle.getTotal()));
+        }
+        // También actualizar el label del desglose si existe
+        try {
+            javafx.scene.Node node = desgloseContainer != null ? 
+                desgloseContainer.lookup("#costoTotalLabel") : null;
+            if (node instanceof Label) {
+                ((Label) node).setText(String.format("$ %,.2f", detalle.getTotal()));
+            }
+        } catch (Exception e) {
+            // Ignorar si no existe
         }
     }
 
@@ -440,12 +636,38 @@ public abstract class CrearEnvioController {
         zonaOrigenCombo.getSelectionModel().clearSelection();
         zonaDestinoCombo.getSelectionModel().clearSelection();
         tipoPaqueteCombo.getSelectionModel().clearSelection();
+        if (tipoTarifaCombo != null) {
+            tipoTarifaCombo.setValue("Normal");
+        }
         prioridadCheck.setSelected(false);
         seguroCheck.setSelected(false);
         if (fragilCheck != null) fragilCheck.setSelected(false);
         if (firmaRequeridaCheck != null) firmaRequeridaCheck.setSelected(false);
         costoLabel.setText("—");
         if (crearBtn != null) crearBtn.setDisable(true);
+    }
+
+    /**
+     * Carga las tarifas disponibles desde el DataStore y las actualiza en el ComboBox
+     */
+    protected void cargarTarifasDisponibles() {
+        if (tipoTarifaCombo != null) {
+            tipoTarifaCombo.getItems().clear();
+            java.util.List<String> nombresTarifas = facade.getNombresTarifas();
+            if (!nombresTarifas.isEmpty()) {
+                tipoTarifaCombo.getItems().addAll(nombresTarifas);
+                // Establecer el primer valor como predeterminado si no hay selección
+                if (tipoTarifaCombo.getValue() == null) {
+                    tipoTarifaCombo.setValue(nombresTarifas.get(0));
+                }
+            } else {
+                // Fallback si no hay tarifas
+                tipoTarifaCombo.getItems().addAll("Normal", "Express");
+                tipoTarifaCombo.setValue("Normal");
+            }
+        }
+        // Actualizar valor de tarifa después de cargar
+        actualizarValorTarifa();
     }
 
     protected void mostrarMensaje(String texto, String color) {
@@ -461,6 +683,36 @@ public abstract class CrearEnvioController {
         alert.showAndWait();
     }
 
+    /**
+     * Muestra un diálogo para seleccionar el canal de notificación
+     * @return CanalNotificacion seleccionado o null si se canceló
+     */
+    protected co.edu.uniquindio.logistica.service.NotificationService.CanalNotificacion mostrarDialogoCanalNotificacion() {
+        Alert canalDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        canalDialog.setTitle("Canal de Notificación");
+        canalDialog.setHeaderText("Seleccione cómo desea recibir las notificaciones sobre su envío");
+        canalDialog.getButtonTypes().setAll(
+            new ButtonType("📱 WhatsApp", ButtonBar.ButtonData.YES),
+            new ButtonType("📧 Correo Electrónico", ButtonBar.ButtonData.NO),
+            new ButtonType("💬 SMS", ButtonBar.ButtonData.CANCEL_CLOSE),
+            ButtonType.CANCEL
+        );
+        
+        final co.edu.uniquindio.logistica.service.NotificationService.CanalNotificacion[] canalSeleccionado = {null};
+        canalDialog.showAndWait().ifPresent(opcion -> {
+            if (opcion.getButtonData() == ButtonBar.ButtonData.YES) {
+                canalSeleccionado[0] = co.edu.uniquindio.logistica.service.NotificationService.CanalNotificacion.WHATSAPP;
+            } else if (opcion.getButtonData() == ButtonBar.ButtonData.NO) {
+                canalSeleccionado[0] = co.edu.uniquindio.logistica.service.NotificationService.CanalNotificacion.EMAIL;
+            } else if (opcion.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
+                canalSeleccionado[0] = co.edu.uniquindio.logistica.service.NotificationService.CanalNotificacion.SMS;
+            } else {
+                canalSeleccionado[0] = null;
+            }
+        });
+        return canalSeleccionado[0];
+    }
+    
     /**
      * Muestra un diálogo para seleccionar el método de pago
      * @param mensaje Mensaje a mostrar en el diálogo
@@ -494,6 +746,41 @@ public abstract class CrearEnvioController {
         });
 
         return metodoSeleccionado[0];
+    }
+    
+    /**
+     * Imprime la factura/guía de envío en PDF
+     */
+    protected void imprimirFactura(Long envioId) {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Guardar Factura de Envío");
+            fileChooser.setInitialFileName("factura_envio_" + envioId + ".pdf");
+            fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+            );
+            
+            Stage stage = (Stage) (pesoField != null ? pesoField.getScene().getWindow() : null);
+            if (stage == null) {
+                mostrarMensaje("❌ Error: No se pudo obtener la ventana", "red");
+                return;
+            }
+            
+            File file = fileChooser.showSaveDialog(stage);
+            if (file != null) {
+                facade.generarFacturaEnvio(envioId, file.getAbsolutePath());
+                mostrarMensaje("✅ Factura generada exitosamente: " + file.getName(), "green");
+                
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Factura Generada");
+                alert.setHeaderText("Factura generada exitosamente");
+                alert.setContentText("La factura se ha guardado en:\n" + file.getAbsolutePath());
+                alert.showAndWait();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al generar la factura: " + e.getMessage(), "red");
+        }
     }
 
     @FXML

@@ -111,11 +111,9 @@ public class UsuariosController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/crear_usuario_admin.fxml"));
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            currentStage.close();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Crear Usuario");
-            stage.show();
+            currentStage.setScene(new Scene(root));
+            currentStage.setTitle("Crear Usuario");
+            currentStage.show();
         } catch (Exception e) {
             e.printStackTrace();
             mostrarAlerta("Error", "No se pudo crear usuario.");

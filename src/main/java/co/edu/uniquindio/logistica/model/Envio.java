@@ -19,6 +19,7 @@ public class Envio {
     private boolean seguro;
     private boolean fragil;
     private boolean firmaRequerida;
+    private String tipoTarifa; // "Normal" o "Express"
     private double costoEstimado;
     private EstadoEnvio estado;
     private Repartidor repartidor;
@@ -60,6 +61,9 @@ public class Envio {
 
     public boolean isFirmaRequerida() { return firmaRequerida; }
     public void setFirmaRequerida(boolean firmaRequerida) { this.firmaRequerida = firmaRequerida; }
+
+    public String getTipoTarifa() { return tipoTarifa; }
+    public void setTipoTarifa(String tipoTarifa) { this.tipoTarifa = tipoTarifa; }
 
     public double getCostoEstimado() { return costoEstimado; }
     public void setCostoEstimado(double costoEstimado) { this.costoEstimado = costoEstimado; }

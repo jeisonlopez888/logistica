@@ -35,7 +35,7 @@
                 <Separator style="-fx-background-color: #CFD8DC;"/>
 
                 <!-- Grid de desglose -->
-                <GridPane hgap="20" vgap="12">
+                <GridPane fx:id="gridPane" hgap="20" vgap="12">
                     <columnConstraints>
                         <ColumnConstraints halignment="RIGHT" minWidth="180"/>
                         <ColumnConstraints halignment="LEFT" minWidth="150"/>
@@ -56,29 +56,34 @@
                     <Label fx:id="volumenLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"
                            style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
 
-                    <Label text="🗺️ Recargo zona:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                    <Label text="🚚 Tipo de tarifa:" GridPane.rowIndex="3" GridPane.columnIndex="0"
                            style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
-                    <Label fx:id="zonaLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                    <Label fx:id="tipoTarifaLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"
                            style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
 
-                    <Label text="⚡ Prioridad:" GridPane.rowIndex="4" GridPane.columnIndex="0"
+                    <Label text="🗺️ Recargo zona:" GridPane.rowIndex="4" GridPane.columnIndex="0"
                            style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
-                    <Label fx:id="prioridadLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"
+                    <Label fx:id="zonaLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"
                            style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
 
-                    <Label text="🛡️ Seguro:" GridPane.rowIndex="5" GridPane.columnIndex="0"
+                    <Label text="⚡ Prioridad:" GridPane.rowIndex="5" GridPane.columnIndex="0"
                            style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
-                    <Label fx:id="seguroLabel" GridPane.rowIndex="5" GridPane.columnIndex="1"
+                    <Label fx:id="prioridadLabel" GridPane.rowIndex="5" GridPane.columnIndex="1"
                            style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
 
-                    <Label text="⚠️ Frágil:" GridPane.rowIndex="6" GridPane.columnIndex="0"
+                    <Label text="🛡️ Seguro:" GridPane.rowIndex="6" GridPane.columnIndex="0"
                            style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
-                    <Label fx:id="fragilLabel" GridPane.rowIndex="6" GridPane.columnIndex="1"
+                    <Label fx:id="seguroLabel" GridPane.rowIndex="6" GridPane.columnIndex="1"
                            style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
 
-                    <Label text="✍️ Firma requerida:" GridPane.rowIndex="7" GridPane.columnIndex="0"
+                    <Label text="⚠️ Frágil:" GridPane.rowIndex="7" GridPane.columnIndex="0"
                            style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
-                    <Label fx:id="firmaLabel" GridPane.rowIndex="7" GridPane.columnIndex="1"
+                    <Label fx:id="fragilLabel" GridPane.rowIndex="7" GridPane.columnIndex="1"
+                           style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
+
+                    <Label text="✍️ Firma requerida:" GridPane.rowIndex="8" GridPane.columnIndex="0"
+                           style="-fx-font-size: 13px; -fx-text-fill: #546E7A; -fx-font-weight: bold;"/>
+                    <Label fx:id="firmaLabel" GridPane.rowIndex="8" GridPane.columnIndex="1"
                            style="-fx-font-size: 14px; -fx-text-fill: #37474F;"/>
                 </GridPane>
 

@@ -107,6 +107,14 @@
                                -fx-cursor: hand;"/>
 
                 <!-- Fila 4 -->
+                <Button text="🔍 Rastrear Envío" onAction="#handleRastrearEnvio"
+                        GridPane.columnIndex="0" GridPane.rowIndex="3"
+                        style="-fx-background-color: linear-gradient(to bottom right, #FF6F00, #FF8F00);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 14; -fx-padding: 25 35;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
                 <Button text="↩️ Volver al Login" onAction="#handleVolverLogin"
                         GridPane.columnIndex="1" GridPane.rowIndex="3"
                         style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);

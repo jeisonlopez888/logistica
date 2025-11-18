@@ -2,6 +2,7 @@ package co.edu.uniquindio.logistica.service;
 
 import co.edu.uniquindio.logistica.factory.EntityFactory;
 import co.edu.uniquindio.logistica.model.*;
+import co.edu.uniquindio.logistica.observer.EnvioSubject;
 import co.edu.uniquindio.logistica.store.DataStore;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,27 @@ public class EnvioService {
     private final DataStore store = DataStore.getInstance();
     private final TarifaService tarifaService = new TarifaService();
     private final RepartidorService repartidorService = new RepartidorService();
+    private final EnvioSubject envioSubject = new EnvioSubject();
+    
+    // Singleton para NotificationService
+    private static NotificationService notificationService;
+    
+    public EnvioService() {
+        // Registrar el servicio de notificaciones como observador
+        if (notificationService == null) {
+            notificationService = new NotificationService();
+        }
+        envioSubject.registrarObserver(notificationService);
+    }
+    
+    /**
+     * Establece el canal de notificación preferido
+     */
+    public void setCanalNotificacion(NotificationService.CanalNotificacion canal) {
+        if (notificationService != null) {
+            notificationService.setCanalPreferido(canal);
+        }
+    }
 
     // 🔹 CREAR o GUARDAR envío
     public void registrarEnvio(Envio envio) {
@@ -38,6 +60,9 @@ public class EnvioService {
             envio.setCostoEstimado(tarifaService.calcularTarifa(envio));
 
         store.addEnvio(envio);
+        
+        // Notificar creación de envío usando Observer
+        envioSubject.notificarCreacionEnvio(envio);
     }
     
     // 🔹 Actualizar completamente un envío existente
@@ -82,6 +107,41 @@ public class EnvioService {
                 .findFirst()
                 .orElse(null);
     }
+    
+    // 🔹 Filtrar envíos por fecha y estado
+    public List<Envio> filtrarEnvios(List<Envio> envios, java.time.LocalDate fechaInicio, 
+                                     java.time.LocalDate fechaFin, Envio.EstadoEnvio estado) {
+        List<Envio> filtrados = new ArrayList<>(envios);
+        
+        // Filtrar por fecha de inicio
+        if (fechaInicio != null) {
+            filtrados = filtrados.stream()
+                    .filter(e -> {
+                        if (e.getFechaCreacion() == null) return false;
+                        return e.getFechaCreacion().toLocalDate().isAfter(fechaInicio.minusDays(1));
+                    })
+                    .collect(Collectors.toList());
+        }
+        
+        // Filtrar por fecha de fin
+        if (fechaFin != null) {
+            filtrados = filtrados.stream()
+                    .filter(e -> {
+                        if (e.getFechaCreacion() == null) return false;
+                        return e.getFechaCreacion().toLocalDate().isBefore(fechaFin.plusDays(1));
+                    })
+                    .collect(Collectors.toList());
+        }
+        
+        // Filtrar por estado
+        if (estado != null) {
+            filtrados = filtrados.stream()
+                    .filter(e -> e.getEstado() != null && e.getEstado().equals(estado))
+                    .collect(Collectors.toList());
+        }
+        
+        return filtrados;
+    }
 
     // 🔹 Actualizar envío existente
     public boolean actualizarEnvio(Envio envio, Envio actualizado, Usuario usuarioActual) {
@@ -116,6 +176,8 @@ public class EnvioService {
         Envio envio = buscarPorId(idEnvio);
         if (envio == null) return;
 
+        // Guardar estado anterior para notificación
+        Envio.EstadoEnvio estadoAnterior = envio.getEstado();
         envio.setEstado(nuevoEstado);
 
         switch (nuevoEstado) {
@@ -128,8 +190,22 @@ public class EnvioService {
                     System.out.println("⚠️ No se encontró repartidor disponible para la zona de origen del envío.");
                 }
             }
-            case ENTREGADO -> envio.setFechaEntrega(LocalDateTime.now());
+            case ENTREGADO -> {
+                envio.setFechaEntrega(LocalDateTime.now());
+                // Notificar entrega completada
+                String mensaje = String.format("El envío #%d ha sido entregado exitosamente",
+                        envio.getId());
+                envioSubject.notificarObservers(envio, 
+                    co.edu.uniquindio.logistica.observer.TipoEvento.ENTREGA_COMPLETADA, mensaje);
+            }
             default -> { /* No se necesita acción extra */ }
+        }
+        
+        // Notificar cambio de estado usando Observer
+        if (estadoAnterior != nuevoEstado) {
+            envioSubject.notificarCambioEstado(envio, 
+                estadoAnterior != null ? estadoAnterior.name() : "N/A",
+                nuevoEstado.name());
         }
     }
 
@@ -154,6 +230,7 @@ public class EnvioService {
 
         // Asignar repartidor al envío
         envio.setRepartidor(elegido);
+        Envio.EstadoEnvio estadoAnterior = envio.getEstado();
         envio.setEstado(Envio.EstadoEnvio.ASIGNADO);
         envio.setFechaEntregaEstimada(LocalDateTime.now().plusDays(2));
 
@@ -162,6 +239,17 @@ public class EnvioService {
         // repartidorService.marcarNoDisponible(elegido);
 
         System.out.println("🚚 Repartidor asignado: " + elegido.getNombre() + " (Zona: " + elegido.getZona() + ")");
+        
+        // Notificar asignación de repartidor usando Observer
+        envioSubject.notificarAsignacionRepartidor(envio);
+        
+        // Notificar cambio de estado si cambió
+        if (estadoAnterior != Envio.EstadoEnvio.ASIGNADO) {
+            envioSubject.notificarCambioEstado(envio,
+                estadoAnterior != null ? estadoAnterior.name() : "N/A",
+                Envio.EstadoEnvio.ASIGNADO.name());
+        }
+        
         return true;
     }
 
@@ -169,12 +257,26 @@ public class EnvioService {
     public void registrarIncidencia(Envio envio, String descripcion) {
         if (envio == null || descripcion == null || descripcion.isBlank()) return;
 
+        Envio.EstadoEnvio estadoAnterior = envio.getEstado();
         envio.setEstado(Envio.EstadoEnvio.INCIDENCIA);
         envio.setIncidenciaDescripcion(descripcion);
         envio.setFechaIncidencia(LocalDateTime.now());
 
         // Reemplazar en DataStore
         store.getEnvios().replaceAll(e -> e.getId().equals(envio.getId()) ? envio : e);
+        
+        // Notificar incidencia usando Observer
+        String mensaje = String.format("Se ha registrado una incidencia en el envío #%d: %s",
+                envio.getId(), descripcion);
+        envioSubject.notificarObservers(envio, 
+            co.edu.uniquindio.logistica.observer.TipoEvento.INCIDENCIA, mensaje);
+        
+        // Notificar cambio de estado si cambió
+        if (estadoAnterior != Envio.EstadoEnvio.INCIDENCIA) {
+            envioSubject.notificarCambioEstado(envio,
+                estadoAnterior != null ? estadoAnterior.name() : "N/A",
+                Envio.EstadoEnvio.INCIDENCIA.name());
+        }
     }
 
     // 🔹 Consultar descripción de una incidencia
@@ -195,8 +297,16 @@ public class EnvioService {
     public String confirmarPago(Envio envio) {
         envio.setFechaConfirmacion(LocalDateTime.now());
         envio.setEstado(Envio.EstadoEnvio.CONFIRMADO);
+        // Asignar repartidor disponible en la zona de destino
         boolean asignado = asignarRepartidor(envio);
-        return asignado ? "✅ Repartidor asignado" : "⚠️ No hay repartidores disponibles.";
+        if (asignado) {
+            // Si se asignó repartidor, el estado cambia a ASIGNADO
+            // Mantener el estado como ASIGNADO después de asignar repartidor
+            return "✅ Repartidor asignado en zona de destino";
+        } else {
+            // Si no hay repartidor disponible, mantener como CONFIRMADO
+            return "⚠️ No hay repartidores disponibles en la zona de destino. Estado: CONFIRMADO";
+        }
     }
 
 
