@@ -56,8 +56,8 @@ public class EnvioService {
         if (envio.getFechaCreacion() == null)
             envio.setFechaCreacion(LocalDateTime.now());
 
-        if (envio.getCostoEstimado() == 0.0)
-            envio.setCostoEstimado(tarifaService.calcularTarifa(envio));
+        // Siempre recalcular el costo para asegurar que esté actualizado
+        envio.setCostoEstimado(tarifaService.calcularTarifa(envio));
 
         store.addEnvio(envio);
         
@@ -75,7 +75,15 @@ public class EnvioService {
         existente.setSeguro(actualizado.isSeguro());
         existente.setFragil(actualizado.isFragil());
         existente.setFirmaRequerida(actualizado.isFirmaRequerida());
-        existente.setCostoEstimado(actualizado.getCostoEstimado());
+        existente.setTipoTarifa(actualizado.getTipoTarifa());
+        
+        // Recalcular el costo si cambió algún parámetro relevante
+        if (actualizado.getCostoEstimado() > 0) {
+            existente.setCostoEstimado(actualizado.getCostoEstimado());
+        } else {
+            // Recalcular el costo basado en los nuevos datos
+            existente.setCostoEstimado(tarifaService.calcularTarifa(existente));
+        }
         
         if (actualizado.getEstado() != null) {
             existente.setEstado(actualizado.getEstado());

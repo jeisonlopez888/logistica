@@ -130,6 +130,13 @@
                                -fx-effect: dropshadow(gaussian, rgba(156,39,176,0.5), 8, 0, 0, 3);
                                -fx-cursor: hand;"/>
 
+                <Button text="💰 Detalle Tarifa" onAction="#verDetalleTarifa"
+                        style="-fx-background-color: linear-gradient(to bottom right, #26C6DA, #0097A7);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 10; -fx-padding: 12 25;
+                               -fx-effect: dropshadow(gaussian, rgba(0,151,167,0.5), 8, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
                 <Button text="↩️ Volver" onAction="#handleVolver"
                         style="-fx-background-color: linear-gradient(to bottom right, #757575, #424242);
                                -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;

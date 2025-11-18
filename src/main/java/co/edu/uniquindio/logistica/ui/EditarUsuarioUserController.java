@@ -155,9 +155,7 @@ public class EditarUsuarioUserController {
 
             if (onUsuarioEditado != null) onUsuarioEditado.run();
 
-            // Cerrar ventana
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.close();
+            // NO cerrar la ventana - el usuario puede seguir editando o usar el botón "Volver"
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -179,8 +177,19 @@ public class EditarUsuarioUserController {
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.close();
+            mostrarMensaje("❌ Error al volver al panel de usuario", "red");
+            // Intentar volver al login como fallback
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+                Parent root = loader.load();
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Inicio de Sesión");
+                stage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                mostrarMensaje("❌ Error crítico al volver", "red");
+            }
         }
     }
 

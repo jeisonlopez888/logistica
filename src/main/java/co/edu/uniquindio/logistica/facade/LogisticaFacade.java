@@ -94,6 +94,12 @@ public class LogisticaFacade {
     
     public void registrarEnvio(EnvioDTO envioDTO) {
         Envio envio = EnvioMapper.toEntity(envioDTO);
+        // Asegurar que el costo esté calculado antes de guardar
+        if (envioDTO.getCostoEstimado() == 0.0 || envio.getCostoEstimado() == 0.0) {
+            double costoCalculado = tarifaService.calcularTarifa(envio);
+            envio.setCostoEstimado(costoCalculado);
+            envioDTO.setCostoEstimado(costoCalculado);
+        }
         envioService.registrarEnvio(envio);
     }
     
@@ -252,7 +258,14 @@ public class LogisticaFacade {
                 .orElse(null);
         if (envio == null) return null;
         
-        Pago pago = pagoService.registrarPagoEnvio(envio, monto, metodo);
+        // Asegurar que el costo estimado del envío esté actualizado
+        // Si el costo estimado es 0 o diferente al monto, actualizarlo
+        if (envio.getCostoEstimado() == 0.0 || Math.abs(envio.getCostoEstimado() - monto) > 0.01) {
+            envio.setCostoEstimado(monto);
+        }
+        
+        // El monto pagado será igual al costo estimado del envío (se establece en el constructor de Pago)
+        Pago pago = pagoService.registrarPagoEnvio(envio, envio.getCostoEstimado(), metodo);
         return PagoMapper.toDTO(pago);
     }
 

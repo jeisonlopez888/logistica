@@ -157,9 +157,7 @@ public class EditarUsuarioAdminController {
 
             if (onUsuarioEditado != null) onUsuarioEditado.run();
 
-            // Cerrar ventana
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.close();
+            // NO cerrar la ventana - el usuario puede seguir editando o usar el botón "Volver"
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -170,15 +168,27 @@ public class EditarUsuarioAdminController {
     @FXML
     private void handleVolver(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/usuarios.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/usuarios.fxml"));
+            Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Lista Completa de Usuarios");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.close();
+            mostrarMensaje("❌ Error al volver a la lista de usuarios", "red");
+            // Intentar volver al panel admin como fallback
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/admin.fxml"));
+                Parent root = loader.load();
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Panel de Administración");
+                stage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                mostrarMensaje("❌ Error crítico al volver", "red");
+            }
         }
     }
 

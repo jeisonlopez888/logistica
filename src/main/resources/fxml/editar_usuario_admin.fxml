@@ -189,7 +189,7 @@
                                        -fx-effect: dropshadow(gaussian, rgba(30,136,229,0.5), 8, 0, 0, 3);
                                        -fx-cursor: hand;"/>
                         
-                        <Button text="✖ Cancelar" onAction="#handleVolver"
+                        <Button text="✖ Volver" onAction="#handleVolver"
                                 style="-fx-background-color: linear-gradient(to right, #757575, #616161);
                                        -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
                                        -fx-background-radius: 10; -fx-padding: 12 40;

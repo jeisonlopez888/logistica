@@ -23,11 +23,9 @@ public class Pago {
     public Pago(Long id, Envio envio, double montoPagado, MetodoPago metodo) {
         this.id = id;
         this.envio = envio;
-        this.montoPagado = montoPagado;
         this.metodo = metodo;
         this.fechaPago = LocalDateTime.now();
         this.confirmado = false;
-
 
         if (envio != null) {
             this.peso = envio.getPeso();
@@ -35,19 +33,23 @@ public class Pago {
             this.prioridad = envio.isPrioridad();
             this.seguro = envio.isSeguro();
 
-            // Tarifa base
+            // El monto pagado debe ser igual al costo estimado del envío (fuente de verdad)
+            // Si el envío tiene un costo estimado, usarlo; de lo contrario usar el monto pasado
+            if (envio.getCostoEstimado() > 0) {
+                this.montoPagado = envio.getCostoEstimado();
+                this.costoBase = envio.getCostoEstimado();
+                this.costoFinal = envio.getCostoEstimado();
+            } else {
+                // Si no hay costo estimado, usar el monto pasado y actualizar el envío
+                this.montoPagado = montoPagado;
+                this.costoBase = montoPagado;
+                this.costoFinal = montoPagado;
+                envio.setCostoEstimado(montoPagado);
+            }
+        } else {
+            this.montoPagado = montoPagado;
             this.costoBase = montoPagado;
-
-            // Ajuste por prioridad o seguro
-            double ajuste = 1.0;
-            if (prioridad) ajuste += 0.2;   // +20% si es prioritario
-            if (seguro) ajuste += 0.1;      // +10% si tiene seguro
-
-            // Volumen afecta costo si es alto
-            if (volumen > 0.5) ajuste += 0.15;
-
-            this.costoFinal = montoPagado * ajuste;
-            this.montoPagado = this.costoFinal;
+            this.costoFinal = montoPagado;
         }
     }
 

@@ -32,7 +32,7 @@ public abstract class HistorialEnviosController {
     @FXML protected TableColumn<EnvioDTO, String> colFragil;
     @FXML protected TableColumn<EnvioDTO, String> colFirmaRequerida;
     @FXML protected TableColumn<EnvioDTO, EnvioDTO.EstadoEnvio> colEstado;
-    @FXML protected TableColumn<EnvioDTO, Double> colCostoEstimado;
+    @FXML protected TableColumn<EnvioDTO, String> colCostoEstimado;
     @FXML protected TableColumn<EnvioDTO, String> colFechaCreacion;
     @FXML protected TableColumn<EnvioDTO, String> colFechaConfirmacion;
     @FXML protected TableColumn<EnvioDTO, String> colFechaEntrega;
@@ -108,8 +108,21 @@ public abstract class HistorialEnviosController {
                     c.getValue().isFirmaRequerida() ? "SÍ" : "NO"));
         }
         
-        // Costo
-        colCostoEstimado.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getCostoEstimado()));
+        // Costo (formateado sin decimales)
+        colCostoEstimado.setCellValueFactory(c -> {
+            double costo = c.getValue().getCostoEstimado();
+            // Si el costo es 0, recalcularlo
+            if (costo == 0.0) {
+                EnvioDTO envio = c.getValue();
+                co.edu.uniquindio.logistica.service.TarifaService.TarifaDetalle detalle = facade.desglosarTarifa(envio);
+                costo = detalle.getTotal();
+                // Actualizar el costo en el DTO
+                envio.setCostoEstimado(costo);
+            }
+            // Convertir a long para evitar problemas de formato
+            long costoRedondeado = Math.round(costo);
+            return new javafx.beans.property.SimpleStringProperty(String.format("$ %,d", costoRedondeado));
+        });
         
         // Fechas
         colFechaCreacion.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getFechaCreacionStr()));
@@ -224,6 +237,32 @@ public abstract class HistorialEnviosController {
         a.setHeaderText(null);
         a.setContentText(mensaje);
         a.showAndWait();
+    }
+
+    @FXML
+    protected void verDetalleTarifa(ActionEvent event) {
+        EnvioDTO envioDTO = tablaEnvios.getSelectionModel().getSelectedItem();
+        if (envioDTO == null) {
+            mostrarAlerta("Selecciona un envío", "Debes seleccionar un envío para ver el detalle de tarifa.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/detalle_tarifa.fxml"));
+            Parent root = loader.load();
+
+            DetalleTarifaController controller = loader.getController();
+            controller.mostrarDetalle(envioDTO);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.setTitle("Detalle de Tarifa - Envío #" + envioDTO.getId());
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo abrir el detalle de tarifa.");
+        }
     }
 
     @FXML protected abstract void editarEnvio(ActionEvent event);

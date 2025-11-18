@@ -34,101 +34,53 @@
                     </columnConstraints>
 
                     <!-- Origen -->
-                    <Label text="📍 Origen:" GridPane.rowIndex="0" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="origenDireccionCombo" promptText="Seleccione dirección o nueva"
-                              GridPane.rowIndex="0" GridPane.columnIndex="1"
-                              style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                     -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                    <Label text="📍 Origen:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="origenDireccionCombo" promptText="Seleccione dirección o nueva" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                    <Label text="Dirección:" GridPane.rowIndex="1" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
-                    <TextField fx:id="origenDireccionField" promptText="Calle 45 #10-23"
-                               GridPane.rowIndex="1" GridPane.columnIndex="1"
-                               style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                      -fx-border-radius: 8; -fx-background-radius: 8;
-                                      -fx-padding: 8; -fx-font-size: 12px;"/>
+                    <Label text="Dirección:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="origenDireccionField" promptText="Calle 45 #10-23" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 12px;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                    <Label text="Zona origen:" GridPane.rowIndex="2" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="zonaOrigenCombo" promptText="Seleccione zona"
-                              GridPane.rowIndex="2" GridPane.columnIndex="1"
-                              style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                     -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                    <Label text="Zona origen:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="zonaOrigenCombo" promptText="Seleccione zona" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
                     <!-- Destino -->
-                    <Label text="📍 Destino:" GridPane.rowIndex="3" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="destinoDireccionCombo" promptText="Seleccione dirección o nueva"
-                              GridPane.rowIndex="3" GridPane.columnIndex="1"
-                              style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                     -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                    <Label text="📍 Destino:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="destinoDireccionCombo" promptText="Seleccione dirección o nueva" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                    <Label text="Dirección:" GridPane.rowIndex="4" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
-                    <TextField fx:id="destinoDireccionField" promptText="Avenida Central 55"
-                               GridPane.rowIndex="4" GridPane.columnIndex="1"
-                               style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                      -fx-border-radius: 8; -fx-background-radius: 8;
-                                      -fx-padding: 8; -fx-font-size: 12px;"/>
+                    <Label text="Dirección:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <TextField fx:id="destinoDireccionField" promptText="Avenida Central 55" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 12px;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-                    <Label text="Zona destino:" GridPane.rowIndex="5" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="zonaDestinoCombo" promptText="Seleccione zona"
-                              GridPane.rowIndex="5" GridPane.columnIndex="1"
-                              style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                     -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                    <Label text="Zona destino:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="zonaDestinoCombo" promptText="Seleccione zona" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8;" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
                     <!-- Tipo de paquete -->
-                    <Label text="📦 Tipo:" GridPane.rowIndex="6" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="tipoPaqueteCombo" promptText="Seleccione tipo"
-                              GridPane.rowIndex="6" GridPane.columnIndex="1"
-                              style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                     -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                    <Label text="📦 Tipo:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="tipoPaqueteCombo" promptText="Seleccione tipo" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8;" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
                     <!-- Tipo de tarifa -->
-                    <Label text="🚚 Tarifa:" GridPane.rowIndex="7" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <Label text="🚚 Tarifa:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
                     <HBox spacing="8" GridPane.rowIndex="7" GridPane.columnIndex="1">
-                        <ComboBox fx:id="tipoTarifaCombo" promptText="Seleccione tarifa" prefWidth="180"
-                                  style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                         -fx-border-radius: 8; -fx-background-radius: 8;"/>
-                        <Label fx:id="tarifaValorLabel" text="" prefWidth="80"
-                               style="-fx-font-size: 11px; -fx-text-fill: #43A047; -fx-font-weight: bold;"/>
+                        <ComboBox fx:id="tipoTarifaCombo" promptText="Seleccione tarifa" prefWidth="180" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                        <Label fx:id="tarifaValorLabel" text="" prefWidth="80" style="-fx-font-size: 11px; -fx-text-fill: #43A047; -fx-font-weight: bold;"/>
                     </HBox>
 
                     <!-- Peso -->
-                    <Label text="⚖️ Peso (kg):" GridPane.rowIndex="8" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
-                    <TextField fx:id="pesoField" promptText="Ej: 5.0"
-                               GridPane.rowIndex="8" GridPane.columnIndex="1"
-                               style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                      -fx-border-radius: 8; -fx-background-radius: 8;
-                                      -fx-padding: 8; -fx-font-size: 12px;"/>
+                    <Label text="⚖️ Peso (kg):" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+                    <TextField fx:id="pesoField" promptText="Ej: 5.0" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 12px;" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
 
                     <!-- Dimensiones -->
-                    <Label text="📏 Dimensiones:" GridPane.rowIndex="9" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <Label text="📏 Dimensiones:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
                     <VBox spacing="5" GridPane.rowIndex="9" GridPane.columnIndex="1">
                         <HBox fx:id="dimensionesBox" spacing="8">
-                            <TextField fx:id="largoField" promptText="Largo" prefWidth="90"
-                                       style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                              -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
-                            <TextField fx:id="anchoField" promptText="Ancho" prefWidth="90"
-                                       style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                              -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
-                            <TextField fx:id="altoField" promptText="Alto" prefWidth="90"
-                                       style="-fx-background-color: white; -fx-border-color: #B0BEC5;
-                                              -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
+                            <TextField fx:id="largoField" promptText="Largo" prefWidth="90" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
+                            <TextField fx:id="anchoField" promptText="Ancho" prefWidth="90" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
+                            <TextField fx:id="altoField" promptText="Alto" prefWidth="90" style="-fx-background-color: white; -fx-border-color: #B0BEC5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
                         </HBox>
-                        <Label fx:id="volumenValorLabel" text="Volumen: 0.0000 m³"
-                               style="-fx-font-size: 10px; -fx-text-fill: #666; -fx-font-style: italic;"/>
+                        <Label fx:id="volumenValorLabel" text="Volumen: 0.0000 m³" style="-fx-font-size: 10px; -fx-text-fill: #666; -fx-font-style: italic;"/>
                     </VBox>
 
                     <!-- Opciones adicionales -->
-                    <Label text="🎁 Opciones:" GridPane.rowIndex="10" GridPane.columnIndex="0"
-                           style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                    <Label text="🎁 Opciones:" style="-fx-font-size: 12px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="10" GridPane.columnIndex="0"/>
                     <VBox spacing="6" GridPane.rowIndex="10" GridPane.columnIndex="1">
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <CheckBox fx:id="prioridadCheck" text="⚡ Prioridad"
@@ -179,25 +131,25 @@
                             <ColumnConstraints halignment="RIGHT" prefWidth="100"/>
                         </columnConstraints>
                         
-                        <Label text="Base:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="baseValorLabel" text="$ 0.00" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Base:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label fx:id="baseValorLabel" text="$ 0.00" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
                         
-                        <Label text="Por Peso:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="pesoValorLabel" text="$ 0.00" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Por Peso:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Label fx:id="pesoValorLabel" text="$ 0.00" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                         
-                        <Label text="Por Volumen:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="volumenDesgloseLabel" text="$ 0.00" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Por Volumen:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <Label fx:id="volumenDesgloseLabel" text="$ 0.00" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
                         
-                        <Label text="Tipo Tarifa:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="tipoTarifaDesgloseLabel" text="Normal" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Tipo Tarifa:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <Label fx:id="tipoTarifaDesgloseLabel" text="Normal" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
                         
-                        <Label text="Recargo Zona:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="zonaValorLabel" text="$ 0.00" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Recargo Zona:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <Label fx:id="zonaValorLabel" text="$ 0.00" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
                         
-                        <Separator GridPane.columnSpan="2" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                        <Separator GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
                         
-                        <Label text="TOTAL:" GridPane.rowIndex="6" GridPane.columnIndex="0" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #37474F;"/>
-                        <Label fx:id="costoTotalLabel" text="$ 0.00" GridPane.rowIndex="6" GridPane.columnIndex="1" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #43A047;"/>
+                        <Label text="TOTAL:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #37474F;" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                        <Label fx:id="costoTotalLabel" text="$ 0.00" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #43A047;" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
                     </GridPane>
                 </VBox>
                 

@@ -106,6 +106,14 @@
                                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
                                -fx-cursor: hand;"/>
 
+                <Button text="👤 Panel de Usuario" onAction="#handleVerPanelUsuario"
+                        GridPane.columnIndex="2" GridPane.rowIndex="2"
+                        style="-fx-background-color: linear-gradient(to bottom right, #AB47BC, #8E24AA);
+                               -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 14; -fx-padding: 25 35;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+
                 <!-- Fila 4 -->
                 <Button text="🔍 Rastrear Envío" onAction="#handleRastrearEnvio"
                         GridPane.columnIndex="0" GridPane.rowIndex="3"

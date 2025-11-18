@@ -1338,10 +1338,14 @@ public class ReportUtil {
                 content.endText();
                 yPos -= 20;
                 
+                // Usar el costo estimado del envío como fuente de verdad (debe coincidir con monto pagado)
+                double montoTotal = envio.getCostoEstimado() > 0 ? envio.getCostoEstimado() : pago.getMontoPagado();
+                long montoRedondeado = Math.round(montoTotal);
+                
                 content.setFont(PDType1Font.HELVETICA, 10);
                 String[] pagoInfo = {
                     "Número de Pago: #" + (pago.getId() != null ? pago.getId() : "N/A"),
-                    "Monto Pagado: $" + String.format("%,.2f", pago.getMontoPagado()) + " COP",
+                    "Monto Pagado: $" + String.format("%,d", montoRedondeado) + " COP",
                     "Método de Pago: " + (pago.getMetodo() != null ? pago.getMetodo().name() : "N/A"),
                     "Estado: " + (pago.isConfirmado() ? "CONFIRMADO" : "PENDIENTE"),
                     "Fecha de Pago: " + (pago.getFechaPago() != null ? DATE_FORMAT.format(pago.getFechaPago()) : "N/A"),
@@ -1365,11 +1369,13 @@ public class ReportUtil {
                 }
             }
             
-            // Total
+            // Total - usar el costo estimado del envío (sin decimales)
+            double totalFinal = envio.getCostoEstimado() > 0 ? envio.getCostoEstimado() : (pago != null ? pago.getMontoPagado() : 0.0);
+            long totalRedondeado = Math.round(totalFinal);
             content.setFont(PDType1Font.HELVETICA_BOLD, 14);
             content.beginText();
             content.newLineAtOffset(margin, yPos);
-            content.showText("TOTAL: $" + String.format("%,.2f", envio.getCostoEstimado()) + " COP");
+            content.showText("TOTAL: $" + String.format("%,d", totalRedondeado) + " COP");
             content.endText();
             
             // Cerrar el último beginText si quedó abierto

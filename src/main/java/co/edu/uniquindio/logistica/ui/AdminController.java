@@ -188,6 +188,34 @@ public class AdminController {
     }
 
     @FXML
+    private void handleVerPanelUsuario(ActionEvent event) {
+        try {
+            // Obtener el usuario actual de la sesión
+            UsuarioDTO usuarioActual = usuario != null ? usuario : Sesion.getUsuarioActual();
+            
+            if (usuarioActual == null) {
+                mostrarAlerta("Error", "No hay usuario en sesión. Por favor, inicia sesión nuevamente.");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/user_admin.fxml"));
+            Parent root = loader.load();
+
+            UserAdminController controller = loader.getController();
+            controller.setUsuario(usuarioActual);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Panel de Usuario - " + usuarioActual.getNombre());
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo abrir el panel de usuario.");
+        }
+    }
+
+    @FXML
     private void handleVolverLogin(ActionEvent event) {
         try {
             Sesion.cerrarSesion();

@@ -126,25 +126,25 @@
                             <ColumnConstraints halignment="RIGHT" prefWidth="100"/>
                         </columnConstraints>
                         
-                        <Label text="Base:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="baseValorLabel" text="$ 0.00" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Base:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label fx:id="baseValorLabel" text="$ 0.00" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
                         
-                        <Label text="Por Peso:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="pesoValorLabel" text="$ 0.00" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Por Peso:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Label fx:id="pesoValorLabel" text="$ 0.00" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                         
-                        <Label text="Por Volumen:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="volumenDesgloseLabel" text="$ 0.00" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Por Volumen:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <Label fx:id="volumenDesgloseLabel" text="$ 0.00" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
                         
-                        <Label text="Tipo Tarifa:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="tipoTarifaDesgloseLabel" text="Normal" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Tipo Tarifa:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <Label fx:id="tipoTarifaDesgloseLabel" text="Normal" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
                         
-                        <Label text="Recargo Zona:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                        <Label fx:id="zonaValorLabel" text="$ 0.00" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;"/>
+                        <Label text="Recargo Zona:" style="-fx-font-size: 11px; -fx-text-fill: #666;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <Label fx:id="zonaValorLabel" text="$ 0.00" style="-fx-font-size: 11px; -fx-text-fill: #37474F; -fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
                         
-                        <Separator GridPane.columnSpan="2" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                        <Separator GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
                         
-                        <Label text="TOTAL:" GridPane.rowIndex="6" GridPane.columnIndex="0" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #37474F;"/>
-                        <Label fx:id="costoTotalLabel" text="$ 0.00" GridPane.rowIndex="6" GridPane.columnIndex="1" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #43A047;"/>
+                        <Label text="TOTAL:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #37474F;" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                        <Label fx:id="costoTotalLabel" text="$ 0.00" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #43A047;" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
                     </GridPane>
                 </VBox>
                 

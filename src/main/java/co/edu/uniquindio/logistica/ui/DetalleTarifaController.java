@@ -65,10 +65,24 @@ public class DetalleTarifaController {
         // Obtener desglose usando Facade (trabaja con DTOs)
         co.edu.uniquindio.logistica.service.TarifaService.TarifaDetalle detalle = facade.desglosarTarifa(envioDTO);
 
-        // Siempre mostrar estos valores base
-        baseLabel.setText(String.format("$ %,.2f", detalle.getBase()));
-        pesoLabel.setText(String.format("$ %,.2f", detalle.getPorPeso()));
-        volumenLabel.setText(String.format("$ %,.2f", detalle.getPorVolumen()));
+        // Usar el costo calculado (es el correcto) y actualizar el almacenado si es diferente
+        double costoCalculado = detalle.getTotal();
+        double costoAlmacenado = envioDTO.getCostoEstimado();
+        
+        // Si el costo almacenado es diferente al calculado, actualizar el almacenado
+        if (Math.abs(costoAlmacenado - costoCalculado) > 0.01) {
+            envioDTO.setCostoEstimado(costoCalculado);
+            // Actualizar también en el DataStore
+            facade.registrarEnvio(envioDTO);
+        }
+        
+        // Usar el costo calculado (que ahora coincide con el almacenado)
+        double costoTotal = costoCalculado;
+
+        // Siempre mostrar estos valores base (sin decimales)
+        baseLabel.setText(String.format("$ %,d", Math.round(detalle.getBase())));
+        pesoLabel.setText(String.format("$ %,d", Math.round(detalle.getPorPeso())));
+        volumenLabel.setText(String.format("$ %,d", Math.round(detalle.getPorVolumen())));
         
         // Tipo de tarifa (siempre visible)
         if (tipoTarifaLabel != null) {
@@ -80,7 +94,7 @@ public class DetalleTarifaController {
         
         // Zona solo si tiene recargo
         if (detalle.getRecargoZona() > 0) {
-            zonaLabel.setText(String.format("$ %,.2f", detalle.getRecargoZona()));
+            zonaLabel.setText(String.format("$ %,d", Math.round(detalle.getRecargoZona())));
             mostrarFila(4);
         } else {
             ocultarFila(4);
@@ -88,7 +102,7 @@ public class DetalleTarifaController {
         
         // Prioridad solo si fue seleccionada
         if (envioDTO.isPrioridad() && detalle.getRecargoPrioridad() > 0) {
-            prioridadLabel.setText(String.format("$ %,.2f", detalle.getRecargoPrioridad()));
+            prioridadLabel.setText(String.format("$ %,d", Math.round(detalle.getRecargoPrioridad())));
             mostrarFila(5);
         } else {
             ocultarFila(5);
@@ -96,7 +110,7 @@ public class DetalleTarifaController {
         
         // Seguro solo si fue seleccionado
         if (envioDTO.isSeguro() && detalle.getRecargoSeguro() > 0) {
-            seguroLabel.setText(String.format("$ %,.2f", detalle.getRecargoSeguro()));
+            seguroLabel.setText(String.format("$ %,d", Math.round(detalle.getRecargoSeguro())));
             mostrarFila(6);
         } else {
             ocultarFila(6);
@@ -105,7 +119,7 @@ public class DetalleTarifaController {
         // Frágil solo si fue seleccionado
         if (fragilLabel != null) {
             if (envioDTO.isFragil() && detalle.getRecargoFragil() > 0) {
-                fragilLabel.setText(String.format("$ %,.2f", detalle.getRecargoFragil()));
+                fragilLabel.setText(String.format("$ %,d", Math.round(detalle.getRecargoFragil())));
                 mostrarFila(7);
             } else {
                 ocultarFila(7);
@@ -115,14 +129,15 @@ public class DetalleTarifaController {
         // Firma solo si fue seleccionada
         if (firmaLabel != null) {
             if (envioDTO.isFirmaRequerida() && detalle.getRecargoFirma() > 0) {
-                firmaLabel.setText(String.format("$ %,.2f", detalle.getRecargoFirma()));
+                firmaLabel.setText(String.format("$ %,d", Math.round(detalle.getRecargoFirma())));
                 mostrarFila(8);
             } else {
                 ocultarFila(8);
             }
         }
         
-        totalLabel.setText(String.format("$ %,.2f", detalle.getTotal()));
+        // Mostrar el costo total calculado (sin decimales)
+        totalLabel.setText(String.format("$ %,d", Math.round(costoTotal)));
     }
 
     @FXML
