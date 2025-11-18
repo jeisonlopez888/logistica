@@ -61,6 +61,9 @@ public abstract class CrearEnvioController {
     @FXML protected Label tipoTarifaDesgloseLabel;
     @FXML protected Label zonaValorLabel;
     @FXML protected GridPane desgloseContainer;
+    
+    // Label para mostrar el total estimado al lado de los botones
+    @FXML protected Label totalEstimadoLabel;
 
     protected final LogisticaFacade facade = LogisticaFacade.getInstance();
 
@@ -91,9 +94,9 @@ public abstract class CrearEnvioController {
         tipoPaqueteCombo.getItems().addAll("Sobre", "Paquete", "Caja");
         tipoPaqueteCombo.setOnAction(e -> {
             boolean esCaja = "Caja".equals(tipoPaqueteCombo.getValue());
-            largoField.setDisable(!esCaja);
-            anchoField.setDisable(!esCaja);
-            altoField.setDisable(!esCaja);
+            if (largoField != null) largoField.setDisable(!esCaja);
+            if (anchoField != null) anchoField.setDisable(!esCaja);
+            if (altoField != null) altoField.setDisable(!esCaja);
             actualizarVolumen();
         });
 
@@ -138,13 +141,13 @@ public abstract class CrearEnvioController {
         if (altoField != null) {
             altoField.textProperty().addListener((obs, oldVal, newVal) -> actualizarVolumen());
         }
-        if (tipoPaqueteCombo != null) {
-            tipoPaqueteCombo.setOnAction(e -> actualizarVolumen());
-        }
+        // El listener de tipoPaqueteCombo ya está configurado arriba (línea 92-98)
+        // No necesitamos otro listener que sobrescriba el anterior
 
-        largoField.setDisable(true);
-        anchoField.setDisable(true);
-        altoField.setDisable(true);
+        // Inicializar campos de dimensiones como deshabilitados
+        if (largoField != null) largoField.setDisable(true);
+        if (anchoField != null) anchoField.setDisable(true);
+        if (altoField != null) altoField.setDisable(true);
 
         if (Sesion.getUsuarioActual() != null) {
             this.usuarioActual = Sesion.getUsuarioActual();
@@ -280,11 +283,11 @@ public abstract class CrearEnvioController {
             double total = facade.calcularTarifa(envioTempDTO);
             costoEstimadoActual = total;
             
-            // Obtener desglose detallado
-            co.edu.uniquindio.logistica.service.TarifaService.TarifaDetalle detalle = facade.desglosarTarifa(envioTempDTO);
-            
-            // Actualizar todos los labels con los valores del desglose
-            actualizarDesglose(detalle);
+            // Actualizar el label del total estimado al lado de los botones (sin desglose)
+            if (totalEstimadoLabel != null) {
+                long totalRedondeado = Math.round(total);
+                totalEstimadoLabel.setText("Total estimado: " + String.format("$ %,d", totalRedondeado));
+            }
             
             if (crearBtn != null) crearBtn.setDisable(false);
             mostrarMensaje("💰 Costo estimado calculado correctamente", "green");
@@ -294,6 +297,56 @@ public abstract class CrearEnvioController {
         } catch (Exception e) {
             e.printStackTrace();
             mostrarMensaje("❌ Error al calcular la tarifa", "red");
+        }
+    }
+
+    /** Ver detalle de tarifa en ventana separada */
+    @FXML
+    protected void handleVerDetalleTarifa() {
+        try {
+            if (costoEstimadoActual <= 0) {
+                mostrarMensaje("⚠️ Primero calcule el costo antes de ver el detalle", "orange");
+                return;
+            }
+
+            if (!validarCampos()) return;
+
+            // Crear DTO temporal con los datos actuales
+            double peso = Double.parseDouble(pesoField.getText());
+            double volumen = calcularVolumen();
+            
+            DireccionDTO origenDTO = facade.crearDireccion("Origen",
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), "");
+            DireccionDTO destinoDTO = facade.crearDireccion("Destino",
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), "");
+
+            EnvioDTO envioTempDTO = new EnvioDTO();
+            envioTempDTO.setOrigen(origenDTO);
+            envioTempDTO.setDestino(destinoDTO);
+            envioTempDTO.setPeso(peso);
+            envioTempDTO.setVolumen(volumen);
+            envioTempDTO.setPrioridad(prioridadCheck.isSelected());
+            envioTempDTO.setSeguro(seguroCheck.isSelected());
+            envioTempDTO.setFragil(fragilCheck != null && fragilCheck.isSelected());
+            envioTempDTO.setFirmaRequerida(firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected());
+            envioTempDTO.setTipoTarifa(tipoTarifaCombo != null && tipoTarifaCombo.getValue() != null 
+                    ? tipoTarifaCombo.getValue() : "Normal");
+            envioTempDTO.setCostoEstimado(costoEstimadoActual);
+
+            // Abrir ventana de detalle tarifa
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/detalle_tarifa.fxml"));
+            Parent root = loader.load();
+            DetalleTarifaController controller = loader.getController();
+            controller.mostrarDetalle(envioTempDTO);
+
+            Stage stage = new Stage();
+            stage.setTitle("Detalle de Tarifa");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("❌ Error al abrir el detalle de tarifa", "red");
         }
     }
 
@@ -554,67 +607,49 @@ public abstract class CrearEnvioController {
     protected void actualizarDesglose(co.edu.uniquindio.logistica.service.TarifaService.TarifaDetalle detalle) {
         if (detalle == null) return;
         
-        // Actualizar desglose principal
-        if (baseValorLabel != null) {
-            baseValorLabel.setText(String.format("$ %,.2f", detalle.getBase()));
-        }
-        if (pesoValorLabel != null) {
-            pesoValorLabel.setText(String.format("$ %,.2f", detalle.getPorPeso()));
-        }
-        if (volumenDesgloseLabel != null) {
-            volumenDesgloseLabel.setText(String.format("$ %,.2f", detalle.getPorVolumen()));
-        }
-        if (tipoTarifaDesgloseLabel != null && tipoTarifaCombo != null) {
-            String tarifa = tipoTarifaCombo.getValue() != null ? tipoTarifaCombo.getValue() : "Normal";
-            tipoTarifaDesgloseLabel.setText(tarifa);
-        }
-        if (zonaValorLabel != null) {
-            zonaValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoZona()));
-        }
-        
-        // Actualizar valores de opciones individuales
+        // Actualizar valores de opciones individuales (solo para mostrar en tiempo real)
         if (prioridadValorLabel != null) {
             if (prioridadCheck != null && prioridadCheck.isSelected()) {
-                prioridadValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoPrioridad()));
+                long valor = Math.round(detalle.getRecargoPrioridad());
+                prioridadValorLabel.setText(String.format("$ %,d", valor));
             } else {
                 prioridadValorLabel.setText("");
             }
         }
         if (seguroValorLabel != null) {
             if (seguroCheck != null && seguroCheck.isSelected()) {
-                seguroValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoSeguro()));
+                long valor = Math.round(detalle.getRecargoSeguro());
+                seguroValorLabel.setText(String.format("$ %,d", valor));
             } else {
                 seguroValorLabel.setText("");
             }
         }
         if (fragilValorLabel != null) {
             if (fragilCheck != null && fragilCheck.isSelected()) {
-                fragilValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoFragil()));
+                long valor = Math.round(detalle.getRecargoFragil());
+                fragilValorLabel.setText(String.format("$ %,d", valor));
             } else {
                 fragilValorLabel.setText("");
             }
         }
         if (firmaValorLabel != null) {
             if (firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected()) {
-                firmaValorLabel.setText(String.format("$ %,.2f", detalle.getRecargoFirma()));
+                long valor = Math.round(detalle.getRecargoFirma());
+                firmaValorLabel.setText(String.format("$ %,d", valor));
             } else {
                 firmaValorLabel.setText("");
             }
         }
         
-        // Actualizar total - usar costoLabel si existe, sino buscar costoTotalLabel
+        // Actualizar total - usar costoLabel si existe
         if (costoLabel != null) {
-            costoLabel.setText(String.format("$ %,.2f", detalle.getTotal()));
+            long totalRedondeado = Math.round(detalle.getTotal());
+            costoLabel.setText(String.format("$ %,d", totalRedondeado));
         }
-        // También actualizar el label del desglose si existe
-        try {
-            javafx.scene.Node node = desgloseContainer != null ? 
-                desgloseContainer.lookup("#costoTotalLabel") : null;
-            if (node instanceof Label) {
-                ((Label) node).setText(String.format("$ %,.2f", detalle.getTotal()));
-            }
-        } catch (Exception e) {
-            // Ignorar si no existe
+        // Actualizar el label del total estimado al lado de los botones
+        if (totalEstimadoLabel != null) {
+            long totalRedondeado = Math.round(detalle.getTotal());
+            totalEstimadoLabel.setText("Total estimado: " + String.format("$ %,d", totalRedondeado));
         }
     }
 
@@ -643,7 +678,7 @@ public abstract class CrearEnvioController {
         seguroCheck.setSelected(false);
         if (fragilCheck != null) fragilCheck.setSelected(false);
         if (firmaRequeridaCheck != null) firmaRequeridaCheck.setSelected(false);
-        costoLabel.setText("—");
+        if (costoLabel != null) costoLabel.setText("—");
         if (crearBtn != null) crearBtn.setDisable(true);
     }
 

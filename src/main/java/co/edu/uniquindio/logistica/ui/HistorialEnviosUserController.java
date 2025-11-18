@@ -116,8 +116,17 @@ public class HistorialEnviosUserController extends HistorialEnviosController {
         String desc = envioDTO.getIncidenciaDescripcion() != null && !envioDTO.getIncidenciaDescripcion().isEmpty() 
                 ? envioDTO.getIncidenciaDescripcion() 
                 : "No hay descripción registrada.";
-        String fecha = envioDTO.getFechaIncidencia() != null 
-                ? envioDTO.getFechaIncidencia().toString() 
+        // Usar fecha de incidencia, si no existe usar fecha de entrega, si no existe usar fecha de confirmación (asignación)
+        java.time.LocalDateTime fechaIncidencia = envioDTO.getFechaIncidencia();
+        if (fechaIncidencia == null) {
+            fechaIncidencia = envioDTO.getFechaEntrega();
+        }
+        if (fechaIncidencia == null) {
+            fechaIncidencia = envioDTO.getFechaConfirmacion();
+        }
+        
+        String fecha = fechaIncidencia != null 
+                ? fechaIncidencia.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 : "Sin fecha registrada.";
         alert.setContentText("📅 Fecha: " + fecha + "\n\n📝 Descripción:\n" + desc);
         alert.showAndWait();

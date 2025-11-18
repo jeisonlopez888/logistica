@@ -2,7 +2,7 @@ package co.edu.uniquindio.logistica.ui;
 
 import co.edu.uniquindio.logistica.facade.LogisticaFacade;
 import co.edu.uniquindio.logistica.model.DTO.EnvioDTO;
-import co.edu.uniquindio.logistica.service.MetricsService;
+import co.edu.uniquindio.logistica.service.MetricasService;
 import co.edu.uniquindio.logistica.util.ReportUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -61,7 +61,7 @@ public class MetricasController {
     @FXML private TableColumn<MetricaIncidencia, String> incidenciaCantidadCol;
 
     private final LogisticaFacade facade = LogisticaFacade.getInstance();
-    private final MetricsService metricsService = new MetricsService();
+    private final MetricasService metricasService = new MetricasService();
 
     @FXML
     private void initialize() {
@@ -168,7 +168,7 @@ public class MetricasController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Tiempo Promedio (días)");
 
-        Map<String, Double> tiempos = metricsService.calcularTiemposPromedioPorZona();
+        Map<String, Double> tiempos = metricasService.calcularTiemposPromedioPorZona();
         
         if (tiempos.isEmpty()) {
             // Datos de ejemplo si no hay datos reales
@@ -191,7 +191,7 @@ public class MetricasController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Cantidad de Usos");
 
-        Map<String, Long> servicios = metricsService.contarServiciosAdicionales();
+        Map<String, Long> servicios = metricasService.contarServiciosAdicionales();
         
         // Siempre mostrar todos los servicios, incluso si son 0
         if (servicios.isEmpty()) {
@@ -212,7 +212,7 @@ public class MetricasController {
     }
 
     private void cargarServiciosPieChart() {
-        Map<String, Long> servicios = metricsService.contarServiciosAdicionales();
+        Map<String, Long> servicios = metricasService.contarServiciosAdicionales();
         
         // Siempre mostrar todos los servicios, incluso si son 0
         if (servicios.isEmpty()) {
@@ -241,7 +241,7 @@ public class MetricasController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Ingresos (COP)");
 
-        Map<String, Double> ingresosPorServicio = metricsService.calcularIngresosPorServicio(inicio, fin);
+        Map<String, Double> ingresosPorServicio = metricasService.calcularIngresosPorServicio(inicio, fin);
         
         if (!ingresosPorServicio.isEmpty()) {
             for (Map.Entry<String, Double> entry : ingresosPorServicio.entrySet()) {
@@ -253,12 +253,12 @@ public class MetricasController {
         
         // Si no hay ingresos por servicio, mostrar ingresos totales del período
         if (series.getData().isEmpty()) {
-            double ingresosTotal = metricsService.calcularIngresosPorPeriodo(inicio, fin);
+            double ingresosTotal = metricasService.calcularIngresosPorPeriodo(inicio, fin);
             if (ingresosTotal > 0) {
                 series.getData().add(new XYChart.Data<>("Ingresos Totales", ingresosTotal));
             } else {
                 // Mostrar ingresos totales de todos los pagos como alternativa
-                double ingresosTodos = metricsService.calcularIngresosTotales();
+                double ingresosTodos = metricasService.calcularIngresosTotales();
                 if (ingresosTodos > 0) {
                     series.getData().add(new XYChart.Data<>("Ingresos Totales", ingresosTodos));
                 } else {
@@ -277,7 +277,7 @@ public class MetricasController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Cantidad de Incidencias");
 
-        Map<String, Long> incidencias = metricsService.contarIncidenciasPorZona();
+        Map<String, Long> incidencias = metricasService.contarIncidenciasPorZona();
         
         // Siempre mostrar todas las zonas, incluso si son 0
         if (incidencias.isEmpty()) {
@@ -298,7 +298,7 @@ public class MetricasController {
 
     private void actualizarMetricasGenerales(LocalDate inicio, LocalDate fin) {
         // Tiempo promedio de entrega
-        double tiempoPromedio = metricsService.calcularTiempoPromedioEntrega();
+        double tiempoPromedio = metricasService.calcularTiempoPromedioEntrega();
         if (tiempoPromedio > 0) {
             tiempoPromedioLabel.setText(String.format("%.2f días", tiempoPromedio));
         } else {
@@ -306,7 +306,7 @@ public class MetricasController {
         }
 
         // Ingresos totales
-        double ingresosTotales = metricsService.calcularIngresosTotales();
+        double ingresosTotales = metricasService.calcularIngresosTotales();
         if (ingresosTotales > 0) {
             ingresosTotalesLabel.setText(String.format("$%,.2f COP", ingresosTotales));
         } else {
@@ -327,7 +327,7 @@ public class MetricasController {
     private void cargarTablas(LocalDate inicio, LocalDate fin) {
         // Tabla de Tiempos por Zona
         ObservableList<MetricaTiempo> tiemposData = FXCollections.observableArrayList();
-        Map<String, Double> tiempos = metricsService.calcularTiemposPromedioPorZona();
+        Map<String, Double> tiempos = metricasService.calcularTiemposPromedioPorZona();
         if (tiempos.isEmpty()) {
             tiemposData.add(new MetricaTiempo("Norte", "2.5 días"));
             tiemposData.add(new MetricaTiempo("Centro", "1.8 días"));
@@ -341,7 +341,7 @@ public class MetricasController {
         
         // Tabla de Servicios Adicionales
         ObservableList<MetricaServicio> serviciosData = FXCollections.observableArrayList();
-        Map<String, Long> servicios = metricsService.contarServiciosAdicionales();
+        Map<String, Long> servicios = metricasService.contarServiciosAdicionales();
         if (servicios.isEmpty()) {
             servicios.put("Prioridad", 0L);
             servicios.put("Seguro", 0L);
@@ -355,7 +355,7 @@ public class MetricasController {
         
         // Tabla de Ingresos por Servicio
         ObservableList<MetricaIngreso> ingresosData = FXCollections.observableArrayList();
-        Map<String, Double> ingresosPorServicio = metricsService.calcularIngresosPorServicio(inicio, fin);
+        Map<String, Double> ingresosPorServicio = metricasService.calcularIngresosPorServicio(inicio, fin);
         if (!ingresosPorServicio.isEmpty()) {
             for (Map.Entry<String, Double> entry : ingresosPorServicio.entrySet()) {
                 if (entry.getValue() > 0) {
@@ -364,11 +364,11 @@ public class MetricasController {
             }
         }
         if (ingresosData.isEmpty()) {
-            double ingresosTotal = metricsService.calcularIngresosPorPeriodo(inicio, fin);
+            double ingresosTotal = metricasService.calcularIngresosPorPeriodo(inicio, fin);
             if (ingresosTotal > 0) {
                 ingresosData.add(new MetricaIngreso("Ingresos Totales", String.format("$%,.2f COP", ingresosTotal)));
             } else {
-                double ingresosTodos = metricsService.calcularIngresosTotales();
+                double ingresosTodos = metricasService.calcularIngresosTotales();
                 if (ingresosTodos > 0) {
                     ingresosData.add(new MetricaIngreso("Ingresos Totales", String.format("$%,.2f COP", ingresosTodos)));
                 } else {
@@ -380,7 +380,7 @@ public class MetricasController {
         
         // Tabla de Incidencias por Zona
         ObservableList<MetricaIncidencia> incidenciasData = FXCollections.observableArrayList();
-        Map<String, Long> incidencias = metricsService.contarIncidenciasPorZona();
+        Map<String, Long> incidencias = metricasService.contarIncidenciasPorZona();
         if (incidencias.isEmpty()) {
             incidencias.put("Norte", 0L);
             incidencias.put("Centro", 0L);
@@ -426,12 +426,12 @@ public class MetricasController {
             LocalDate inicio = fechaInicio.getValue() != null ? fechaInicio.getValue() : LocalDate.now().minusMonths(1);
             LocalDate fin = fechaFin.getValue() != null ? fechaFin.getValue() : LocalDate.now();
             
-            Map<String, Double> tiemposPorZona = metricsService.calcularTiemposPromedioPorZona();
-            Map<String, Long> serviciosAdicionales = metricsService.contarServiciosAdicionales();
-            Map<String, Double> ingresosPorServicio = metricsService.calcularIngresosPorServicio(inicio, fin);
-            Map<String, Long> incidenciasPorZona = metricsService.contarIncidenciasPorZona();
-            double tiempoPromedio = metricsService.calcularTiempoPromedioEntrega();
-            double ingresosTotales = metricsService.calcularIngresosTotales();
+            Map<String, Double> tiemposPorZona = metricasService.calcularTiemposPromedioPorZona();
+            Map<String, Long> serviciosAdicionales = metricasService.contarServiciosAdicionales();
+            Map<String, Double> ingresosPorServicio = metricasService.calcularIngresosPorServicio(inicio, fin);
+            Map<String, Long> incidenciasPorZona = metricasService.contarIncidenciasPorZona();
+            double tiempoPromedio = metricasService.calcularTiempoPromedioEntrega();
+            double ingresosTotales = metricasService.calcularIngresosTotales();
             long totalEnvios = facade.listarTodosEnvios().size();
             long totalIncidencias = facade.listarTodosEnvios().stream()
                     .filter(e -> e.getEstado() == EnvioDTO.EstadoEnvio.INCIDENCIA)

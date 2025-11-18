@@ -1354,13 +1354,19 @@ public class ReportUtil {
                 
                 for (String line : pagoInfo) {
                     if (yPos < 100) {
-                        content.endText();
+                        // Cerrar el content actual si hay un beginText activo
+                        try {
+                            content.endText();
+                        } catch (Exception e) {
+                            // Si no hay beginText activo, ignorar
+                        }
                         content.close();
                         page = new PDPage();
                         doc.addPage(page);
                         content = new PDPageContentStream(doc, page);
                         yPos = 750;
                     }
+                    content.setFont(PDType1Font.HELVETICA, 10);
                     content.beginText();
                     content.newLineAtOffset(margin, yPos);
                     content.showText(line);

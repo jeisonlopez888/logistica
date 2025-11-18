@@ -100,7 +100,10 @@ public class EditarEnvioController extends CrearEnvioController {
             tipoTarifaCombo.setValue(envioDTO.getTipoTarifa() != null ? envioDTO.getTipoTarifa() : "Normal");
         }
         
-        costoLabel.setText(String.format("$ %.2f", envioDTO.getCostoEstimado()));
+        // Actualizar costo si el label existe
+        if (costoLabel != null) {
+            costoLabel.setText(String.format("$ %.2f", envioDTO.getCostoEstimado()));
+        }
         costoEstimadoActual = envioDTO.getCostoEstimado();
 
         mostrarMensaje("✏️ Editando envío ID: " + envioDTO.getId(), "blue");
@@ -169,6 +172,7 @@ public class EditarEnvioController extends CrearEnvioController {
 
     /**
      * Confirma el envío existente y realiza el pago usando DTOs
+     * Mismo flujo que CrearEnvioController: pregunta por notificación, método de pago e impresión de factura
      */
     @FXML
     @Override
@@ -179,29 +183,27 @@ public class EditarEnvioController extends CrearEnvioController {
                 return;
             }
 
-            // Mostrar diálogo para elegir método de pago
-            Alert metodoPagoDialog = new Alert(Alert.AlertType.CONFIRMATION);
-            metodoPagoDialog.setTitle("Método de Pago");
-            metodoPagoDialog.setHeaderText("Seleccione un método de pago para confirmar el envío");
-            metodoPagoDialog.getButtonTypes().setAll(
-                    new ButtonType("Tarjeta Crédito"),
-                    new ButtonType("Efectivo"),
-                    new ButtonType("PSE"),
-                    new ButtonType("Transferencia"),
-                    ButtonType.CANCEL
-            );
+            if (costoEstimadoActual <= 0) {
+                mostrarMensaje("⚠️ Primero calcule el costo antes de confirmar", "orange");
+                return;
+            }
 
-            metodoPagoDialog.showAndWait().ifPresent(opcion -> {
-                if (opcion == ButtonType.CANCEL) return;
+            // Primero preguntar por el método de notificación
+            co.edu.uniquindio.logistica.service.NotificationService.CanalNotificacion canal = mostrarDialogoCanalNotificacion();
+            if (canal == null) {
+                mostrarMensaje("⚠️ Operación cancelada", "orange");
+                return;
+            }
+            
+            // Establecer el canal de notificación en el servicio
+            facade.setCanalNotificacion(canal);
 
-                MetodoPago metodo = switch (opcion.getText()) {
-                    case "Efectivo" -> MetodoPago.EFECTIVO;
-                    case "PSE" -> MetodoPago.PSE;
-                    case "Transferencia" -> MetodoPago.TRANSFERENCIA;
-                    default -> MetodoPago.TARJETA_CREDITO;
-                };
-
-                procesarPagoExistente(metodo);
+            Alert pagoDialog = new Alert(Alert.AlertType.CONFIRMATION);
+            pagoDialog.setTitle("Confirmar Pago");
+            pagoDialog.setHeaderText("Total a pagar: $" + costoEstimadoActual);
+            pagoDialog.setContentText("¿Desea confirmar el pago y actualizar el envío?");
+            pagoDialog.showAndWait().ifPresent(result -> {
+                if (result == ButtonType.OK) procesarPagoExistente();
             });
 
         } catch (Exception e) {
@@ -212,55 +214,68 @@ public class EditarEnvioController extends CrearEnvioController {
 
     /**
      * Procesar el pago sin crear un nuevo envío usando DTOs
+     * Mismo flujo que CrearEnvioController: pregunta por método de pago e impresión de factura
      */
-    private void procesarPagoExistente(MetodoPago metodo) {
+    private void procesarPagoExistente() {
         try {
-            double monto = envioEditadoDTO.getCostoEstimado();
+            // Actualizar el envío con los valores actuales del formulario antes de procesar el pago
+            if (!validarCampos()) return;
 
-            // Registrar pago usando Facade (trabaja con DTOs)
-            facade.registrarPagoSimulado(envioEditadoDTO.getId(), monto, metodo);
+            double peso = Double.parseDouble(pesoField.getText());
+            double volumen = calcularVolumen();
 
-            // Buscar el pago recién creado para confirmarlo
-            PagoDTO pagoDTO = facade.buscarPagoPorEnvio(envioEditadoDTO.getId());
-            if (pagoDTO != null) {
-                // Confirmar pago (esto asignará automáticamente un repartidor si está disponible)
-                facade.confirmarPago(pagoDTO.getId());
-                
-                // Obtener el envío actualizado desde el DataStore para incluir el repartidor asignado
-                EnvioDTO envioActualizado = facade.buscarEnvioPorId(envioEditadoDTO.getId());
-                if (envioActualizado != null) {
-                    // Actualizar el DTO con los datos actualizados (incluyendo repartidor si fue asignado)
-                    envioEditadoDTO.setEstado(envioActualizado.getEstado());
-                    envioEditadoDTO.setIdRepartidor(envioActualizado.getIdRepartidor());
-                    envioEditadoDTO.setFechaConfirmacion(envioActualizado.getFechaConfirmacion());
-                    envioEditadoDTO.setFechaEntregaEstimada(envioActualizado.getFechaEntregaEstimada());
-                } else {
-                    // Fallback si no se puede obtener el envío actualizado
-                    envioEditadoDTO.setEstado(EnvioDTO.EstadoEnvio.CONFIRMADO);
-                    envioEditadoDTO.setFechaConfirmacion(java.time.LocalDateTime.now());
-                }
-            } else {
-                // Si no hay pago, solo actualizar el estado
-                envioEditadoDTO.setEstado(EnvioDTO.EstadoEnvio.CONFIRMADO);
-                envioEditadoDTO.setFechaConfirmacion(java.time.LocalDateTime.now());
-            }
-            
+            // Actualizar direcciones
+            DireccionDTO origenDTO = facade.crearDireccion("Origen",
+                    origenDireccionField.getText(), zonaOrigenCombo.getValue(), "");
+            DireccionDTO destinoDTO = facade.crearDireccion("Destino",
+                    destinoDireccionField.getText(), zonaDestinoCombo.getValue(), "");
+
+            envioEditadoDTO.setOrigen(origenDTO);
+            envioEditadoDTO.setDestino(destinoDTO);
+            envioEditadoDTO.setPeso(peso);
+            envioEditadoDTO.setVolumen(volumen);
+            envioEditadoDTO.setPrioridad(prioridadCheck.isSelected());
+            envioEditadoDTO.setSeguro(seguroCheck.isSelected());
+            envioEditadoDTO.setFragil(fragilCheck != null && fragilCheck.isSelected());
+            envioEditadoDTO.setFirmaRequerida(firmaRequeridaCheck != null && firmaRequeridaCheck.isSelected());
+            envioEditadoDTO.setTipoTarifa(tipoTarifaCombo != null && tipoTarifaCombo.getValue() != null 
+                    ? tipoTarifaCombo.getValue() : "Normal");
+            envioEditadoDTO.setCostoEstimado(costoEstimadoActual);
+
             // Registrar cambios del envío
             facade.registrarEnvio(envioEditadoDTO);
 
-            mostrarMensaje("✅ Pago confirmado. Envío actualizado correctamente.", "green");
-            
-            // Ofrecer imprimir factura
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Factura de Envío");
-            alert.setHeaderText("¿Desea imprimir la factura/guía de envío?");
-            alert.setContentText("El envío ha sido confirmado. Puede generar la factura ahora.");
-            alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-            alert.showAndWait().ifPresent(bt -> {
-                if (bt == ButtonType.YES) {
-                    imprimirFactura(envioEditadoDTO.getId());
-                }
-            });
+            // Mostrar diálogo para elegir método de pago
+            MetodoPago metodoSeleccionado = mostrarDialogoMetodoPago("Seleccione el método de pago para el envío");
+            if (metodoSeleccionado == null) {
+                mostrarMensaje("⚠️ Operación cancelada. El envío fue actualizado pero sin pago.", "orange");
+                return;
+            }
+
+            // Registrar pago simulado
+            facade.registrarPagoSimulado(envioEditadoDTO.getId(), costoEstimadoActual, metodoSeleccionado);
+
+            // Buscar el pago recién creado y confirmarlo (esto asignará automáticamente un repartidor)
+            PagoDTO pagoDTO = facade.buscarPagoPorEnvio(envioEditadoDTO.getId());
+            if (pagoDTO != null) {
+                // Confirmar pago (esto asignará automáticamente un repartidor disponible en la zona de destino)
+                String resultado = facade.confirmarPago(pagoDTO.getId());
+                mostrarMensaje("✅ Envío #" + envioEditadoDTO.getId() + " actualizado. " + resultado, "green");
+                
+                // Ofrecer imprimir factura
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Factura de Envío");
+                alert.setHeaderText("¿Desea imprimir la factura/guía de envío?");
+                alert.setContentText("El envío ha sido confirmado. Puede generar la factura ahora.");
+                alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+                alert.showAndWait().ifPresent(bt -> {
+                    if (bt == ButtonType.YES) {
+                        imprimirFactura(envioEditadoDTO.getId());
+                    }
+                });
+            } else {
+                mostrarMensaje("✅ Envío #" + envioEditadoDTO.getId() + " actualizado. Pago registrado pero no confirmado.", "green");
+            }
 
             if (onEnvioCreado != null) onEnvioCreado.run();
 

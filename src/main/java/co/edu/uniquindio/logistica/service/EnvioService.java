@@ -67,6 +67,9 @@ public class EnvioService {
     
     // 🔹 Actualizar completamente un envío existente
     private void actualizarEnvioCompleto(Envio existente, Envio actualizado) {
+        // Guardar estado anterior para notificación
+        Envio.EstadoEnvio estadoAnterior = existente.getEstado();
+        
         existente.setOrigen(actualizado.getOrigen());
         existente.setDestino(actualizado.getDestino());
         existente.setPeso(actualizado.getPeso());
@@ -102,6 +105,13 @@ public class EnvioService {
         existente.setFechaEntregaEstimada(actualizado.getFechaEntregaEstimada());
         existente.setFechaIncidencia(actualizado.getFechaIncidencia());
         existente.setIncidenciaDescripcion(actualizado.getIncidenciaDescripcion());
+        
+        // Notificar cambio de estado si cambió
+        if (actualizado.getEstado() != null && estadoAnterior != actualizado.getEstado()) {
+            envioSubject.notificarCambioEstado(existente, 
+                estadoAnterior != null ? estadoAnterior.name() : "N/A",
+                actualizado.getEstado().name());
+        }
     }
 
 
@@ -291,7 +301,21 @@ public class EnvioService {
     public String obtenerIncidencia(Long envioId) {
         Envio envio = buscarPorId(envioId);
         if (envio != null && envio.getEstado() == Envio.EstadoEnvio.INCIDENCIA) {
-            return envio.getIncidenciaDescripcion();
+            // Usar fecha de incidencia, si no existe usar fecha de entrega, si no existe usar fecha de confirmación (asignación)
+            LocalDateTime fechaIncidencia = envio.getFechaIncidencia();
+            if (fechaIncidencia == null) {
+                fechaIncidencia = envio.getFechaEntrega();
+            }
+            if (fechaIncidencia == null) {
+                fechaIncidencia = envio.getFechaConfirmacion();
+            }
+            
+            String fechaStr = fechaIncidencia != null 
+                    ? fechaIncidencia.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                    : "Sin fecha registrada";
+            
+            return "📅 Fecha: " + fechaStr + "\n\n📝 Descripción:\n" + 
+                   (envio.getIncidenciaDescripcion() != null ? envio.getIncidenciaDescripcion() : "Sin descripción registrada.");
         }
         return "Sin incidencias registradas.";
     }
